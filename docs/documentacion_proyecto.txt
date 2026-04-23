@@ -1,0 +1,5 @@
+fases
+diagrama MVC
+modelo de datos
+rutas
+capturas

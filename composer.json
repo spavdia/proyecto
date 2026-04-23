@@ -1,0 +1,16 @@
+{
+    "name": "sergio/ex42526",
+    "autoload": {
+        "psr-4": {
+            "Sergio\\App\\": "app/",
+            "Sergio\\Lib\\": "lib/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sergio Pavon",
+            "email": "s.pavon.diaz@iescristobaldemonroy.es"
+        }
+    ],
+    "require": {}
+}
