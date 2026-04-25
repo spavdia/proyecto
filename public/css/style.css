@@ -1,10 +1,11 @@
-
+/* RESETEO */
 *,
 *::before,
 *::after {
     box-sizing: border-box;
 }
 
+/* BASE */
 html {
     font-size: 16px;
 }
@@ -19,8 +20,20 @@ body.cuerpo-pagina {
 img {
     max-width: 100%;
     height: auto;
+    display: block;
 }
 
+a {
+    color: inherit;
+}
+
+/* CONTENEDOR */
+.contenedor {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+/* MARCA */
 .marca {
     display: inline-flex;
     align-items: center;
@@ -29,23 +42,18 @@ img {
     color: #111827;
 }
 
-.marca-logo {
+.marca img {
     width: 52px;
     height: auto;
-    display: block;
 }
 
-.marca-texto {
+.marca span {
     font-size: 2.2rem;
     font-weight: 700;
     letter-spacing: -0.03em;
 }
 
-.contenedor {
-    width: min(1180px, calc(100% - 32px));
-    margin: 0 auto;
-}
-
+/* BOTONES */
 .boton {
     display: inline-flex;
     align-items: center;
@@ -92,4 +100,27 @@ img {
 button[aria-disabled="true"] {
     opacity: 0.75;
     cursor: not-allowed;
+}
+
+/* ENLACES */
+.enlace-simple {
+    color: #4f46e5;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.enlace-simple:hover {
+    text-decoration: underline;
+}
+
+.enlace-simple:focus-visible {
+    outline: 3px solid rgba(79, 70, 229, 0.22);
+    outline-offset: 3px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .marca span {
+        font-size: 1.8rem;
+    }
 }

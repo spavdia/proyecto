@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 $tituloPagina = 'PipelineDesk | Inicio';
@@ -27,14 +26,14 @@ $diapositivas = $diapositivas ?? [
 ];
 ?>
 
-<header class="encabezado-principal">
-    <div class="contenedor encabezado-contenido">
+<header class="cabecera-inicio">
+    <div class="contenedor fila-cabecera">
         <a href="<?= BASE_URL ?>" class="marca" aria-label="Ir al inicio de PipelineDesk">
-            <img src="<?= BASE_URL . 'img/logo-crm.png' ?>" alt="Logo de PipelineDesk" class="marca-logo">
-            <span class="marca-texto">PipelineDesk</span>
+            <img src="<?= BASE_URL . 'img/logo-crm.png' ?>" alt="Logo de PipelineDesk">
+            <span>PipelineDesk</span>
         </a>
 
-        <nav class="navegacion-principal" aria-label="Navegación principal">
+        <nav class="acciones" aria-label="Navegación principal">
             <a href="<?= BASE_URL . 'login' ?>" class="boton boton-secundario">Iniciar sesión</a>
             <button type="button" class="boton boton-primario" aria-disabled="true" title="Disponible en fases futuras">
                 Formulario lead
@@ -43,46 +42,47 @@ $diapositivas = $diapositivas ?? [
     </div>
 </header>
 
-<section class="barra-eslogan" aria-label="Mensaje destacado">
+<section class="eslogan">
     <div class="contenedor">
-        <p class="texto-eslogan">
+        <p>
             PipelineDesk: organiza tu embudo de ventas, mejora el seguimiento comercial y presenta tu proyecto con claridad.
         </p>
     </div>
 </section>
 
-<main class="contenido-inicio">
-    <section class="seccion-presentacion contenedor">
-        <div class="cabecera-presentacion">
-            <p class="etiqueta-marca">PipelineDesk CRM</p>
-            <h1 class="titulo-principal">Hecho para gestionar tus clientes</h1>
-            <p class="texto-principal">
-                Una plataforma centrada en leads, seguimiento comercial, evolución del embudo y visualización de etapas de tu negocio.
-            </p>
-        </div>
-        <!-- Visor de diapositivas -->
+<main class="inicio">
+    <section class="contenedor hero">
+        <p class="etiqueta">PipelineDesk CRM Pipeline</p>
+        <h1>Hecho para gestionar tu pipeline, diseñado para presentar tu proyecto</h1>
+        <p class="intro">
+            Una plataforma centrada en leads, seguimiento comercial, evolución del embudo y visualización clara del trabajo.
+        </p>
+
         <section
-            id="visorPresentacion" class="visor-diapositivas" aria-label="Presentación visual del proyecto"
-            data-diapositivas='<?= htmlspecialchars(json_encode($diapositivas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>'>
-            <div class="diapositiva-activa" id="diapositivaActiva" tabindex="0" aria-live="polite">
+            id="visorPresentacion"
+            class="visor"
+            aria-label="Presentación visual del proyecto"
+            data-diapositivas='<?= htmlspecialchars(json_encode($diapositivas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>'
+        >
+            <div class="diapositiva" id="diapositivaActiva" tabindex="0" aria-live="polite">
                 <img
                     src="<?= htmlspecialchars($diapositivas[0]['imagen']) ?>"
                     alt="<?= htmlspecialchars($diapositivas[0]['titulo']) ?>"
                     id="imagenDiapositiva"
-                    class="imagen-diapositiva">
+                >
 
-                <div class="contenido-diapositiva">
+                <div class="texto-diapositiva">
                     <h2 id="tituloDiapositiva"><?= htmlspecialchars($diapositivas[0]['titulo']) ?></h2>
                     <p id="textoDiapositiva"><?= htmlspecialchars($diapositivas[0]['texto']) ?></p>
                 </div>
             </div>
 
-            <div class="controles-diapositivas">
+            <div class="controles">
                 <button type="button" class="boton-control" id="botonAnterior" aria-label="Ver diapositiva anterior">
                     Anterior
                 </button>
 
-                <p class="indicador-diapositiva">
+                <p class="contador">
                     <span id="contadorDiapositiva">1</span> / <span id="totalDiapositivas"><?= count($diapositivas) ?></span>
                 </p>
 
@@ -91,15 +91,11 @@ $diapositivas = $diapositivas ?? [
                 </button>
             </div>
 
-            <p class="ayuda-diapositivas">
-                Consejo: haz clic sobre la diapositiva para avanzar, o usa los botones.
+            <p class="ayuda">
+                Haz clic sobre la diapositiva o usa los botones para avanzar durante la presentación.
             </p>
         </section>
     </section>
 </main>
-
-<script>
-    window.diapositivasPipelineDesk = <?= json_encode($diapositivas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-</script>
 
 <?php require_once APP_ROOT . '/app/views/layouts/footer.php'; ?>

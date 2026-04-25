@@ -1,83 +1,63 @@
-.encabezado-principal {
+/* CABECERA */
+.cabecera-inicio {
     background-color: #f7f7f9;
     border-bottom: 1px solid #dddddd;
 }
 
-.encabezado-contenido {
+.cabecera-inicio .fila-cabecera {
+    min-height: 84px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    min-height: 84px;
 }
 
-.marca {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: #111827;
-}
-
-.marca-logo {
-    width: 52px;
-    height: auto;
-    display: block;
-}
-
-.marca-texto {
-    font-size: 2.2rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-}
-
-.navegacion-principal {
+/* ACCIONES */
+.acciones {
     display: flex;
     align-items: center;
     gap: 14px;
     flex-wrap: wrap;
 }
 
-.barra-eslogan {
+/* ESLOGAN */
+.eslogan {
     background-color: #000000;
     color: #ffffff;
     padding: 14px 0;
 }
 
-.texto-eslogan {
+.eslogan p {
+    margin: 0;
     text-align: center;
     font-size: 1rem;
-    margin: 0;
     font-weight: 500;
 }
 
-.contenido-inicio {
+/* BLOQUE PRINCIPAL */
+.inicio {
     padding: 32px 0 48px;
     background: #f4f5fb;
     min-height: calc(100vh - 130px);
 }
 
-.seccion-presentacion {
+.hero {
     background-color: #e9ebf5;
     border-radius: 28px;
     padding: 48px 24px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-}
-
-.cabecera-presentacion {
-    max-width: 980px;
-    margin: 0 auto 32px;
     text-align: center;
 }
 
-.etiqueta-marca {
+/* TEXTO PRINCIPAL */
+.etiqueta {
     font-size: 0.95rem;
     font-weight: 700;
     color: #374151;
-    margin-bottom: 16px;
+    margin: 0 0 16px;
 }
 
-.titulo-principal {
+.hero h1 {
     font-size: clamp(2rem, 5vw, 4.6rem);
     line-height: 1.1;
     margin: 0 0 20px;
@@ -86,20 +66,22 @@
     letter-spacing: -0.04em;
 }
 
-.texto-principal {
+.intro {
     font-size: 1.2rem;
     line-height: 1.7;
     color: #374151;
     max-width: 860px;
-    margin: 0 auto;
+    margin: 0 auto 32px;
 }
 
-.visor-diapositivas {
+/* VISOR */
+.visor {
     max-width: 960px;
     margin: 0 auto;
 }
 
-.diapositiva-activa {
+/* DIAPOSITIVA */
+.diapositiva {
     background: #ffffff;
     border-radius: 22px;
     overflow: hidden;
@@ -108,36 +90,38 @@
     outline: none;
 }
 
-.diapositiva-activa:focus-visible {
+.diapositiva:focus-visible {
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
 }
 
-.imagen-diapositiva {
-    display: block;
+.diapositiva img {
     width: 100%;
     height: min(420px, 48vw);
     object-fit: cover;
     background: #dbe1f3;
 }
 
-.contenido-diapositiva {
+/* TEXTO DIAPOSITIVA */
+.texto-diapositiva {
     padding: 24px;
+    text-align: left;
 }
 
-.contenido-diapositiva h2 {
+.texto-diapositiva h2 {
     margin: 0 0 12px;
     font-size: 1.8rem;
     color: #111827;
 }
 
-.contenido-diapositiva p {
+.texto-diapositiva p {
     margin: 0;
     font-size: 1.05rem;
     line-height: 1.7;
     color: #374151;
 }
 
-.controles-diapositivas {
+/* CONTROLES */
+.controles {
     margin-top: 18px;
     display: flex;
     justify-content: center;
@@ -166,44 +150,42 @@
     outline-offset: 2px;
 }
 
-.indicador-diapositiva {
+.contador {
+    margin: 0;
     font-weight: 700;
     color: #1f2937;
-    margin: 0;
 }
 
-.ayuda-diapositivas {
+/* AYUDA */
+.ayuda {
     margin-top: 12px;
     text-align: center;
     color: #4b5563;
     font-size: 0.95rem;
 }
 
+/* RESPONSIVE */
 @media (max-width: 768px) {
-    .encabezado-contenido {
+    .cabecera-inicio .fila-cabecera {
         flex-direction: column;
         justify-content: center;
         padding: 14px 0;
     }
 
-    .marca-texto {
-        font-size: 1.8rem;
-    }
-
-    .navegacion-principal {
+    .acciones {
         justify-content: center;
     }
 
-    .seccion-presentacion {
+    .hero {
         padding: 28px 18px;
         border-radius: 18px;
     }
 
-    .contenido-diapositiva h2 {
+    .texto-diapositiva h2 {
         font-size: 1.4rem;
     }
 
-    .contenido-diapositiva p {
+    .texto-diapositiva p {
         font-size: 1rem;
     }
 }

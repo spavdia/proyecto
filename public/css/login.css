@@ -1,15 +1,17 @@
-.encabezado-login {
+/* CABECERA */
+.cabecera-login {
     background-color: #f7f7f9;
     border-bottom: 1px solid #dddddd;
 }
 
-.encabezado-login-contenido {
+.cabecera-login .contenedor {
     min-height: 84px;
     display: flex;
     align-items: center;
 }
 
-.zona-login {
+/* ZONA LOGIN */
+.login {
     min-height: calc(100vh - 85px);
     display: flex;
     align-items: center;
@@ -17,6 +19,7 @@
     background: linear-gradient(180deg, #f4f5fb 0%, #edf1ff 100%);
 }
 
+/* TARJETA */
 .tarjeta-login {
     width: 100%;
     max-width: 560px;
@@ -28,12 +31,13 @@
     border: 1px solid #ebedf3;
 }
 
-.cabecera-login {
+/* CABECERA FORMULARIO */
+.cabecera-formulario {
     text-align: center;
     margin-bottom: 24px;
 }
 
-.titulo-login {
+.cabecera-formulario h1 {
     font-size: clamp(2rem, 5vw, 3rem);
     line-height: 1.15;
     margin: 0 0 14px;
@@ -41,13 +45,14 @@
     color: #1f2937;
 }
 
-.texto-login {
+.cabecera-formulario p {
     margin: 0;
     color: #4b5563;
     font-size: 1.05rem;
     line-height: 1.6;
 }
 
+/* MENSAJES */
 .mensaje-flash {
     margin-bottom: 20px;
     border-radius: 14px;
@@ -77,6 +82,11 @@
     border: 1px solid #bfdbfe;
 }
 
+.icono-flash {
+    flex-shrink: 0;
+}
+
+/* FORMULARIO */
 .formulario-login {
     display: flex;
     flex-direction: column;
@@ -89,12 +99,12 @@
     gap: 8px;
 }
 
-.etiqueta-campo {
+.grupo-campo label {
     font-weight: 600;
     color: #111827;
 }
 
-.campo-texto {
+.grupo-campo input {
     min-height: 52px;
     border: 1px solid #d1d5db;
     border-radius: 12px;
@@ -104,16 +114,17 @@
     background-color: #ffffff;
 }
 
-.campo-texto::placeholder {
+.grupo-campo input::placeholder {
     color: #9ca3af;
 }
 
-.campo-texto:focus {
+.grupo-campo input:focus {
     outline: none;
     border-color: #5f5cf1;
     box-shadow: 0 0 0 4px rgba(95, 92, 241, 0.16);
 }
 
+/* BOTON LOGIN */
 .boton-login {
     width: 100%;
     justify-content: center;
@@ -122,47 +133,33 @@
     margin-top: 6px;
 }
 
+/* PIE */
 .pie-login {
     margin-top: 22px;
     text-align: center;
 }
 
-.texto-secundario-login {
+.pie-login p {
     color: #6b7280;
     line-height: 1.6;
+}
+
+.pie-login p:first-child {
     margin-bottom: 12px;
 }
 
-.volver-inicio {
-    margin: 0;
-}
-
-.enlace-secundario {
-    color: #4f46e5;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.enlace-secundario:hover {
-    text-decoration: underline;
-}
-
-.enlace-secundario:focus-visible {
-    outline: 3px solid rgba(79, 70, 229, 0.22);
-    outline-offset: 3px;
-}
-
+/* RESPONSIVE */
 @media (max-width: 640px) {
     .tarjeta-login {
         padding: 26px 18px;
         border-radius: 18px;
     }
 
-    .titulo-login {
+    .cabecera-formulario h1 {
         font-size: 2rem;
     }
 
-    .texto-login {
+    .cabecera-formulario p {
         font-size: 1rem;
     }
 }

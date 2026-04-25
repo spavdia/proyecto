@@ -6,24 +6,23 @@ $archivoCssVista = 'login.css';
 $archivoJsVista = null;
 
 require_once APP_ROOT . '/app/views/layouts/header.php';
-
 ?>
 
-<header class="encabezado-login">
-    <div class="contenedor encabezado-login-contenido">
+<header class="cabecera-login">
+    <div class="contenedor">
         <a href="<?= BASE_URL ?>" class="marca" aria-label="Ir al inicio de PipelineDesk">
-            <img src="<?= BASE_URL . 'img/logo-crm.png' ?>" alt="Logo de PipelineDesk" class="marca-logo">
-            <span class="marca-texto">PipelineDesk</span>
+            <img src="<?= BASE_URL . 'img/logo-crm.png' ?>" alt="Logo de PipelineDesk">
+            <span>PipelineDesk</span>
         </a>
     </div>
 </header>
 
-<main class="zona-login">
+<main class="login">
     <section class="contenedor">
         <div class="tarjeta-login" aria-labelledby="tituloLogin">
-            <div class="cabecera-login">
-                <h1 id="tituloLogin" class="titulo-login">Inicia sesión</h1>
-                <p class="texto-login">
+            <div class="cabecera-formulario">
+                <h1 id="tituloLogin">Inicia sesión</h1>
+                <p>
                     Introduce tus credenciales para acceder a PipelineDesk.
                 </p>
             </div>
@@ -31,7 +30,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
             <?php if (!empty($mensajeFlash)): ?>
                 <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash ?? 'error') ?>" role="alert" aria-live="assertive">
                     <?php if (!empty($iconoFlash)): ?>
-                        <span class="mensaje-icono" aria-hidden="true"><?= htmlspecialchars($iconoFlash) ?></span>
+                        <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars($iconoFlash) ?></span>
                     <?php endif; ?>
                     <span><?= htmlspecialchars($mensajeFlash) ?></span>
                 </div>
@@ -39,12 +38,11 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
 
             <form class="formulario-login" action="<?= BASE_URL . 'login' ?>" method="POST" novalidate>
                 <div class="grupo-campo">
-                    <label for="email" class="etiqueta-campo">Correo electrónico de tu empresa</label>
+                    <label for="email">Correo electrónico</label>
                     <input
                         type="email"
                         id="email"
                         name="email"
-                        class="campo-texto"
                         placeholder="ejemplo@empresa.com"
                         value="<?= htmlspecialchars($emailAnterior ?? '') ?>"
                         required
@@ -53,12 +51,11 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
                 </div>
 
                 <div class="grupo-campo">
-                    <label for="password" class="etiqueta-campo">Contraseña</label>
+                    <label for="password">Contraseña</label>
                     <input
                         type="password"
                         id="password"
                         name="password"
-                        class="campo-texto"
                         placeholder="Introduce tu contraseña"
                         required
                         autocomplete="current-password"
@@ -71,11 +68,11 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
             </form>
 
             <div class="pie-login">
-                <p class="texto-secundario-login">
-                    Acceso interno al CRM Pipeline. Si tienes problemas de acceso, revisa tu usuario o consulta con el administrador.
+                <p>
+                    Si tienes problemas de acceso, consulta con el administrador.
                 </p>
-                <p class="volver-inicio">
-                    <a href="<?= BASE_URL ?>" class="enlace-secundario">Volver al inicio</a>
+                <p>
+                    <a href="<?= BASE_URL ?>" class="enlace-simple">Volver al inicio</a>
                 </p>
             </div>
         </div>
