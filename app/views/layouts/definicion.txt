@@ -1,0 +1,11 @@
+Cada vista define:
+
+$tituloPagina
+$archivoCssVista
+opcionalmente $archivoJsVista
+
+Y después carga:
+
+layouts/header.php
+el contenido de la vista
+layouts/footer.php

@@ -1,43 +1,85 @@
 <?php
-
 declare(strict_types=1);
+
+$tituloPagina = 'PipelineDesk | Iniciar sesión';
+$archivoCssVista = 'login.css';
+$archivoJsVista = null;
+
+require_once APP_ROOT . '/app/views/layouts/header.php';
+
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($titulo ?? 'Login') ?></title>
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/login.css">
-    <script defer src="<?= BASE_URL ?>js/app.js"></script>
-</head>
-<body>
-    <main>
-        <h1><?= htmlspecialchars($titulo ?? 'Login') ?></h1>
 
-        <?php if (!empty($flash)): ?>
-            <div class="flash-message <?= htmlspecialchars($flash['clase'] ?? 'error') ?>">
-                <?php if (!empty($flash['icono'])): ?>
-                    <span class="flash-icono"><?= htmlspecialchars($flash['icono']) ?></span>
-                <?php endif; ?>
-                <span><?= htmlspecialchars($flash['mensaje'] ?? '') ?></span>
-            </div>
-        <?php endif; ?>
+<header class="encabezado-login">
+    <div class="contenedor encabezado-login-contenido">
+        <a href="<?= BASE_URL ?>" class="marca" aria-label="Ir al inicio de PipelineDesk">
+            <img src="<?= BASE_URL . 'img/logo-crm.png' ?>" alt="Logo de PipelineDesk" class="marca-logo">
+            <span class="marca-texto">PipelineDesk</span>
+        </a>
+    </div>
+</header>
 
-        <form action="<?= BASE_URL ?>login" method="POST">
-            <div>
-                <label for="email">Correo electrónico</label>
-                <input type="email" id="email" name="email" required autocomplete="email">
+<main class="zona-login">
+    <section class="contenedor">
+        <div class="tarjeta-login" aria-labelledby="tituloLogin">
+            <div class="cabecera-login">
+                <h1 id="tituloLogin" class="titulo-login">Inicia sesión</h1>
+                <p class="texto-login">
+                    Introduce tus credenciales para acceder a PipelineDesk.
+                </p>
             </div>
 
-            <div>
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password">
-            </div>
+            <?php if (!empty($mensajeFlash)): ?>
+                <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash ?? 'error') ?>" role="alert" aria-live="assertive">
+                    <?php if (!empty($iconoFlash)): ?>
+                        <span class="mensaje-icono" aria-hidden="true"><?= htmlspecialchars($iconoFlash) ?></span>
+                    <?php endif; ?>
+                    <span><?= htmlspecialchars($mensajeFlash) ?></span>
+                </div>
+            <?php endif; ?>
 
-            <button type="submit">Entrar</button>
-        </form>
-    </main>
-</body>
-</html>
+            <form class="formulario-login" action="<?= BASE_URL . 'login' ?>" method="POST" novalidate>
+                <div class="grupo-campo">
+                    <label for="email" class="etiqueta-campo">Correo electrónico de tu empresa</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="campo-texto"
+                        placeholder="ejemplo@empresa.com"
+                        value="<?= htmlspecialchars($emailAnterior ?? '') ?>"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="password" class="etiqueta-campo">Contraseña</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="campo-texto"
+                        placeholder="Introduce tu contraseña"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <button type="submit" class="boton boton-primario boton-login">
+                    Iniciar sesión
+                </button>
+            </form>
+
+            <div class="pie-login">
+                <p class="texto-secundario-login">
+                    Acceso interno al CRM Pipeline. Si tienes problemas de acceso, revisa tu usuario o consulta con el administrador.
+                </p>
+                <p class="volver-inicio">
+                    <a href="<?= BASE_URL ?>" class="enlace-secundario">Volver al inicio</a>
+                </p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<?php require_once APP_ROOT . '/app/views/layouts/footer.php'; ?>

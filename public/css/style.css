@@ -1,23 +1,95 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f9;
-    color: #222;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body.cuerpo-pagina {
     margin: 0;
-    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111827;
+    background-color: #ffffff;
 }
 
-main, body {
-    padding: 20px;
+img {
+    max-width: 100%;
+    height: auto;
 }
 
-h1 {
-    color: #1f3b63;
+.marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #111827;
 }
 
-ul {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    list-style-position: inside;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.marca-logo {
+    width: 52px;
+    height: auto;
+    display: block;
+}
+
+.marca-texto {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.contenedor {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.boton:hover {
+    transform: translateY(-1px);
+}
+
+.boton:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.24);
+    outline-offset: 2px;
+}
+
+.boton-primario {
+    background-color: #5f5cf1;
+    color: #ffffff;
+}
+
+.boton-primario:hover {
+    background-color: #4f46e5;
+}
+
+.boton-secundario {
+    background-color: #ffffff;
+    color: #4f46e5;
+    border-color: #5f5cf1;
+}
+
+.boton-secundario:hover {
+    background-color: #eef2ff;
+}
+
+button[aria-disabled="true"] {
+    opacity: 0.75;
+    cursor: not-allowed;
 }

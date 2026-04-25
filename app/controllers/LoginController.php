@@ -11,14 +11,18 @@ class LoginController extends Controller
 {
     public static function mostrarLoginForm(): void
     {
-        SessionManager::usuarioAutenticado('usuario','panel');
         SessionManager::iniciarSesion();
+        SessionManager::usuarioAutenticado('usuario','panel');
 
         $flash = SessionManager::getMensajeFlash();
+        $emailAnterior = SessionManager::get('email_anterior');
 
         self::view('home/login_view', [
-            'titulo' => 'Iniciar sesión',
-            'flash' => $flash,
+            'tituloPagina'  => 'PipelineDesk | Iniciar sesión',
+            'mensajeFlash'  => $flash['mensaje'] ?? null,
+            'iconoFlash'    => $flash['icono'] ?? null,
+            'claseFlash'    => $flash['clase'] ?? 'error',
+            'emailAnterior' => $emailAnterior ?? ''
         ]);
     }
 
@@ -30,11 +34,12 @@ class LoginController extends Controller
         $pass = trim($_POST['password'] ?? '');
 
         if ($email === '' || $pass === '') {
-            SessionManager::setMensajeFlash(
-                'Debes rellenar correo y contraseña.',
-                'warning',
+             SessionManager::setMensajeFlash(
+                'Debes rellenar el correo y la contraseña.',
+                '⚠',
                 'error'
             );
+            SessionManager::set('email_anterior', $email);
             header('Location: ' . BASE_URL . 'login');
             exit();
         }
@@ -44,10 +49,11 @@ class LoginController extends Controller
 
         if (!$usuario) {
             SessionManager::setMensajeFlash(
-                'Usuario no existe en base de datos o correo incorrecto.',
-                'error',
+                'Credenciales incorrectas.',
+                '⚠',
                 'error'
             );
+            SessionManager::set('email_anterior', $email);
             header('Location: ' . BASE_URL . 'login');
             exit();
         }
@@ -55,9 +61,10 @@ class LoginController extends Controller
         if ((int) $usuario['activo'] !== 1) {
             SessionManager::setMensajeFlash(
                 'Tu usuario está inactivo.',
-                'warning',
+                '⛔',
                 'error'
             );
+            SessionManager::set('email_anterior', $email);
             header('Location: ' . BASE_URL . 'login');
             exit();
         }
@@ -65,9 +72,11 @@ class LoginController extends Controller
         if (!password_verify($pass, $usuario['password_hash'])) {
             SessionManager::setMensajeFlash(
                 'Credenciales incorrectas.',
-                'error',
+                '⚠',
                 'error'
             );
+
+            SessionManager::set('email_anterior', $email);
             header('Location: ' . BASE_URL . 'login');
             exit();
         }
@@ -76,9 +85,9 @@ class LoginController extends Controller
         unset($usuario['password_hash']);
         SessionManager::set('usuario', $usuario);
         SessionManager::setMensajeFlash(
-            'Bienvenido, ' . $usuario['nombre'] . '.',
-            'success',
-            'success'
+            'Bienvenido a PipelineDesk, ' . $usuario['nombre'] . '.',
+            '✅',
+            'exito'
         );
 
         header('Location: ' . BASE_URL . 'panel');
@@ -91,8 +100,8 @@ class LoginController extends Controller
         SessionManager::iniciarSesion();
         SessionManager::setMensajeFlash(
             'Has cerrado sesión correctamente.',
-            'info',
-            'success'
+            'ℹ',
+            'info'
         );
 
         header('Location: ' . BASE_URL . 'login');

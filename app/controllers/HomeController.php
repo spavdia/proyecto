@@ -14,23 +14,27 @@ class HomeController extends Controller
         $flash = SessionManager::getMensajeFlash();
 
         self::view('home/index_view', [
-            'titulo' => 'CRM Pipeline',
-            'mensaje' => 'Fase 0 funcionando',
-            'flash' => $flash,
+            'tituloPagina' => 'PipelineDesk | Inicio',
+            'mensajeFlash' => $flash['mensaje'] ?? null,
+            'iconoFlash'   => $flash['icono'] ?? null,
+            'claseFlash'   => $flash['clase'] ?? 'info'
         ]);
     }
 
     public static function panel(): void
     {
+        SessionManager::iniciarSesion();
         SessionManager::usuarioNoAutenticado('usuario', '/login');
 
         $usuario = SessionManager::get('usuario');
         $flash = SessionManager::getMensajeFlash();
 
         self::view('home/panel_view', [
-            'titulo' => 'Panel privado',
-            'usuario' => $usuario,
-            'flash' => $flash,
+            'tituloPagina' => 'PipelineDesk | Panel',
+            'usuario'      => $usuario,
+            'mensajeFlash' => $flash['mensaje'] ?? null,
+            'iconoFlash'   => $flash['icono'] ?? null,
+            'claseFlash'   => $flash['clase'] ?? 'info'
         ]);
     }
 }
