@@ -1,0 +1,5 @@
+DROP DATABASE IF EXISTS pipeline_crm;
+
+CREATE DATABASE IF NOT EXISTS pipeline_crm
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;

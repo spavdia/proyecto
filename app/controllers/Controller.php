@@ -2,7 +2,7 @@
 
 namespace Sergio\App\controllers;
 
-class Controller
+abstract class Controller
 {
 
     // Método común para cargar vistas

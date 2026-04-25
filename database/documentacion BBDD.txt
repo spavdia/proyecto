@@ -1,0 +1,36 @@
+1) desde terminal:
+
+
+contraseña 1234
+php -r "echo password_hash('1234*', PASSWORD_DEFAULT), PHP_EOL;"     
+$2y$10$Fw9y0ZXg2N2D6NoidCjFteUYm9P0Sc6BnPrWhDRbsB7/eRzua/GDK
+
+2) en sql añado usuarios con su hash:
+
+INSERT INTO usuarios (nombre, email, password_hash, rol, activo)
+VALUES (
+    'Administrador',
+    'admin@crm.com',
+    '$2y$10$Fw9y0ZXg2N2D6NoidCjFteUYm9P0Sc6BnPrWhDRbsB7/eRzua/GDK',
+    'admin',
+    1
+),
+(
+    'Vendedor',
+    'ventas@crm.com',
+    '$2y$10$Fw9y0ZXg2N2D6NoidCjFteUYm9P0Sc6BnPrWhDRbsB7/eRzua/GDK',
+    'ventas',
+    1
+);
+
+3)  creo super usuario en MYSQL WORKBENCH, por si tengo que entrar sin root
+-- Crear usuario
+CREATE USER 'crm_admin'@'localhost'
+IDENTIFIED BY '';
+
+-- Dar todos los permisos sobre la base de datos
+GRANT ALL PRIVILEGES ON pipeline_crm.* 
+TO 'crm_admin'@'localhost';
+
+-- Aplicar cambios
+FLUSH PRIVILEGES;

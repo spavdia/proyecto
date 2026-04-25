@@ -1,3 +1,0 @@
-usuario admin
-datos de prueba
-leads demo
