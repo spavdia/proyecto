@@ -1,0 +1,248 @@
+/* CABECERA */
+.cabecera-contacto {
+    background-color: var(--color-fondo-cabecera);
+    border-bottom: 1px solid var(--color-borde-suave);
+}
+
+.cabecera-contacto .fila-cabecera {
+    min-height: 84px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.acciones {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* BLOQUE PRINCIPAL */
+.contacto {
+    min-height: calc(100vh - 85px);
+    padding: 36px 0 48px;
+    background: linear-gradient(180deg, #faf7f6 0%, #f4f5fb 100%);
+}
+
+.contacto-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 28px;
+    align-items: stretch;
+}
+
+/* INFORMACION */
+.info {
+    background: #fff8f5;
+    border: 1px solid #f3ddd4;
+    border-radius: 22px;
+    padding: 32px 26px;
+    color: #3f3f46;
+}
+
+.info h1 {
+    margin: 0 0 14px;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.1;
+    color: #7c2d12;
+    font-weight: 700;
+}
+
+.intro {
+    margin: 0 0 22px;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #57534e;
+}
+
+.datos {
+    margin: 0 0 22px;
+    padding-left: 18px;
+    color: #44403c;
+    line-height: 1.8;
+}
+
+.nota {
+    margin: 0;
+    color: #9a3412;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+/* FORMULARIO */
+.formulario-box {
+    background: #ffffff;
+    border: 1px solid var(--color-borde-general);
+    border-radius: 22px;
+    padding: 30px 24px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+}
+
+.formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.campo label {
+    font-weight: 700;
+    color: #3f3f46;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    width: 100%;
+    min-height: 52px;
+    border: 1px solid var(--color-borde-input);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    color: var(--color-texto-principal);
+    background: #fffdfc;
+}
+
+.campo textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+    color: var(--color-texto-suave);
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    outline: none;
+    border-color: #ea580c;
+    box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.14);
+}
+
+/* MENSAJES */
+.mensaje-flash {
+    margin-bottom: 20px;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 0.98rem;
+    line-height: 1.5;
+}
+
+.mensaje-error {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.mensaje-exito {
+    background-color: #fff7ed;
+    color: #9a3412;
+    border: 1px solid #fed7aa;
+}
+
+.mensaje-info {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.icono-flash {
+    flex-shrink: 0;
+}
+
+/* ACCIONES */
+.acciones-formulario {
+    padding-top: 6px;
+}
+
+.boton-enviar {
+    width: 100%;
+    min-height: 54px;
+    border: none;
+    background: #ea580c;
+    color: #ffffff;
+}
+
+.boton-enviar:hover {
+    background: #c2410c;
+}
+
+/* ESCRITORIO REDUCIDO */
+@media (max-width: 1024px) {
+    .contacto-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+    }
+
+    .info,
+    .formulario-box {
+        padding: 26px 20px;
+    }
+}
+
+/* TABLET */
+@media (max-width: 768px) {
+    .cabecera-contacto .fila-cabecera {
+        flex-direction: column;
+        justify-content: center;
+        padding: 14px 0;
+    }
+
+    .acciones {
+        justify-content: center;
+    }
+
+    .contacto-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info,
+    .formulario-box {
+        border-radius: 18px;
+    }
+}
+
+/* MOVIL */
+@media (max-width: 480px) {
+    .contacto {
+        padding: 22px 0 30px;
+    }
+
+    .info,
+    .formulario-box {
+        padding: 20px 14px;
+    }
+
+    .info h1 {
+        font-size: 2rem;
+    }
+
+    .intro,
+    .datos,
+    .nota {
+        font-size: 1rem;
+    }
+
+    .campo input,
+    .campo select,
+    .campo textarea {
+        font-size: 1rem;
+    }
+
+    .boton-enviar {
+        min-height: 56px;
+        font-size: 1rem;
+    }
+}

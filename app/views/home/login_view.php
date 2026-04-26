@@ -26,7 +26,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
                     Introduce tus credenciales para acceder a PipelineDesk.
                 </p>
             </div>
-
+            <!-- Mensaje Flash-->
             <?php if (!empty($mensajeFlash)): ?>
                 <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash ?? 'error') ?>" role="alert" aria-live="assertive">
                     <?php if (!empty($iconoFlash)): ?>
@@ -35,19 +35,29 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
                     <span><?= htmlspecialchars($mensajeFlash) ?></span>
                 </div>
             <?php endif; ?>
+            <!-- Error general-->
+            <?php if (!empty($errores['general'])): ?>
+                <div class="mensaje-flash mensaje-error" role="alert" aria-live="assertive">
+                    <span><?= htmlspecialchars($errores['general']) ?></span>
+                </div>
+            <?php endif; ?>
 
+            <!-- Formulario Login-->
             <form class="formulario-login" action="<?= BASE_URL . 'login' ?>" method="POST" novalidate>
                 <div class="grupo-campo">
-                    <label for="email">Correo electrónico</label>
+                    <label for="email">Correo electrónico de trabajo</label>
                     <input
                         type="email"
                         id="email"
                         name="email"
-                        placeholder="ejemplo@empresa.com"
-                        value="<?= htmlspecialchars($emailAnterior ?? '') ?>"
+                        placeholder="nombre@crm.com"
+                        value="<?= htmlspecialchars($email ?? '') ?>"
                         required
                         autocomplete="email"
                     >
+                    <span class="error-campo">
+                        <?= !empty($errores['email']) ? htmlspecialchars($errores['email']) : '' ?>
+                    </span>
                 </div>
 
                 <div class="grupo-campo">
@@ -60,6 +70,9 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
                         required
                         autocomplete="current-password"
                     >
+                    <span class="error-campo">
+                        <?= !empty($errores['password']) ? htmlspecialchars($errores['password']) : '' ?>
+                    </span>
                 </div>
 
                 <button type="submit" class="boton boton-primario boton-login">

@@ -1,7 +1,7 @@
 /* CABECERA */
 .cabecera-inicio {
-    background-color: #f7f7f9;
-    border-bottom: 1px solid #dddddd;
+    background-color: var(--color-fondo-cabecera);
+    border-bottom: 1px solid var(--color-borde-suave);
 }
 
 .cabecera-inicio .fila-cabecera {
@@ -22,8 +22,8 @@
 
 /* ESLOGAN */
 .eslogan {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--color-fondo-oscuro);
+    color: var(--color-texto-invertido);
     padding: 14px 0;
 }
 
@@ -37,7 +37,7 @@
 /* BLOQUE PRINCIPAL */
 .inicio {
     padding: 32px 0 48px;
-    background: #f4f5fb;
+    background: var(--color-fondo-suave);
     min-height: calc(100vh - 130px);
 }
 
@@ -53,7 +53,7 @@
 .etiqueta {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #374151;
+    color: var(--color-texto-secundario);
     margin: 0 0 16px;
 }
 
@@ -61,7 +61,7 @@
     font-size: clamp(2rem, 5vw, 4.6rem);
     line-height: 1.1;
     margin: 0 0 20px;
-    color: #1f2937;
+    color: var(--color-texto-principal);
     font-weight: 300;
     letter-spacing: -0.04em;
 }
@@ -69,7 +69,7 @@
 .intro {
     font-size: 1.2rem;
     line-height: 1.7;
-    color: #374151;
+    color: var(--color-texto-secundario);
     max-width: 860px;
     margin: 0 auto 32px;
 }
@@ -82,7 +82,7 @@
 
 /* DIAPOSITIVA */
 .diapositiva {
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
     border-radius: 22px;
     overflow: hidden;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
@@ -91,7 +91,7 @@
 }
 
 .diapositiva:focus-visible {
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 0 0 4px var(--color-foco);
 }
 
 .diapositiva img {
@@ -110,14 +110,14 @@
 .texto-diapositiva h2 {
     margin: 0 0 12px;
     font-size: 1.8rem;
-    color: #111827;
+    color: var(--color-texto-principal);
 }
 
 .texto-diapositiva p {
     margin: 0;
     font-size: 1.05rem;
     line-height: 1.7;
-    color: #374151;
+    color: var(--color-texto-secundario);
 }
 
 /* CONTROLES */
@@ -134,33 +134,33 @@
     border: none;
     border-radius: 999px;
     padding: 12px 22px;
-    background: #5f5cf1;
-    color: #ffffff;
+    background: var(--color-marca);
+    color: var(--color-texto-invertido);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
 }
 
 .boton-control:hover {
-    background: #4946dc;
+    background: var(--color-marca-hover);
 }
 
 .boton-control:focus-visible {
-    outline: 3px solid rgba(95, 92, 241, 0.35);
+    outline: 3px solid var(--color-foco);
     outline-offset: 2px;
 }
 
 .contador {
     margin: 0;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-texto-principal);
 }
 
 /* AYUDA */
 .ayuda {
     margin-top: 12px;
     text-align: center;
-    color: #4b5563;
+    color: var(--color-texto-suave);
     font-size: 0.95rem;
 }
 

@@ -1,0 +1,445 @@
+/* ESTRUCTURA GENERAL */
+.panel {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+    background: var(--color-fondo-suave);
+    position: relative;
+}
+
+.contenido {
+    padding: 28px 24px 40px;
+}
+
+/* ASIDE */
+.aside {
+    background: var(--color-fondo-superficie);
+    border-right: 1px solid var(--color-borde-general);
+    padding: 24px 18px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    z-index: 40;
+}
+
+.aside-top {
+    margin-bottom: 28px;
+}
+
+/* MENU */
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-titulo {
+    margin: 18px 0 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-texto-suave);
+}
+
+.menu-enlace {
+    display: block;
+    padding: 12px 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--color-texto-principal);
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.menu-enlace:hover {
+    background: var(--color-fondo-suave);
+    color: var(--color-marca-hover);
+}
+
+.menu-enlace.activo {
+    background: var(--color-marca);
+    color: var(--color-texto-invertido);
+}
+
+/* FONDO MENU */
+.fondo-menu {
+    display: none;
+}
+
+/* CABECERA PANEL */
+.cabecera-panel {
+    background: var(--color-fondo-superficie);
+    border-radius: 22px;
+    padding: 28px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.cabecera-etiqueta {
+    margin: 0 0 10px;
+    color: var(--color-marca);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.cabecera-panel h1 {
+    margin: 0 0 12px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.15;
+    color: var(--color-texto-principal);
+    font-weight: 300;
+}
+
+.cabecera-texto {
+    margin: 0;
+    max-width: 760px;
+    color: var(--color-texto-secundario);
+    line-height: 1.7;
+    font-size: 1.02rem;
+}
+
+.cabecera-acciones {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* BOTON MENU */
+.boton-menu {
+    display: none;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-borde-general);
+    border-radius: 12px;
+    background: var(--color-fondo-superficie);
+    cursor: pointer;
+    padding: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.boton-menu span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-texto-principal);
+    border-radius: 999px;
+}
+
+.boton-menu:focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 2px;
+}
+
+/* USUARIO */
+.usuario {
+    min-width: 180px;
+    background: #f8f9ff;
+    border: 1px solid var(--color-borde-general);
+    border-radius: 16px;
+    padding: 14px 16px;
+    text-align: right;
+}
+
+.usuario-nombre {
+    display: block;
+    font-weight: 700;
+    color: var(--color-texto-principal);
+}
+
+.usuario-rol {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-marca);
+    font-size: 0.92rem;
+    text-transform: capitalize;
+}
+
+/* MENSAJES */
+.mensaje-flash {
+    margin-bottom: 20px;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 0.98rem;
+    line-height: 1.5;
+}
+
+.mensaje-error {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.mensaje-exito {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.mensaje-info {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.icono-flash {
+    flex-shrink: 0;
+}
+
+/* BLOQUES */
+.bloque {
+    background: var(--color-fondo-superficie);
+    border-radius: 22px;
+    padding: 22px 20px;
+    margin-bottom: 22px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+}
+
+.bloque-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.bloque-top h2 {
+    margin: 0;
+    color: var(--color-texto-principal);
+    font-size: 1.5rem;
+}
+
+/* ESTADOS */
+.estado {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.estado-nuevo {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.estado-contactado {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.estado-progreso {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.estado-objeciones {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.estado-ganado {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.estado-perdido {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* TABLAS */
+.tabla-wrap {
+    overflow-x: auto;
+}
+
+.tabla-panel {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.tabla-panel th,
+.tabla-panel td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--color-borde-general);
+    text-align: left;
+    vertical-align: top;
+}
+
+.tabla-panel th {
+    background: #f8f9ff;
+    color: var(--color-texto-secundario);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.tabla-panel td {
+    color: var(--color-texto-principal);
+    background: var(--color-fondo-superficie);
+}
+
+.tabla-panel tbody tr:hover td {
+    background: #f8faff;
+}
+
+.tabla-vacia {
+    text-align: center;
+    color: var(--color-texto-suave);
+    font-style: italic;
+}
+
+/* ESCRITORIO REDUCIDO */
+@media (max-width: 1024px) {
+    .contenido {
+        padding: 22px 18px 32px;
+    }
+
+    .cabecera-panel {
+        padding: 24px 20px;
+    }
+
+    .bloque {
+        padding: 20px 16px;
+    }
+
+    .tabla-panel {
+        min-width: 680px;
+    }
+
+    .tabla-panel th,
+    .tabla-panel td {
+        padding: 12px 10px;
+        font-size: 0.95rem;
+    }
+}
+
+/* TABLET */
+@media (max-width: 768px) {
+    .panel {
+        grid-template-columns: 1fr;
+    }
+
+    .boton-menu {
+        display: inline-flex;
+    }
+
+    .aside {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        max-width: 86vw;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    .panel.menu-abierto .aside {
+        transform: translateX(0);
+    }
+
+    .fondo-menu {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        z-index: 30;
+        display: block;
+    }
+
+    .panel.menu-abierto .fondo-menu {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .contenido {
+        padding: 18px 14px 28px;
+    }
+
+    .cabecera-panel {
+        padding: 22px 18px;
+        border-radius: 18px;
+    }
+
+    .bloque {
+        padding: 18px 14px;
+        border-radius: 18px;
+    }
+
+    .usuario {
+        min-width: auto;
+        text-align: left;
+    }
+
+    .tabla-panel {
+        min-width: 620px;
+    }
+}
+
+/* MOVIL */
+@media (max-width: 480px) {
+    .contenido {
+        padding: 14px 10px 22px;
+    }
+
+    .cabecera-panel {
+        padding: 18px 14px;
+        gap: 14px;
+    }
+
+    .cabecera-panel h1 {
+        font-size: 2rem;
+    }
+
+    .cabecera-texto {
+        font-size: 1rem;
+    }
+
+    .bloque {
+        padding: 16px 12px;
+    }
+
+    .bloque-top h2 {
+        font-size: 1.25rem;
+    }
+
+    .estado {
+        min-height: 36px;
+        font-size: 0.88rem;
+        padding: 7px 12px;
+    }
+
+    .boton-menu {
+        width: 52px;
+        height: 52px;
+    }
+
+    .tabla-panel {
+        min-width: 560px;
+    }
+
+    .tabla-panel th,
+    .tabla-panel td {
+        padding: 11px 9px;
+        font-size: 0.92rem;
+    }
+}

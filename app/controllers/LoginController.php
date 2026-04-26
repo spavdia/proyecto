@@ -12,7 +12,7 @@ class LoginController extends Controller
     public static function mostrarLoginForm(): void
     {
         SessionManager::iniciarSesion();
-        SessionManager::usuarioAutenticado('usuario','panel');
+        SessionManager::usuarioAutenticado('usuario', 'panel');
 
         $flash = SessionManager::getMensajeFlash();
         $emailAnterior = SessionManager::get('email_anterior');
@@ -22,7 +22,8 @@ class LoginController extends Controller
             'mensajeFlash'  => $flash['mensaje'] ?? null,
             'iconoFlash'    => $flash['icono'] ?? null,
             'claseFlash'    => $flash['clase'] ?? 'error',
-            'emailAnterior' => $emailAnterior ?? ''
+            'errores'      => [],
+            'email'        => ''
         ]);
     }
 
@@ -30,22 +31,31 @@ class LoginController extends Controller
     {
         SessionManager::iniciarSesion();
 
+        $errores = [];
         $email = trim($_POST['email'] ?? '');
-        $pass = trim($_POST['password'] ?? '');
+        $pass  = trim($_POST['password'] ?? '');
 
-        if ($email === '' || $pass === '') {
-             SessionManager::setMensajeFlash(
-                'Debes rellenar el correo y la contraseña.',
-                '⚠',
-                'error'
-            );
-            SessionManager::set('email_anterior', $email);
-            header('Location: ' . BASE_URL . 'login');
-            exit();
+        if ($email === '') {
+            $errores['email'] = 'Error. Debes rellenar email.';
         }
 
-        $loginModel = new LoginModel();
-        $usuario = $loginModel->findByEmail($email);
+        if ($pass === '') {
+            $errores['password'] = 'Error. Debes rellenar contraseña.';
+        }
+
+        if (!empty($errores)) {
+            self::view('home/login_view', [
+                'tituloPagina' => 'PipelineDesk | Iniciar sesión',
+                'errores'      => $errores,
+                'email'        => $email,
+                'mensajeFlash' => null,
+                'iconoFlash'   => null,
+                'claseFlash'   => 'error'
+            ]);
+            return;
+        }
+        $lm = new LoginModel();
+        $usuario = $lm->findByEmail($email);
 
         if (!$usuario) {
             SessionManager::setMensajeFlash(

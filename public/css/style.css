@@ -1,3 +1,26 @@
+/* VARIABLES DE TEMA */
+:root {
+    --color-fondo-app: #ffffff;
+    --color-fondo-suave: #f4f5fb;
+    --color-fondo-superficie: #ffffff;
+    --color-fondo-cabecera: #f7f7f9;
+    --color-fondo-oscuro: #000000;
+
+    --color-texto-principal: #111827;
+    --color-texto-secundario: #374151;
+    --color-texto-suave: #6b7280;
+    --color-texto-invertido: #ffffff;
+
+    --color-borde-suave: #dddddd;
+    --color-borde-general: #e5e7eb;
+    --color-borde-input: #d1d5db;
+
+    --color-marca: #5f5cf1;
+    --color-marca-hover: #4f46e5;
+
+    --color-foco: rgba(95, 92, 241, 0.18);
+}
+
 /* RESETEO */
 *,
 *::before,
@@ -13,8 +36,8 @@ html {
 body.cuerpo-pagina {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    color: #111827;
-    background-color: #ffffff;
+    color: var(--color-texto-principal);
+    background-color: var(--color-fondo-app);
 }
 
 img {
@@ -39,7 +62,7 @@ a {
     align-items: center;
     gap: 12px;
     text-decoration: none;
-    color: #111827;
+    color: var(--color-texto-principal);
 }
 
 .marca img {
@@ -74,27 +97,27 @@ a {
 }
 
 .boton:focus-visible {
-    outline: 3px solid rgba(37, 99, 235, 0.24);
+    outline: 3px solid var(--color-foco);
     outline-offset: 2px;
 }
 
 .boton-primario {
-    background-color: #5f5cf1;
-    color: #ffffff;
+    background-color: var(--color-marca);
+    color: var(--color-texto-invertido);
 }
 
 .boton-primario:hover {
-    background-color: #4f46e5;
+    background-color: var(--color-marca-hover);
 }
 
 .boton-secundario {
-    background-color: #ffffff;
-    color: #4f46e5;
-    border-color: #5f5cf1;
+    background-color: var(--color-fondo-superficie);
+    color: var(--color-marca);
+    border-color: var(--color-marca);
 }
 
 .boton-secundario:hover {
-    background-color: #eef2ff;
+    background-color: var(--color-fondo-suave);
 }
 
 button[aria-disabled="true"] {
@@ -104,7 +127,7 @@ button[aria-disabled="true"] {
 
 /* ENLACES */
 .enlace-simple {
-    color: #4f46e5;
+    color: var(--color-marca);
     font-weight: 600;
     text-decoration: none;
 }
@@ -114,8 +137,19 @@ button[aria-disabled="true"] {
 }
 
 .enlace-simple:focus-visible {
-    outline: 3px solid rgba(79, 70, 229, 0.22);
+    outline: 3px solid var(--color-foco);
     outline-offset: 3px;
+}
+
+/* ERRORES DE INPUT */
+.grupo-campo .error-campo {
+    display: block;
+    min-height: 20px;
+    margin-top: 4px;
+    color: #b91c1c;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    font-weight: 500;
 }
 
 /* RESPONSIVE */

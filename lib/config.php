@@ -5,6 +5,10 @@
  */
 // Definimos la RUTA RAÍZ del proyecto.
 define('APP_ROOT', dirname(__DIR__));
+//defino variables por defecto
+define('USUARIO_POR_DEFECTO', 2);
+define('PRIORIDAD_POR_DEFECTO', 'Media');
+
 
 // Automatización de BASE_URL (ruta web)
 // 1. Obtenemos la ruta del script que se está ejecutando (siempre será public/index.php)

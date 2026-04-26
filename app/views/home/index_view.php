@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 $tituloPagina = 'PipelineDesk | Inicio';
@@ -34,10 +35,10 @@ $diapositivas = $diapositivas ?? [
         </a>
 
         <nav class="acciones" aria-label="Navegación principal">
-            <a href="<?= BASE_URL . 'login' ?>" class="boton boton-secundario">Iniciar sesión</a>
-            <button type="button" class="boton boton-primario" aria-disabled="true" title="Disponible en fases futuras">
+            <a href="<?= BASE_URL ?>login" class="boton boton-secundario">Iniciar sesión</a>
+            <a href="<?= BASE_URL ?>contacto" class="boton boton-primario" aria-label="Ir al formulario de Contacto">
                 Formulario lead
-            </button>
+            </a>
         </nav>
     </div>
 </header>
@@ -62,14 +63,12 @@ $diapositivas = $diapositivas ?? [
             id="visorPresentacion"
             class="visor"
             aria-label="Presentación visual del proyecto"
-            data-diapositivas='<?= htmlspecialchars(json_encode($diapositivas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>'
-        >
+            data-diapositivas='<?= htmlspecialchars(json_encode($diapositivas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>'>
             <div class="diapositiva" id="diapositivaActiva" tabindex="0" aria-live="polite">
                 <img
                     src="<?= htmlspecialchars($diapositivas[0]['imagen']) ?>"
                     alt="<?= htmlspecialchars($diapositivas[0]['titulo']) ?>"
-                    id="imagenDiapositiva"
-                >
+                    id="imagenDiapositiva">
 
                 <div class="texto-diapositiva">
                     <h2 id="tituloDiapositiva"><?= htmlspecialchars($diapositivas[0]['titulo']) ?></h2>
