@@ -18,7 +18,7 @@ use Sergio\App\models\leadModel;
 class LeadController extends Controller
 {
     //mostrar FORM Contacto
-    public static function mostrarContacto(): void
+    public static function mostrarFormContacto(): void
     {
         SessionManager::iniciarSesion();
 
@@ -42,7 +42,7 @@ class LeadController extends Controller
     }
 
     //POST -> formulario contacto
-    public static function guardarContacto(): void
+    public static function nuevoContacto(): void
     {
         SessionManager::iniciarSesion();
         $errores = [];
@@ -129,69 +129,124 @@ class LeadController extends Controller
     }
 
     // crear desde App interna
-    public static function crearLead(): void
+    public static function mostrarFormLead(): void
     {
         SessionManager::iniciarSesion();
         SessionManager::usuarioNoAutenticado('usuario', 'login');
 
         $flash = SessionManager::getMensajeFlash();
-        $datosAntiguos = SessionManager::get('datos_lead') ?? [];
-        SessionManager::eliminar('datos_lead');
-
         $lm = new LeadModel();
 
         self::view('lead/lead_create_view', [
             'tituloPagina'   => 'PipelineDesk | Nuevo lead',
+            'errores'        => [],
+            'lead_nombre'    => '',
+            'email'          => '',
+            'telefono'       => '',
+            'servicios'      => '',
+            'indicaciones'   => '',
+            'prioridad'      => PRIORIDAD_POR_DEFECTO,
+            'valor'          => '',
+            'estado'         => 'Nuevo Lead',
+            'responsable_id' => USUARIO_POR_DEFECTO,
             'mensajeFlash'   => $flash['mensaje'] ?? null,
             'iconoFlash'     => $flash['icono'] ?? null,
             'claseFlash'     => $flash['clase'] ?? 'info',
-            'datosAntiguos'  => $datosAntiguos,
             'serviciosLista' => $lm->getServicios(),
-            'prioridades'    => $lm->getPrioridades()
+            'prioridades'    => $lm->getPrioridades(),
+            'estadosLista'   => $lm->getEstados(),
+            'responsables'   => $lm->getResponsables()
         ]);
     }
-    //POST
-    public static function guardarLead(): void
+    //POST formulario manual con asignacion de responsable y estado
+    public static function nuevoLead(): void
+
     {
         SessionManager::iniciarSesion();
         SessionManager::usuarioNoAutenticado('usuario', 'login');
 
-        $usuario = SessionManager::get('usuario');
+        $lm = new LeadModel();
+        $errores = [];
 
-        $leadNombre = trim($_POST['lead_nombre'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $telefono = trim($_POST['telefono'] ?? '');
-        $servicios = trim($_POST['servicios'] ?? '');
+        $leadNombre   = trim($_POST['lead_nombre'] ?? '');
+        $email        = trim($_POST['email'] ?? '');
+        $telefono     = trim($_POST['telefono'] ?? '');
+        $servicios    = trim($_POST['servicios'] ?? '');
         $indicaciones = trim($_POST['indicaciones'] ?? '');
-        $prioridad = trim($_POST['prioridad'] ?? 'Media');
-        $valor = trim($_POST['valor'] ?? '');
+        $prioridad    = trim($_POST['prioridad'] ?? PRIORIDAD_POR_DEFECTO);
+        $valor        = trim($_POST['valor'] ?? '');
+        $estado       = trim($_POST['estado'] ?? 'Nuevo Lead');
+        $responsableId = (int)($_POST['responsable_id'] ?? USUARIO_POR_DEFECTO);
 
-        if ($leadNombre === '' || $servicios === '') {
-            SessionManager::setMensajeFlash(
-                'Debes rellenar al menos el nombre del lead y el servicio.',
-                '⚠',
-                'error'
-            );
-
-            SessionManager::set('datos_lead', [
-                'lead_nombre'  => $leadNombre,
-                'email'        => $email,
-                'telefono'     => $telefono,
-                'servicios'    => $servicios,
-                'indicaciones' => $indicaciones,
-                'prioridad'    => $prioridad,
-                'valor'        => $valor
-            ]);
-
-            header('Location: ' . BASE_URL . 'leads/nuevo');
-            exit();
+        if ($leadNombre === '') {
+            $errores['lead_nombre'] = 'Error. Debes rellenar el nombre del lead.';
+        } elseif (mb_strlen($leadNombre) < 2) {
+            $errores['lead_nombre'] = 'Error. El nombre del lead es demasiado corto.';
         }
 
-        $lm = new LeadModel();
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errores['email'] = 'Error. El email no tiene un formato válido.';
+        }
+
+        if ($telefono === '') {
+            $errores['telefono'] = 'Error. El teléfono no tiene un formato válido.';
+        }
+
+        if ($servicios === '') {
+            $errores['servicios'] = 'Error. Debes seleccionar un servicio.';
+        }
+
+        if (!in_array($prioridad, $lm->getPrioridades(), true)) {
+            $errores['prioridad'] = 'Error. Debes seleccionar una prioridad válida.';
+        }
+
+        if (!in_array($estado, $lm->getEstados(), true)) {
+            $errores['estado'] = 'Error. Debes seleccionar un estado válido.';
+        }
+
+        $responsables = $lm->getResponsables();
+        $idsResponsables = array_map(static fn($item) => (int)$item['id'], $responsables);
+
+        if (!in_array($responsableId, $idsResponsables, true)) {
+            $errores['responsable_id'] = 'Error. Debes seleccionar un responsable válido.';
+        }
+
+        if ($valor === '' || !is_numeric($valor) || (int)$valor <0) {
+            $errores['valor'] = 'Error. El valor debe ser número positivo.';
+        }
+
+        if ($indicaciones === '' ) {
+            $errores['indicaciones'] = 'Error. Escribe una breve indicación.';
+        }
+
+        if (!empty($errores)) {
+            self::view('lead/lead_create_view', [
+                'tituloPagina'   => 'PipelineDesk | Nuevo lead',
+                'errores'        => $errores,
+                'lead_nombre'    => $leadNombre,
+                'email'          => $email,
+                'telefono'       => $telefono,
+                'servicios'      => $servicios,
+                'indicaciones'   => $indicaciones,
+                'prioridad'      => $prioridad,
+                'valor'          => $valor,
+                'estado'         => $estado,
+                'responsable_id' => $responsableId,
+                'mensajeFlash'   => null,
+                'iconoFlash'     => null,
+                'claseFlash'     => 'error',
+                'serviciosLista' => $lm->getServicios(),
+                'prioridades'    => $lm->getPrioridades(),
+                'estadosLista'   => $lm->getEstados(),
+                'responsables'   => $responsables
+            ]);
+            return;
+        }
 
         $guardado = $lm->create([
             'lead_nombre'     => $leadNombre,
-            'responsable_id'  => $usuario['id'] ?? null,
+            'estado'          => $estado,
+            'responsable_id'  => $responsableId,
             'servicios'       => $servicios,
             'indicaciones'    => $indicaciones !== '' ? $indicaciones : null,
             'lead_score'      => 0,
@@ -199,7 +254,7 @@ class LeadController extends Controller
             'telefono'        => $telefono !== '' ? $telefono : null,
             'valor'           => $valor !== '' ? (float) $valor : null,
             'ultimo_contacto' => null,
-            'prioridad'       => $prioridad !== '' ? $prioridad : 'Media',
+            'prioridad'       => $prioridad,
             'origen'          => 'app_interna'
         ]);
 

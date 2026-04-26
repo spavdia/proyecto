@@ -9,7 +9,7 @@ use Sergio\Lib\SessionManager;
 
 class LoginController extends Controller
 {
-    public static function mostrarLoginForm(): void
+    public static function mostrarFormLogin(): void
     {
         SessionManager::iniciarSesion();
         SessionManager::usuarioAutenticado('usuario', 'panel');

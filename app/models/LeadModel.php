@@ -7,12 +7,15 @@ findById(int $id) más adelante
 update() más adelante*/
 
 namespace Sergio\App\models;
+
 use Sergio\Lib\Database;
 
-class LeadModel {
+class LeadModel
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = new Database();
     }
 
@@ -45,6 +48,17 @@ class LeadModel {
             'Acceso Univ+25'
         ];
     }
+    
+    public function getResponsables(): array
+    {
+        $sql = "SELECT id, nombre
+            FROM usuarios
+            WHERE activo = 1
+              AND rol = 'ventas'
+            ORDER BY nombre ASC";
+
+        return $this->db->executeQuery($sql);
+    }
 
     public function getPrioridades(): array
     {
@@ -53,19 +67,19 @@ class LeadModel {
 
     //crea 
     public function create(array $datos): bool
-{
-    //definimos valor por defecto
-    $estado = $datos['estado'] ?? 'Nuevo Lead';
-    $responsableId = $datos['responsable_id'] ?? USUARIO_POR_DEFECTO;
-    $indicaciones = $datos['indicaciones'] ?? null;
-    $leadScore = $datos['lead_score'] ?? 0;
-    $email = $datos['email'] ?? null;
-    $telefono = $datos['telefono'] ?? null;
-    $valor = $datos['valor'] ?? null;
-    $ultimoContacto = $datos['ultimo_contacto'] ?? null;
-    $prioridad = $datos['prioridad'] ?? PRIORIDAD_POR_DEFECTO;
+    {
+        //definimos valor por defecto
+        $estado = $datos['estado'] ?? 'Nuevo Lead';
+        $responsableId = $datos['responsable_id'] ?? USUARIO_POR_DEFECTO;
+        $indicaciones = $datos['indicaciones'] ?? null;
+        $leadScore = $datos['lead_score'] ?? 0;
+        $email = $datos['email'] ?? null;
+        $telefono = $datos['telefono'] ?? null;
+        $valor = $datos['valor'] ?? null;
+        $ultimoContacto = $datos['ultimo_contacto'] ?? null;
+        $prioridad = $datos['prioridad'] ?? PRIORIDAD_POR_DEFECTO;
 
-    $sql = "INSERT INTO leads (
+        $sql = "INSERT INTO leads (
                 lead_nombre,
                 estado,
                 responsable_id,
@@ -80,23 +94,23 @@ class LeadModel {
                 origen
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    $resultado = $this->db->executeUpdate($sql, [
-        $datos['lead_nombre'],
-        $estado,
-        $responsableId,
-        $datos['servicios'],
-        $indicaciones,
-        $leadScore,
-        $email,
-        $telefono,
-        $valor,
-        $ultimoContacto,
-        $prioridad,
-        $datos['origen']
-    ]);
+        $resultado = $this->db->executeUpdate($sql, [
+            $datos['lead_nombre'],
+            $estado,
+            $responsableId,
+            $datos['servicios'],
+            $indicaciones,
+            $leadScore,
+            $email,
+            $telefono,
+            $valor,
+            $ultimoContacto,
+            $prioridad,
+            $datos['origen']
+        ]);
 
-    return $resultado !== false;
-}
+        return $resultado !== false;
+    }
 
     // devuelve array asociativo por estado
     public function obtenerAgrupadosPorEstado(): array
@@ -133,9 +147,4 @@ class LeadModel {
 
         return $agrupados;
     }
-
-
 }
-
-
-?>
