@@ -10,6 +10,15 @@
 .contenido {
     padding: 28px 24px 40px;
 }
+.enlace-lead {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.enlace-lead:hover {
+    text-decoration: underline;
+}
 
 /* ASIDE */
 .aside {
@@ -214,7 +223,7 @@
     align-items: center;
     gap: 14px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .bloque-top h2 {
@@ -223,14 +232,14 @@
     font-size: 1.5rem;
 }
 
-/* ESTADOS */
+/* ESTADOS CABECERA */
 .estado {
     display: inline-flex;
     align-items: center;
-    min-height: 38px;
-    padding: 8px 14px;
+    min-height: 34px;
+    padding: 6px 12px;
     border-radius: 999px;
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 700;
 }
 
@@ -245,22 +254,22 @@
 }
 
 .estado-progreso {
-    background: #e0f2fe;
+    background: #d9f1ff;
     color: #0369a1;
 }
 
 .estado-objeciones {
-    background: #fef3c7;
+    background: #fde68a;
     color: #92400e;
 }
 
 .estado-ganado {
-    background: #dcfce7;
+    background: #bbf7d0;
     color: #166534;
 }
 
 .estado-perdido {
-    background: #fee2e2;
+    background: #fecaca;
     color: #991b1b;
 }
 
@@ -271,38 +280,266 @@
 
 .tabla-panel {
     width: 100%;
-    border-collapse: collapse;
-    min-width: 760px;
-}
-
-.tabla-panel th,
-.tabla-panel td {
-    padding: 14px 12px;
-    border-bottom: 1px solid var(--color-borde-general);
-    text-align: left;
-    vertical-align: top;
+    min-width: 920px;
+    border-collapse: separate;
+    border-spacing: 0 6px;
 }
 
 .tabla-panel th {
-    background: #f8f9ff;
-    color: var(--color-texto-secundario);
-    font-size: 0.95rem;
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 0.88rem;
     font-weight: 700;
+    color: var(--color-texto-secundario);
+    background: transparent;
+    border: none;
+    white-space: nowrap;
 }
 
 .tabla-panel td {
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: middle;
     color: var(--color-texto-principal);
-    background: var(--color-fondo-superficie);
+    background: #f3f4f6;
+    border: none;
+    line-height: 1.35;
+}
+
+.tabla-panel tbody tr td:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.tabla-panel tbody tr td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .tabla-panel tbody tr:hover td {
-    background: #f8faff;
+    background: #eceff3;
 }
 
 .tabla-vacia {
     text-align: center;
     color: var(--color-texto-suave);
     font-style: italic;
+    background: #f8fafc !important;
+}
+
+/* CELDA LEAD */
+.celda-lead {
+    position: relative;
+    overflow: hidden;
+    font-weight: 700;
+    font-size: 0.96rem;
+    color: var(--color-texto-principal);
+    white-space: nowrap;
+    padding-left: 16px;
+}
+
+.celda-lead::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: transparent;
+}
+
+.celda-lead.estado-nuevo::before {
+    background: #8b5cf6;
+}
+
+.celda-lead.estado-contactado::before {
+    background: #3b82f6;
+}
+
+.celda-lead.estado-progreso::before {
+    background: #0ea5e9;
+}
+
+.celda-lead.estado-objeciones::before {
+    background: #f59e0b;
+}
+
+.celda-lead.estado-ganado::before {
+    background: #22c55e;
+}
+
+.celda-lead.estado-perdido::before {
+    background: #ef4444;
+}
+
+/* INDICACIONES */
+.texto-indicaciones {
+    max-width: 220px;
+    color: var(--color-texto-secundario);
+    white-space: normal;
+    line-height: 1.35;
+    font-size: 0.90rem;
+}
+
+/* ORIGEN */
+.etiqueta-origen {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    color: #374151;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+/* SERVICIOS */
+.etiqueta-servicio {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.servicio-general {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.servicio-b1 {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.servicio-b2 {
+    background: #ddd6fe;
+    color: #6d28d9;
+}
+
+.servicio-informatica {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.servicio-primaria {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.servicio-secundaria {
+    background: #fde68a;
+    color: #a16207;
+}
+
+.servicio-bach {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.servicio-univ {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.servicio-gs {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.servicio-selectividad {
+    background: #fae8ff;
+    color: #a21caf;
+}
+
+.servicio-univ25 {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+/* FORMULARIO ESTADO */
+.form-estado {
+    margin: 0;
+}
+
+.estado-campo {
+    display: inline-block;
+    min-width: 150px;
+}
+
+.estado-campo::after {
+    display: none;
+}
+
+.selector-estado {
+    width: 100%;
+    min-width: 150px;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-align: center;
+    text-align-last: center;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-clip: padding-box;
+    box-shadow: none;
+}
+
+.selector-estado:hover {
+    opacity: 0.96;
+}
+
+.selector-estado:focus {
+    box-shadow: 0 0 0 3px var(--color-foco);
+}
+
+.selector-estado option {
+    background: #ffffff;
+    color: #111827;
+    font-weight: 700;
+}
+
+/* COLORES DEL SELECTOR SEGUN ESTADO */
+.selector-estado.estado-nuevo {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.selector-estado.estado-contactado {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.selector-estado.estado-progreso {
+    background: #d9f1ff;
+    color: #0369a1;
+}
+
+.selector-estado.estado-objeciones {
+    background: #fde68a;
+    color: #92400e;
+}
+
+.selector-estado.estado-ganado {
+    background: #bbf7d0;
+    color: #166534;
+}
+
+.selector-estado.estado-perdido {
+    background: #fecaca;
+    color: #991b1b;
 }
 
 /* ESCRITORIO REDUCIDO */
@@ -320,13 +557,17 @@
     }
 
     .tabla-panel {
-        min-width: 680px;
+        min-width: 780px;
     }
 
     .tabla-panel th,
     .tabla-panel td {
         padding: 12px 10px;
         font-size: 0.95rem;
+    }
+
+    .texto-indicaciones {
+        max-width: 200px;
     }
 }
 
@@ -391,7 +632,11 @@
     }
 
     .tabla-panel {
-        min-width: 620px;
+        min-width: 700px;
+    }
+
+    .selector-estado {
+        min-width: 145px;
     }
 }
 
@@ -434,12 +679,23 @@
     }
 
     .tabla-panel {
-        min-width: 560px;
+        min-width: 640px;
     }
 
     .tabla-panel th,
     .tabla-panel td {
         padding: 11px 9px;
+        font-size: 0.92rem;
+    }
+
+    .selector-estado {
+        min-width: 135px;
+        min-height: 40px;
+        font-size: 0.88rem;
+    }
+
+    .texto-indicaciones {
+        max-width: 180px;
         font-size: 0.92rem;
     }
 }

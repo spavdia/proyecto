@@ -42,3 +42,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+//cambiar estado con Selector, haciendo submit del form
+document.addEventListener('DOMContentLoaded', function () {
+    const panel = document.getElementById('panelApp');
+
+    if (!panel) {
+        return;
+    }
+
+    panel.addEventListener('change', function (evento) {
+        const selector = evento.target.closest('.selector-estado');
+
+        if (!selector) {
+            return;
+        }
+
+        const formulario = selector.closest('.form-estado');
+
+        if (formulario) {
+            formulario.submit();
+        }
+    });
+});

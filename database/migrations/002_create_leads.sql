@@ -2,11 +2,11 @@ USE pipeline_crm;
 
 CREATE TABLE IF NOT EXISTS leads (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    lead VARCHAR(150) NOT NULL,
+    lead_nombre VARCHAR(150) NOT NULL,
     estado ENUM('Nuevo Lead', 'Contactado', 'En Progreso', 'Objeciones', 'Ganado', 'Perdido')
         NOT NULL DEFAULT 'Nuevo Lead',
     responsable_id INT UNSIGNED NULL,
-    curso ENUM(
+    servicios ENUM(
         'B1 Inglés',
         'B2 Inglés',
         'Informática',

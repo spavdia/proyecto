@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Sergio\App\Controllers;
 
 use Sergio\Lib\SessionManager;
-use Sergio\App\Models\LeadModel;
+use Sergio\App\models\LeadModel;
 
 class HomeController extends Controller
 {
     public static function index(): void
     {
         SessionManager::iniciarSesion();
-
         $flash = SessionManager::getMensajeFlash();
 
         self::view('home/index_view', [
@@ -33,6 +30,7 @@ class HomeController extends Controller
 
         $lm = new LeadModel();
         $leadsPorEstado = $lm->obtenerAgrupadosPorEstado();
+        $estadosLista = $lm->getEstados();
 
         self::view('home/panel_view', [
             'tituloPagina'   => 'PipelineDesk | Panel',
@@ -40,7 +38,8 @@ class HomeController extends Controller
             'mensajeFlash'   => $flash['mensaje'] ?? null,
             'iconoFlash'     => $flash['icono'] ?? null,
             'claseFlash'     => $flash['clase'] ?? 'info',
-            'leadsPorEstado' => $leadsPorEstado
+            'leadsPorEstado' => $leadsPorEstado,
+            'estadosLista'   => $estadosLista
         ]);
     }
 }

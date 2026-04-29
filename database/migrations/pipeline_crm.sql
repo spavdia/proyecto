@@ -4,8 +4,6 @@ CREATE DATABASE IF NOT EXISTS pipeline_crm
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
-# CREAMOS TABLA USUARIOS
-
 USE pipeline_crm;
 
 CREATE TABLE IF NOT EXISTS usuarios (
@@ -17,9 +15,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
     activo TINYINT(1) NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-# INSERTAMOS USUARIOS
 
 INSERT INTO usuarios (nombre, email, password_hash, rol, activo)
 VALUES
@@ -45,14 +40,13 @@ VALUES
     1
 );
 
-# INSERTAMOS TABLA LEADS
 CREATE TABLE IF NOT EXISTS leads (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     lead_nombre VARCHAR(150) NOT NULL,
     estado ENUM('Nuevo Lead', 'Contactado', 'En Progreso', 'Objeciones', 'Ganado', 'Perdido')
         NOT NULL DEFAULT 'Nuevo Lead',
     responsable_id INT UNSIGNED NULL,
-    curso ENUM(
+    servicios ENUM(
         'B1 Inglés',
         'B2 Inglés',
         'Informática',
@@ -78,4 +72,41 @@ CREATE TABLE IF NOT EXISTS leads (
         FOREIGN KEY (responsable_id) REFERENCES usuarios(id)
         ON UPDATE CASCADE
         ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS notas_lead (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    lead_id INT UNSIGNED NOT NULL,
+    usuario_id INT UNSIGNED NOT NULL,
+    tipo_actividad ENUM('Llamada', 'Email', 'Cita presencial') NOT NULL,
+    contenido TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_notas_lead_lead
+        FOREIGN KEY (lead_id) REFERENCES leads(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_notas_lead_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS historial_lead (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    lead_id INT UNSIGNED NOT NULL,
+    usuario_id INT UNSIGNED NULL,
+    tipo_evento ENUM('alta', 'nota', 'cambio_estado') NOT NULL,
+    titulo VARCHAR(150) NOT NULL,
+    descripcion TEXT NULL,
+    estado_anterior VARCHAR(50) NULL,
+    estado_nuevo VARCHAR(50) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_historial_lead_lead
+        FOREIGN KEY (lead_id) REFERENCES leads(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_historial_lead_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

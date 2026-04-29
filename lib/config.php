@@ -8,6 +8,7 @@ define('APP_ROOT', dirname(__DIR__));
 //defino variables por defecto
 define('USUARIO_POR_DEFECTO', 2);
 define('PRIORIDAD_POR_DEFECTO', 'Media');
+define('ESTADO_POR_DEFECTO', 'Nuevo Lead');
 
 
 // Automatización de BASE_URL (ruta web)

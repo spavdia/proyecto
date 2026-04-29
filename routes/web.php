@@ -15,9 +15,12 @@ Route::get('/panel', [HomeController::class, 'panel']);
 //rutas formulario contacto
 Route::get('/contacto', [LeadController::class, 'mostrarFormContacto']);
 Route::post('/contacto', [LeadController::class, 'nuevoContacto']);
-//rutas internas 
+//rutas lead nuevo
 Route::get('/leads/nuevo', [LeadController::class, 'mostrarFormLead']);
 Route::post('/leads/guardar', [LeadController::class, 'nuevoLead']);
-
+Route::post('/leads/cambiar-estado/{id}', [LeadController::class, 'cambiarEstado']);
+//Rutas notas
+Route::get('/leads/{id}', [LeadController::class, 'mostrarDetalle']);
+Route::post('/leads/{id}/notas/guardar', [LeadController::class, 'nuevaNota']);
 
 Route::handleRoute();
