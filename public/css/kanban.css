@@ -1,14 +1,23 @@
 /* ESTRUCTURA GENERAL */
+html,
+body {
+    min-height: 100%;
+    background: var(--color-fondo-suave);
+}
 .panel {
     display: grid;
     grid-template-columns: 280px 1fr;
     min-height: 100vh;
+    width: 100%;
     background: var(--color-fondo-suave);
     position: relative;
 }
 
 .contenido {
     padding: 28px 24px 40px;
+    background: var(--color-fondo-suave);
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
 /* ASIDE */
@@ -70,6 +79,7 @@
 
 /* CABECERA */
 .cabecera-kanban {
+    position: relative;
     background: var(--color-fondo-superficie);
     border-radius: 22px;
     padding: 28px 24px;
@@ -110,6 +120,87 @@
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+}
+
+/* CONFIG */
+.boton-config {
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-borde-general);
+    border-radius: 12px;
+    background: var(--color-fondo-superficie);
+    color: var(--color-texto-principal);
+    cursor: pointer;
+    font-size: 1.3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.boton-config:focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 2px;
+}
+
+.panel-config {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 24px;
+    width: min(420px, calc(100vw - 40px));
+    background: #ffffff;
+    border: 1px solid var(--color-borde-general);
+    border-radius: 18px;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
+    padding: 18px;
+    z-index: 80;
+}
+
+.panel-config-top {
+    margin-bottom: 16px;
+}
+
+.panel-config-top h2 {
+    margin: 0 0 6px;
+    font-size: 1.1rem;
+    color: var(--color-texto-principal);
+}
+
+.panel-config-top p {
+    margin: 0;
+    color: var(--color-texto-secundario);
+    font-size: 0.92rem;
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.config-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-borde-general);
+    border-radius: 12px;
+    background: #fafbff;
+    color: var(--color-texto-principal);
+    cursor: pointer;
+}
+
+.config-item input {
+    margin: 0;
+}
+
+.config-item.obligatorio {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+}
+
+.config-item input:disabled + span {
+    font-weight: 700;
 }
 
 /* BOTON MENU */
@@ -204,19 +295,18 @@
     display: grid;
     grid-template-columns: repeat(6, minmax(280px, 1fr));
     gap: 18px;
-    align-items: start;
+    align-items: stretch;
     overflow-x: auto;
     padding-bottom: 8px;
+    min-height: calc(100vh - 220px);
 }
 
 .kanban-columna {
-    background: var(--color-fondo-superficie);
     border: 1px solid var(--color-borde-general);
     border-radius: 18px;
-    min-height: 420px;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .kanban-columna-top {
@@ -257,7 +347,7 @@
 }
 
 .kanban-resumen-item {
-    background: #f8faff;
+    background: rgba(255, 255, 255, 0.68);
     border: 1px solid var(--color-borde-general);
     border-radius: 12px;
     padding: 10px 12px;
@@ -281,15 +371,16 @@
     display: grid;
     gap: 14px;
     min-height: 260px;
+    background: transparent;
 }
 
 .kanban-vacio {
-    border: 2px dashed var(--color-borde-general);
+    border: 2px dashed rgba(0, 0, 0, 0.10);
     border-radius: 14px;
     padding: 18px 14px;
     text-align: center;
     color: var(--color-texto-suave);
-    background: #fafafa;
+    background: rgba(255, 255, 255, 0.45);
 }
 
 /* TARJETA */
@@ -360,6 +451,10 @@
     line-height: 1.5;
 }
 
+.campo-tarjeta.oculto-campo {
+    display: none !important;
+}
+
 .enlace-detalle {
     text-decoration: none;
     font-weight: 700;
@@ -374,7 +469,6 @@
 .kanban-columna.destino {
     border-color: var(--color-marca);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.10);
-    background: #fafaff;
 }
 
 /* MENSAJE FLOTANTE */
@@ -410,6 +504,36 @@
 }
 
 /* COLORES POR ETAPA */
+.estado-nuevo.kanban-columna {
+    background: #f5f1ff;
+    border-color: #ddd6fe;
+}
+
+.estado-contactado.kanban-columna {
+    background: #eef6ff;
+    border-color: #bfdbfe;
+}
+
+.estado-progreso.kanban-columna {
+    background: #eefaff;
+    border-color: #bae6fd;
+}
+
+.estado-objeciones.kanban-columna {
+    background: #fff9e8;
+    border-color: #fde68a;
+}
+
+.estado-ganado.kanban-columna {
+    background: #effcf3;
+    border-color: #bbf7d0;
+}
+
+.estado-perdido.kanban-columna {
+    background: #fff1f1;
+    border-color: #fecaca;
+}
+
 .estado-nuevo .kanban-flecha {
     background: #ede9fe;
     color: #5b21b6;
@@ -537,6 +661,10 @@
     .kanban-tablero {
         grid-template-columns: repeat(2, minmax(280px, 1fr));
     }
+
+    .panel-config {
+        right: 14px;
+    }
 }
 
 /* MOVIL */
@@ -558,7 +686,8 @@
         font-size: 1rem;
     }
 
-    .boton-menu {
+    .boton-menu,
+    .boton-config {
         width: 52px;
         height: 52px;
     }
@@ -574,7 +703,13 @@
         padding: 12px 16px;
     }
 
-    .kanban-resumen {
+    .kanban-resumen,
+    .config-grid {
         grid-template-columns: 1fr;
+    }
+
+    .panel-config {
+        position: static;
+        width: 100%;
     }
 }

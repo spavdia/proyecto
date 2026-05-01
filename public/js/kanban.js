@@ -4,16 +4,36 @@ document.addEventListener('DOMContentLoaded', function () {
     const botonMenu = document.getElementById('botonMenu');
     const fondoMenu = document.getElementById('fondoMenu');
     const mensaje = document.getElementById('mensajeKanban');
+    const botonConfig = document.getElementById('botonConfigKanban');
+    const panelConfig = document.getElementById('panelConfigKanban');
 
     if (!app || !tablero) {
         return;
     }
 
     const baseUrl = app.dataset.baseUrl || '/';
+    const claveConfig = 'pipelineDeskCamposKanban';
 
     let tarjetaActiva = null;
     let columnaOrigen = null;
     let estadoOrigen = '';
+
+    const camposObligatorios = ['lead_nombre', 'servicios'];
+
+    const camposPorDefecto = {
+        lead_nombre: true,
+        email: false,
+        telefono: true,
+        responsable_nombre: true,
+        servicios: true,
+        valor: true,
+        prioridad: true,
+        estado: false,
+        indicaciones: false,
+        ultimo_contacto: false,
+        origen: false,
+        lead_score: false
+    };
 
     function formatearEuros(valor) {
         return Number(valor).toLocaleString('es-ES', {
@@ -82,6 +102,87 @@ document.addEventListener('DOMContentLoaded', function () {
         columnas.forEach(function (columna) {
             columna.classList.remove('destino');
         });
+    }
+
+    function leerConfigGuardada() {
+        try {
+            const guardada = window.localStorage.getItem(claveConfig);
+            if (!guardada) {
+                return { ...camposPorDefecto };
+            }
+
+            const config = JSON.parse(guardada);
+            return { ...camposPorDefecto, ...config };
+        } catch (error) {
+            return { ...camposPorDefecto };
+        }
+    }
+
+    function guardarConfig(config) {
+        window.localStorage.setItem(claveConfig, JSON.stringify(config));
+    }
+
+    function aplicarConfigTarjetas(config) {
+        const campos = tablero.querySelectorAll('[data-campo]');
+
+        campos.forEach(function (elemento) {
+            const campo = elemento.dataset.campo || '';
+            const visible = config[campo] !== false;
+
+            if (visible || camposObligatorios.includes(campo)) {
+                elemento.classList.remove('oculto-campo');
+            } else {
+                elemento.classList.add('oculto-campo');
+            }
+        });
+    }
+
+    function sincronizarChecks(config) {
+        const checks = document.querySelectorAll('[data-campo-config]');
+
+        checks.forEach(function (check) {
+            const campo = check.dataset.campoConfig || '';
+            check.checked = config[campo] !== false || camposObligatorios.includes(campo);
+
+            if (camposObligatorios.includes(campo)) {
+                check.checked = true;
+                check.disabled = true;
+            }
+        });
+    }
+
+    function obtenerConfigActual() {
+        const config = { ...camposPorDefecto };
+        const checks = document.querySelectorAll('[data-campo-config]');
+
+        checks.forEach(function (check) {
+            const campo = check.dataset.campoConfig || '';
+
+            if (camposObligatorios.includes(campo)) {
+                config[campo] = true;
+            } else {
+                config[campo] = check.checked;
+            }
+        });
+
+        return config;
+    }
+
+    function abrirCerrarConfig(forzar) {
+        if (!panelConfig || !botonConfig) {
+            return;
+        }
+
+        const abiertoActual = !panelConfig.hasAttribute('hidden');
+        const abiertoNuevo = typeof forzar === 'boolean' ? forzar : !abiertoActual;
+
+        if (abiertoNuevo) {
+            panelConfig.removeAttribute('hidden');
+        } else {
+            panelConfig.setAttribute('hidden', '');
+        }
+
+        botonConfig.setAttribute('aria-expanded', abiertoNuevo ? 'true' : 'false');
     }
 
     const tarjetas = tablero.querySelectorAll('.kanban-tarjeta');
@@ -196,5 +297,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    if (botonConfig && panelConfig) {
+        botonConfig.addEventListener('click', function (evento) {
+            evento.stopPropagation();
+            abrirCerrarConfig();
+        });
+
+        panelConfig.addEventListener('click', function (evento) {
+            evento.stopPropagation();
+        });
+
+        document.addEventListener('click', function () {
+            abrirCerrarConfig(false);
+        });
+
+        const checks = document.querySelectorAll('[data-campo-config]');
+        checks.forEach(function (check) {
+            check.addEventListener('change', function () {
+                const config = obtenerConfigActual();
+                guardarConfig(config);
+                aplicarConfigTarjetas(config);
+            });
+        });
+    }
+
+    const configInicial = leerConfigGuardada();
+    sincronizarChecks(configInicial);
+    aplicarConfigTarjetas(configInicial);
     actualizarResumenColumnas();
 });

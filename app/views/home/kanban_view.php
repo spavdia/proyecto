@@ -52,13 +52,23 @@ $estadosPanel = [
         <header class="cabecera-kanban">
             <div class="cabecera-info">
                 <p class="cabecera-etiqueta">Pipeline interactivo</p>
-                <h1>Embudo de ventas</h1>
+                <h1>Vista Kanban del embudo comercial</h1>
                 <p class="cabecera-texto">
-                    Gestiona las tarjetas.
+                    Arrastra los leads entre columnas para actualizar su estado en tiempo real.
                 </p>
             </div>
 
             <div class="cabecera-acciones">
+                <button
+                    type="button"
+                    class="boton-config"
+                    id="botonConfigKanban"
+                    aria-expanded="false"
+                    aria-controls="panelConfigKanban"
+                    aria-label="Configurar campos visibles de las tarjetas">
+                    <span aria-hidden="true">⚙</span>
+                </button>
+
                 <button
                     type="button"
                     class="boton-menu"
@@ -74,6 +84,75 @@ $estadosPanel = [
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
                     <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>
+                </div>
+            </div>
+
+            <div class="panel-config" id="panelConfigKanban" hidden>
+                <div class="panel-config-top">
+                    <h2>Campos visibles</h2>
+                    <p>Nombre y Servicio son obligatorios.</p>
+                </div>
+
+                <div class="config-grid">
+                    <label class="config-item obligatorio">
+                        <input type="checkbox" data-campo-config="lead_nombre" checked disabled>
+                        <span>Nombre</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="email">
+                        <span>Email</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="telefono" checked>
+                        <span>Teléfono</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="responsable_nombre" checked>
+                        <span>Responsable</span>
+                    </label>
+
+                    <label class="config-item obligatorio">
+                        <input type="checkbox" data-campo-config="servicios" checked disabled>
+                        <span>Servicio</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="valor" checked>
+                        <span>Valor</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="prioridad" checked>
+                        <span>Prioridad</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="estado">
+                        <span>Estado</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="indicaciones">
+                        <span>Indicaciones</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="ultimo_contacto">
+                        <span>Último contacto</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="origen">
+                        <span>Origen</span>
+                    </label>
+
+                    <label class="config-item">
+                        <input type="checkbox" data-campo-config="lead_score">
+                        <span>Score</span>
+                    </label>
                 </div>
             </div>
         </header>
@@ -124,7 +203,11 @@ $estadosPanel = [
                             <div class="kanban-vacio">Sin leads</div>
                         <?php else: ?>
                             <?php foreach ($leadsEstado as $lead): ?>
-                                <?php $valorTarjeta = (float)($lead['valor'] ?? 0); ?>
+                                <?php
+                                $valorTarjeta = (float)($lead['valor'] ?? 0);
+                                $ultimoContacto = !empty($lead['ultimo_contacto']) ? (string)$lead['ultimo_contacto'] : 'Sin contacto';
+                                $origenTexto = (($lead['origen'] ?? '') === 'formulario_web') ? 'Formulario web' : 'App interna';
+                                ?>
 
                                 <article
                                     class="kanban-tarjeta"
@@ -132,19 +215,73 @@ $estadosPanel = [
                                     data-id="<?= (int)($lead['id'] ?? 0) ?>"
                                     data-estado="<?= htmlspecialchars((string)($lead['estado'] ?? '')) ?>"
                                     data-valor="<?= htmlspecialchars((string)$valorTarjeta) ?>">
+
                                     <div class="kanban-tarjeta-top">
-                                        <h3>
-                                            <a href="<?= BASE_URL . 'leads/' . (int)($lead['id'] ?? 0) ?>">
-                                                <?= htmlspecialchars((string)($lead['lead_nombre'] ?? 'Lead')) ?>
-                                            </a>
-                                        </h3>
-                                        <span class="kanban-chip"><?= htmlspecialchars((string)($lead['servicios'] ?? '-')) ?></span>
+                                        <div class="campo-tarjeta campo-obligatorio" data-campo="lead_nombre">
+                                            <h3>
+                                                <a href="<?= BASE_URL . 'leads/' . (int)($lead['id'] ?? 0) ?>">
+                                                    <?= htmlspecialchars((string)($lead['lead_nombre'] ?? 'Lead')) ?>
+                                                </a>
+                                            </h3>
+                                        </div>
+
+                                        <div class="campo-tarjeta campo-obligatorio" data-campo="servicios">
+                                            <span class="kanban-chip"><?= htmlspecialchars((string)($lead['servicios'] ?? '-')) ?></span>
+                                        </div>
                                     </div>
 
                                     <div class="kanban-meta">
-                                        <p><strong>Responsable:</strong> <?= htmlspecialchars((string)($lead['responsable_nombre'] ?? 'Sin asignar')) ?></p>
-                                        <p><strong>Teléfono:</strong> <?= htmlspecialchars((string)($lead['telefono'] ?? '-')) ?></p>
-                                        <p><strong>Valor:</strong> <?= $valorTarjeta > 0 ? htmlspecialchars(number_format($valorTarjeta, 2, ',', '.')) . ' €' : '-' ?></p>
+                                        <p class="campo-tarjeta" data-campo="email">
+                                            <strong>Email:</strong>
+                                            <?= htmlspecialchars((string)($lead['email'] ?? '-')) ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="telefono">
+                                            <strong>Teléfono:</strong>
+                                            <?= htmlspecialchars((string)($lead['telefono'] ?? '-')) ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="responsable_nombre">
+                                            <strong>Responsable:</strong>
+                                            <?= htmlspecialchars((string)($lead['responsable_nombre'] ?? 'Sin asignar')) ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="valor">
+                                            <strong>Valor:</strong>
+                                            <?= $valorTarjeta > 0 ? htmlspecialchars(number_format($valorTarjeta, 2, ',', '.')) . ' €' : '-' ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="prioridad">
+                                            <strong>Prioridad:</strong>
+                                            <?= htmlspecialchars((string)($lead['prioridad'] ?? '-')) ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="estado">
+                                            <strong>Estado:</strong>
+                                            <?= htmlspecialchars((string)($lead['estado'] ?? '-')) ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="indicaciones">
+                                            <strong>Indicaciones:</strong>
+                                            <?= !empty($lead['indicaciones'])
+                                                ? htmlspecialchars(mb_strimwidth((string)$lead['indicaciones'], 0, 70, '...'))
+                                                : '-' ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="ultimo_contacto">
+                                            <strong>Último contacto:</strong>
+                                            <?= htmlspecialchars($ultimoContacto) ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="origen">
+                                            <strong>Origen:</strong>
+                                            <?= htmlspecialchars($origenTexto) ?>
+                                        </p>
+
+                                        <p class="campo-tarjeta" data-campo="lead_score">
+                                            <strong>Score:</strong>
+                                            <?= htmlspecialchars((string)($lead['lead_score'] ?? '0')) ?>
+                                        </p>
                                     </div>
 
                                     <div class="kanban-acciones">
