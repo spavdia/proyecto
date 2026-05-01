@@ -21,7 +21,7 @@ $menuActivo = $menuActivo ?? 'panel';
 
         <p class="menu-titulo">Comercial</p>
         <a href="<?= BASE_URL . 'leads/nuevo' ?>" class="menu-enlace <?= $menuActivo === 'nuevo_lead' ? 'activo' : '' ?>">Nuevo lead</a>
-        <a href="#" class="menu-enlace">Pipeline</a>
+        <a href="<?= BASE_URL . 'pipeline' ?>" class="menu-enlace <?= $menuActivo === 'pipeline' ? 'activo' : '' ?>">Pipeline</a>
         <a href="#" class="menu-enlace">Notas</a>
         <a href="#" class="menu-enlace">Tareas</a>
         <a href="#" class="menu-enlace">Objeciones</a>

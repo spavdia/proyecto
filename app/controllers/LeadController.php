@@ -824,4 +824,92 @@ class LeadController extends Controller
         header('Location: ' . BASE_URL . 'panel');
         exit();
     }
+
+    //kanban
+    public static function cambiarEstadoKanban(): void
+    {
+        SessionManager::iniciarSesion();
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!SessionManager::get('usuario')) {
+            http_response_code(401);
+            echo json_encode([
+                'ok' => false,
+                'mensaje' => 'Debes iniciar sesión.'
+            ]);
+            exit();
+        }
+
+        $usuario = SessionManager::get('usuario');
+        $usuarioId = (int)($usuario['id'] ?? 0);
+
+        $leadId = (int)($_POST['lead_id'] ?? 0);
+        $estadoNuevo = trim($_POST['estado'] ?? '');
+
+        $lm = new LeadModel();
+        $estadosValidos = $lm->getEstados();
+
+        if ($leadId <= 0 || !in_array($estadoNuevo, $estadosValidos, true)) {
+            http_response_code(422);
+            echo json_encode([
+                'ok' => false,
+                'mensaje' => 'Los datos enviados no son válidos.'
+            ]);
+            exit();
+        }
+
+        $leadActual = $lm->findById($leadId);
+
+        if (!$leadActual) {
+            http_response_code(404);
+            echo json_encode([
+                'ok' => false,
+                'mensaje' => 'No se ha encontrado el lead.'
+            ]);
+            exit();
+        }
+
+        $estadoAnterior = (string)($leadActual['estado'] ?? '');
+
+        if ($estadoAnterior === $estadoNuevo) {
+            echo json_encode([
+                'ok' => true,
+                'mensaje' => 'El lead ya estaba en ese estado.',
+                'estadoAnterior' => $estadoAnterior,
+                'estadoNuevo' => $estadoNuevo
+            ]);
+            exit();
+        }
+
+        $actualizado = $lm->updateEstado($leadId, $estadoNuevo);
+
+        if (!$actualizado) {
+            http_response_code(500);
+            echo json_encode([
+                'ok' => false,
+                'mensaje' => 'No se ha podido actualizar el estado.'
+            ]);
+            exit();
+        }
+
+        $lm->createHistorial([
+            'lead_id'         => $leadId,
+            'usuario_id'      => $usuarioId > 0 ? $usuarioId : null,
+            'tipo_evento'     => 'cambio_estado',
+            'titulo'          => 'Cambio de estado desde pipeline',
+            'descripcion'     => 'El lead ha cambiado de estado desde la vista Kanban.',
+            'estado_anterior' => $estadoAnterior,
+            'estado_nuevo'    => $estadoNuevo
+        ]);
+
+        echo json_encode([
+            'ok' => true,
+            'mensaje' => 'Estado actualizado correctamente.',
+            'estadoAnterior' => $estadoAnterior,
+            'estadoNuevo' => $estadoNuevo,
+            'leadId' => $leadId
+        ]);
+        exit();
+    }
 }
