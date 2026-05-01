@@ -277,4 +277,52 @@ class LeadModel
 
         return (int)$fechaCreacion->diff($hoy)->days;
     }
+
+    public function update(int $id, array $datos): bool
+    {
+        $sql = "UPDATE leads
+            SET lead_nombre = ?,
+                estado = ?,
+                responsable_id = ?,
+                servicios = ?,
+                indicaciones = ?,
+                lead_score = ?,
+                email = ?,
+                telefono = ?,
+                valor = ?,
+                ultimo_contacto = ?,
+                prioridad = ?,
+                origen = ?,
+                created_at = ?,
+                updated_at = NOW()
+            WHERE id = ?";
+
+        $resultado = $this->db->executeUpdate($sql, [
+            $datos['lead_nombre'],
+            $datos['estado'],
+            $datos['responsable_id'],
+            $datos['servicios'],
+            $datos['indicaciones'],
+            $datos['lead_score'],
+            $datos['email'],
+            $datos['telefono'],
+            $datos['valor'],
+            $datos['ultimo_contacto'],
+            $datos['prioridad'],
+            $datos['origen'],
+            $datos['created_at'],
+            $id
+        ]);
+
+        return $resultado !== false;
+    }
+
+    public function delete(int $id): bool
+    {
+        $sql = "DELETE FROM leads WHERE id = ?";
+
+        $resultado = $this->db->executeUpdate($sql, [$id]);
+
+        return $resultado !== false;
+    }
 }

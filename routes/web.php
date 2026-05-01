@@ -22,5 +22,10 @@ Route::post('/leads/cambiar-estado/{id}', [LeadController::class, 'cambiarEstado
 //Rutas notas
 Route::get('/leads/{id}', [LeadController::class, 'mostrarDetalle']);
 Route::post('/leads/{id}/notas/guardar', [LeadController::class, 'nuevaNota']);
+//editarLead o eliminar
+Route::post("/leads/{id}/actualizar", [LeadController::class, 'actualizarLead']);
+Route::post('/leads/{id}/eliminar', [LeadController::class, 'eliminarLead']);
+
+
 
 Route::handleRoute();

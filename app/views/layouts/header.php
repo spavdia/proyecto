@@ -16,3 +16,16 @@ declare(strict_types=1);
     
 </head>
 <body class="cuerpo-pagina">
+<?php if (!empty($mostrarBotonMenu)): ?>
+    <button
+        type="button"
+        class="boton-menu boton-menu-layout"
+        id="botonMenu"
+        aria-controls="asidePanel"
+        aria-expanded="false"
+        aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+<?php endif; ?>

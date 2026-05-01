@@ -5,6 +5,8 @@ declare(strict_types=1);
 $tituloPagina = 'PipelineDesk | Panel';
 $archivoCssVista = 'panel.css';
 $archivoJsVista = 'panel.js';
+$menuActivo = 'panel';
+$mostrarBotonMenu = true;
 
 require_once APP_ROOT . '/app/views/layouts/header.php';
 
@@ -63,33 +65,7 @@ $clasesServicios = [
 ?>
 
 <div class="panel" id="panelApp">
-    <aside class="aside" id="asidePanel" aria-label="Menú lateral">
-        <div class="aside-top">
-            <a href="<?= BASE_URL ?>" class="marca" aria-label="Ir al inicio de PipelineDesk">
-                <img src="<?= BASE_URL . 'img/logo-crm.png' ?>" alt="Logo de PipelineDesk">
-                <span>PipelineDesk</span>
-            </a>
-        </div>
-
-        <nav class="menu" aria-label="Navegación principal del panel">
-            <p class="menu-titulo">General</p>
-            <a href="<?= BASE_URL . 'panel' ?>" class="menu-enlace activo">Panel</a>
-            <a href="#" class="menu-enlace">Dashboard</a>
-            <a href="#" class="menu-enlace">Calendario</a>
-
-            <p class="menu-titulo">Comercial</p>
-            <a href="<?= BASE_URL . 'leads/nuevo' ?>" class="menu-enlace">Nuevo lead</a>
-            <a href="#" class="menu-enlace">Pipeline</a>
-            <a href="#" class="menu-enlace">Notas</a>
-            <a href="#" class="menu-enlace">Tareas</a>
-            <a href="#" class="menu-enlace">Objeciones</a>
-
-            <p class="menu-titulo">Configuración</p>
-            <a href="#" class="menu-enlace">Usuarios</a>
-            <a href="#" class="menu-enlace">Estadísticas</a>
-            <a href="<?= BASE_URL . 'logout' ?>" class="menu-enlace">Cerrar sesión</a>
-        </nav>
-    </aside>
+    <?php require APP_ROOT . '/app/views/layouts/panel_aside.php'; ?>
 
     <div class="fondo-menu" id="fondoMenu" aria-hidden="true"></div>
 
@@ -104,18 +80,6 @@ $clasesServicios = [
             </div>
 
             <div class="cabecera-acciones">
-                <button
-                    type="button"
-                    class="boton-menu"
-                    id="botonMenu"
-                    aria-controls="asidePanel"
-                    aria-expanded="false"
-                    aria-label="Abrir menú">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
                     <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>

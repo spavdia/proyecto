@@ -357,6 +357,7 @@ class LeadController extends Controller
         exit();
     }
 
+    //metodo GET URL con id o bien llamado con parametro URL id + ?editar=1
     public static function mostrarDetalle(int $id): void
     {
         SessionManager::iniciarSesion();
@@ -364,6 +365,7 @@ class LeadController extends Controller
 
         $lm = new LeadModel();
         $flash = SessionManager::getMensajeFlash();
+        $usuario = SessionManager::get('usuario');
 
         if ($id <= 0) {
             SessionManager::setMensajeFlash(
@@ -390,17 +392,26 @@ class LeadController extends Controller
         $notas = $lm->getNotasByLead($id);
         $historial = $lm->getHistorialByLead($id);
         $diasEnPanel = $lm->getDiasEnPanel((string)($lead['created_at'] ?? ''));
+        $esModoEdicion = isset($_GET['editar']) && $_GET['editar'] === '1';
 
         self::view('lead/detalles_view', [
-            'tituloPagina'  => 'PipelineDesk | Detalle del lead',
-            'lead'          => $lead,
-            'notas'         => $notas,
-            'historial'     => $historial,
-            'diasEnPanel'   => $diasEnPanel,
-            'estadosEmbudo' => $lm->getEstados(),
-            'mensajeFlash'  => $flash['mensaje'] ?? null,
-            'iconoFlash'    => $flash['icono'] ?? null,
-            'claseFlash'    => $flash['clase'] ?? 'info'
+            'tituloPagina'   => 'PipelineDesk | Detalle del lead',
+            'usuario' => $usuario,
+            'lead'           => $lead,
+            'notas'          => $notas,
+            'historial'      => $historial,
+            'diasEnPanel'    => $diasEnPanel,
+            'estadosEmbudo'  => $lm->getEstados(),
+            'estadosLista'   => $lm->getEstados(),
+            'prioridades'    => $lm->getPrioridades(),
+            'responsables'   => $lm->getResponsables(),
+            'serviciosLista' => $lm->getServicios(),
+            'esModoEdicion'  => $esModoEdicion,
+            'erroresEditar'  => [],
+            'leadForm'       => [],
+            'mensajeFlash'   => $flash['mensaje'] ?? null,
+            'iconoFlash'     => $flash['icono'] ?? null,
+            'claseFlash'     => $flash['clase'] ?? 'info'
         ]);
     }
 
@@ -482,6 +493,335 @@ class LeadController extends Controller
         );
 
         header('Location: ' . BASE_URL . 'leads/' . $id);
+        exit();
+    }
+
+    //Actualizar Lead
+
+
+    //post actualizar lead
+    public static function actualizarLead(int $id): void
+    {
+        SessionManager::iniciarSesion();
+        SessionManager::usuarioNoAutenticado('usuario', 'login');
+
+        $lm = new LeadModel();
+        $usuario = SessionManager::get('usuario');
+        $usuarioId = (int)($usuario['id'] ?? 0);
+        $esAdmin = (($usuario['rol'] ?? '') === 'admin');
+
+        if ($id <= 0) {
+            SessionManager::setMensajeFlash(
+                'Lead no válido.',
+                '⚠',
+                'error'
+            );
+            header('Location: ' . BASE_URL . 'panel');
+            exit();
+        }
+
+        $leadActual = $lm->findById($id);
+
+        if (!$leadActual) {
+            SessionManager::setMensajeFlash(
+                'No se ha encontrado el lead.',
+                '⚠',
+                'error'
+            );
+            header('Location: ' . BASE_URL . 'panel');
+            exit();
+        }
+
+        $erroresEditar = [];
+
+        $leadNombre = trim($_POST['lead_nombre'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $telefono = trim($_POST['telefono'] ?? '');
+        $servicios = trim($_POST['servicios'] ?? '');
+        $prioridad = trim($_POST['prioridad'] ?? PRIORIDAD_POR_DEFECTO);
+        $valor = trim($_POST['valor'] ?? '');
+        $estado = trim($_POST['estado'] ?? ESTADO_POR_DEFECTO);
+        $responsableId = (int)($_POST['responsable_id'] ?? USUARIO_POR_DEFECTO);
+
+        if ($leadNombre === '') {
+            $erroresEditar['lead_nombre'] = 'Error. Debes rellenar el nombre del lead.';
+        }
+
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $erroresEditar['email'] = 'Error. El email no tiene un formato válido.';
+        }
+
+        if ($servicios === '') {
+            $erroresEditar['servicios'] = 'Error. Debes seleccionar un servicio.';
+        }
+
+        if (!in_array($servicios, $lm->getServicios(), true)) {
+            $erroresEditar['servicios'] = 'Error. Debes seleccionar un servicio válido.';
+        }
+
+        if (!in_array($prioridad, $lm->getPrioridades(), true)) {
+            $erroresEditar['prioridad'] = 'Error. Debes seleccionar una prioridad válida.';
+        }
+
+        if (!in_array($estado, $lm->getEstados(), true)) {
+            $erroresEditar['estado'] = 'Error. Debes seleccionar un estado válido.';
+        }
+
+        $responsables = $lm->getResponsables();
+        $idsResponsables = array_map(static fn($r) => (int)$r['id'], $responsables);
+
+        if (!in_array($responsableId, $idsResponsables, true)) {
+            $erroresEditar['responsable_id'] = 'Error. Debes seleccionar un responsable válido.';
+        }
+
+        if ($valor !== '' && (!is_numeric($valor) || (float)$valor < 0)) {
+            $erroresEditar['valor'] = 'Error. El valor debe ser un número positivo.';
+        }
+
+        /*
+     * CAMPOS SOLO ADMIN
+     */
+        $leadScore = (string)($leadActual['lead_score'] ?? '0');
+        $ultimoContacto = '';
+        $indicaciones = (string)($leadActual['indicaciones'] ?? '');
+        $origen = (string)($leadActual['origen'] ?? '');
+        $createdAt = (string)($leadActual['created_at'] ?? '');
+
+        if ($esAdmin) {
+            $leadScore = trim($_POST['lead_score'] ?? (string)($leadActual['lead_score'] ?? '0'));
+            $ultimoContacto = trim($_POST['ultimo_contacto'] ?? '');
+            $indicaciones = trim($_POST['indicaciones'] ?? '');
+            $origen = trim($_POST['origen'] ?? (string)($leadActual['origen'] ?? ''));
+            $createdAt = trim($_POST['created_at'] ?? '');
+
+            if ($leadScore === '' || !ctype_digit($leadScore)) {
+                $erroresEditar['lead_score'] = 'Error. Lead Score debe ser un entero igual o mayor que 0.';
+            }
+
+            if ($ultimoContacto !== '') {
+                $fechaUltimoContacto = \DateTime::createFromFormat('Y-m-d\TH:i', $ultimoContacto);
+                if (!$fechaUltimoContacto) {
+                    $erroresEditar['ultimo_contacto'] = 'Error. La fecha de último contacto no es válida.';
+                }
+            }
+
+            if (!in_array($origen, ['formulario_web', 'app_interna'], true)) {
+                $erroresEditar['origen'] = 'Error. Debes seleccionar un origen válido.';
+            }
+
+            if ($createdAt === '') {
+                $erroresEditar['created_at'] = 'Error. La fecha de creación es obligatoria.';
+            } else {
+                $fechaCreacion = \DateTime::createFromFormat('Y-m-d\TH:i', $createdAt);
+                if (!$fechaCreacion) {
+                    $erroresEditar['created_at'] = 'Error. La fecha de creación no es válida.';
+                }
+            }
+        }
+
+        $leadForm = [
+            'lead_nombre'    => $leadNombre,
+            'email'          => $email,
+            'telefono'       => $telefono,
+            'servicios'      => $servicios,
+            'prioridad'      => $prioridad,
+            'valor'          => $valor,
+            'estado'         => $estado,
+            'responsable_id' => $responsableId,
+            'lead_score'     => $leadScore,
+            'ultimo_contacto' => $ultimoContacto,
+            'indicaciones'   => $indicaciones,
+            'origen'         => $origen,
+            'created_at'     => $createdAt
+        ];
+
+        if (!empty($erroresEditar)) {
+            $notas = $lm->getNotasByLead($id);
+            $historial = $lm->getHistorialByLead($id);
+            $diasEnPanel = $lm->getDiasEnPanel((string)($leadActual['created_at'] ?? ''));
+
+            self::view('lead/detalles_view', [
+                'tituloPagina'   => 'PipelineDesk | Detalle del lead',
+                'usuario'        => $usuario,
+                'lead'           => $leadActual,
+                'notas'          => $notas,
+                'historial'      => $historial,
+                'diasEnPanel'    => $diasEnPanel,
+                'estadosEmbudo'  => $lm->getEstados(),
+                'estadosLista'   => $lm->getEstados(),
+                'prioridades'    => $lm->getPrioridades(),
+                'responsables'   => $responsables,
+                'serviciosLista' => $lm->getServicios(),
+                'esModoEdicion'  => true,
+                'erroresEditar'  => $erroresEditar,
+                'leadForm'       => $leadForm,
+                'mensajeFlash'   => null,
+                'iconoFlash'     => null,
+                'claseFlash'     => 'error'
+            ]);
+            return;
+        }
+
+        $ultimoContactoBd = $leadActual['ultimo_contacto'] ?? null;
+        $createdAtBd = $leadActual['created_at'] ?? null;
+
+        if ($esAdmin) {
+            $ultimoContactoBd = $ultimoContacto !== '' ? str_replace('T', ' ', $ultimoContacto) . ':00' : null;
+            $createdAtBd = str_replace('T', ' ', $createdAt) . ':00';
+        }
+
+        $datosUpdate = [
+            'lead_nombre'    => $leadNombre,
+            'estado'         => $estado,
+            'responsable_id' => $responsableId,
+            'servicios'      => $servicios,
+            'indicaciones'   => $esAdmin ? ($indicaciones !== '' ? $indicaciones : null) : ($leadActual['indicaciones'] ?? null),
+            'lead_score'     => $esAdmin ? (int)$leadScore : (int)($leadActual['lead_score'] ?? 0),
+            'email'          => $email !== '' ? $email : null,
+            'telefono'       => $telefono !== '' ? $telefono : null,
+            'valor'          => $valor !== '' ? (float)$valor : null,
+            'ultimo_contacto' => $ultimoContactoBd,
+            'prioridad'      => $prioridad,
+            'origen'         => $esAdmin ? $origen : (string)($leadActual['origen'] ?? ''),
+            'created_at'     => $createdAtBd
+        ];
+
+        $actualizado = $lm->update($id, $datosUpdate);
+
+        if (!$actualizado) {
+            SessionManager::setMensajeFlash(
+                'No se ha podido actualizar el lead en bbdd.',
+                '⚠',
+                'error'
+            );
+            header('Location: ' . BASE_URL . 'leads/' . $id . '?editar=1');
+            exit();
+        }
+
+        $camposModificados = [];
+
+        $mapaComparacion = [
+            'lead_nombre' => 'nombre',
+            'email' => 'email',
+            'telefono' => 'teléfono',
+            'servicios' => 'servicio',
+            'valor' => 'valor',
+            'prioridad' => 'prioridad',
+            'responsable_id' => 'responsable',
+            'lead_score' => 'lead score',
+            'ultimo_contacto' => 'último contacto',
+            'indicaciones' => 'indicaciones',
+            'origen' => 'origen',
+            'created_at' => 'fecha de creación'
+        ];
+
+        foreach ($mapaComparacion as $campo => $texto) {
+            $valorAnterior = $leadActual[$campo] ?? null;
+            $valorNuevo = $datosUpdate[$campo] ?? null;
+
+            if ((string)$valorAnterior !== (string)$valorNuevo) {
+                $camposModificados[] = $texto;
+            }
+        }
+
+        if ((string)($leadActual['estado'] ?? '') !== $estado) {
+            $lm->createHistorial([
+                'lead_id'         => $id,
+                'usuario_id'      => $usuarioId > 0 ? $usuarioId : null,
+                'tipo_evento'     => 'cambio_estado',
+                'titulo'          => 'Cambio de estado',
+                'descripcion'     => 'El estado se ha actualizado desde la ficha del lead.',
+                'estado_anterior' => (string)($leadActual['estado'] ?? ''),
+                'estado_nuevo'    => $estado
+            ]);
+        }
+
+        if (!empty($camposModificados)) {
+            $descripcion = 'Se han actualizado estos campos: ' . implode(', ', $camposModificados) . '.';
+
+            $lm->createHistorial([
+                'lead_id'         => $id,
+                'usuario_id'      => $usuarioId > 0 ? $usuarioId : null,
+                'tipo_evento'     => 'nota',
+                'titulo'          => 'Lead actualizado',
+                'descripcion'     => $descripcion,
+                'estado_anterior' => null,
+                'estado_nuevo'    => null
+            ]);
+        }
+
+        SessionManager::setMensajeFlash(
+            'Lead actualizado correctamente.',
+            '✅',
+            'exito'
+        );
+
+        header('Location: ' . BASE_URL . 'leads/' . $id);
+        exit();
+    }
+
+    //eliminar solo con admin
+    public static function eliminarLead(int $id): void
+    {
+        SessionManager::iniciarSesion();
+        SessionManager::usuarioNoAutenticado('usuario', 'login');
+
+        $usuario = SessionManager::get('usuario');
+        $rolUsuario = (string)($usuario['rol'] ?? '');
+
+        if ($rolUsuario !== 'admin') {
+            SessionManager::setMensajeFlash(
+                'No tienes permisos para eliminar leads.',
+                '⚠',
+                'error'
+            );
+            header('Location: ' . BASE_URL . 'panel');
+            exit();
+        }
+
+        $lm = new LeadModel();
+
+        if ($id <= 0) {
+            SessionManager::setMensajeFlash(
+                'Lead no válido.',
+                '⚠',
+                'error'
+            );
+            header('Location: ' . BASE_URL . 'panel');
+            exit();
+        }
+
+        $lead = $lm->findById($id);
+
+        if (!$lead) {
+            SessionManager::setMensajeFlash(
+                'No se ha encontrado el lead.',
+                '⚠',
+                'error'
+            );
+            header('Location: ' . BASE_URL . 'panel');
+            exit();
+        }
+
+        $eliminado = $lm->delete($id);
+
+        if (!$eliminado) {
+            SessionManager::setMensajeFlash(
+                'No se ha podido eliminar el lead.',
+                '⚠',
+                'error'
+            );
+            header('Location: ' . BASE_URL . 'leads/' . $id);
+            exit();
+        }
+
+        SessionManager::setMensajeFlash(
+            'Lead eliminado correctamente.',
+            '✅',
+            'exito'
+        );
+
+        header('Location: ' . BASE_URL . 'panel');
         exit();
     }
 }

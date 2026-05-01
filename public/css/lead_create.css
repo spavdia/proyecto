@@ -180,3 +180,79 @@
         min-height: 56px;
     }
 }
+/* CABECERA NUEVO LEAD EN PANEL */
+.cabecera-lead-panel {
+    background: var(--color-fondo-superficie);
+    border-radius: 22px;
+    padding: 28px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.cabecera-etiqueta {
+    margin: 0 0 10px;
+    color: var(--color-marca);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.cabecera-lead-panel h1 {
+    margin: 0 0 12px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.15;
+    color: var(--color-texto-principal);
+    font-weight: 300;
+}
+
+.cabecera-texto {
+    margin: 0;
+    max-width: 760px;
+    color: var(--color-texto-secundario);
+    line-height: 1.7;
+    font-size: 1.02rem;
+}
+
+.cabecera-acciones {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.panel .nuevo-lead {
+    min-height: auto;
+    padding: 0;
+    background: transparent;
+}
+
+.panel .caja-lead {
+    width: min(860px, 100%);
+    max-width: 860px;
+}
+
+@media (max-width: 768px) {
+    .cabecera-lead-panel {
+        padding: 22px 18px;
+        border-radius: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cabecera-lead-panel {
+        padding: 18px 14px;
+        gap: 14px;
+    }
+
+    .cabecera-lead-panel h1 {
+        font-size: 2rem;
+    }
+
+    .cabecera-texto {
+        font-size: 1rem;
+    }
+}
