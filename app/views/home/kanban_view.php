@@ -41,6 +41,18 @@ $estadosPanel = [
         'clase'  => 'estado-perdido'
     ]
 ];
+
+$clasesPrioridadTarjeta = [
+    'Alta' => 'tarjeta-alta',
+    'Media' => 'tarjeta-media',
+    'Baja' => 'tarjeta-baja'
+];
+
+$clasesPrioridadCampo = [
+    'Alta' => 'prioridad-alta',
+    'Media' => 'prioridad-media',
+    'Baja' => 'prioridad-baja'
+];
 ?>
 
 <div class="panel" id="kanbanApp" data-base-url="<?= htmlspecialchars(BASE_URL) ?>">
@@ -51,24 +63,14 @@ $estadosPanel = [
     <main class="contenido">
         <header class="cabecera-kanban">
             <div class="cabecera-info">
-                <p class="cabecera-etiqueta">Pipeline interactivo</p>
-                <h1>Vista Kanban del embudo comercial</h1>
+                <p class="cabecera-etiqueta">Pipeline CRM</p>
+                <h1>Etapas del negocio</h1>
                 <p class="cabecera-texto">
-                    Arrastra los leads entre columnas para actualizar su estado en tiempo real.
+                   Gestión del embudo de ventas
                 </p>
             </div>
 
             <div class="cabecera-acciones">
-                <button
-                    type="button"
-                    class="boton-config"
-                    id="botonConfigKanban"
-                    aria-expanded="false"
-                    aria-controls="panelConfigKanban"
-                    aria-label="Configurar campos visibles de las tarjetas">
-                    <span aria-hidden="true">⚙</span>
-                </button>
-
                 <button
                     type="button"
                     class="boton-menu"
@@ -79,6 +81,18 @@ $estadosPanel = [
                     <span></span>
                     <span></span>
                     <span></span>
+                </button>
+
+                <a href="<?= BASE_URL . 'panel' ?>" class="boton boton-volver">Volver al panel</a>
+
+                <button
+                    type="button"
+                    class="boton-config"
+                    id="botonConfigKanban"
+                    aria-expanded="false"
+                    aria-controls="panelConfigKanban"
+                    aria-label="Configurar campos visibles de las tarjetas">
+                    <span aria-hidden="true">⚙</span>
                 </button>
 
                 <div class="usuario">
@@ -207,10 +221,13 @@ $estadosPanel = [
                                 $valorTarjeta = (float)($lead['valor'] ?? 0);
                                 $ultimoContacto = !empty($lead['ultimo_contacto']) ? (string)$lead['ultimo_contacto'] : 'Sin contacto';
                                 $origenTexto = (($lead['origen'] ?? '') === 'formulario_web') ? 'Formulario web' : 'App interna';
+                                $prioridadLead = (string)($lead['prioridad'] ?? 'Media');
+                                $claseTarjeta = $clasesPrioridadTarjeta[$prioridadLead] ?? 'tarjeta-media';
+                                $clasePrioridad = $clasesPrioridadCampo[$prioridadLead] ?? 'prioridad-media';
                                 ?>
 
                                 <article
-                                    class="kanban-tarjeta"
+                                    class="kanban-tarjeta <?= htmlspecialchars($claseTarjeta) ?>"
                                     draggable="true"
                                     data-id="<?= (int)($lead['id'] ?? 0) ?>"
                                     data-estado="<?= htmlspecialchars((string)($lead['estado'] ?? '')) ?>"
@@ -253,7 +270,9 @@ $estadosPanel = [
 
                                         <p class="campo-tarjeta" data-campo="prioridad">
                                             <strong>Prioridad:</strong>
-                                            <?= htmlspecialchars((string)($lead['prioridad'] ?? '-')) ?>
+                                            <span class="chip-prioridad <?= htmlspecialchars($clasePrioridad) ?>">
+                                                <?= htmlspecialchars($prioridadLead) ?>
+                                            </span>
                                         </p>
 
                                         <p class="campo-tarjeta" data-campo="estado">

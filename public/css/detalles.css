@@ -1,7 +1,7 @@
 /* ESTRUCTURA GENERAL DEL PANEL PRIVADO */
 .panel {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 1fr;
     min-height: 100vh;
     background: var(--color-fondo-suave);
     position: relative;
@@ -9,6 +9,8 @@
 
 .contenido {
     padding: 28px 24px 40px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* ASIDE */
@@ -17,12 +19,20 @@
     border-right: 1px solid var(--color-borde-general);
     padding: 24px 18px;
     height: 100vh;
-    position: sticky;
+    width: 280px;
+    max-width: 86vw;
+    position: fixed;
     top: 0;
+    left: 0;
     overflow-y: auto;
     z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
-
+.panel.menu-abierto .aside {
+    transform: translateX(0);
+}
 .aside-top {
     margin-bottom: 28px;
 }
@@ -109,12 +119,23 @@
 
 /* FONDO MENU */
 .fondo-menu {
-    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 30;
+    display: block;
 }
 
+.panel.menu-abierto .fondo-menu {
+    opacity: 1;
+    pointer-events: auto;
+}
 /* BOTON MENU */
 .boton-menu {
-    display: none;
+    display: inline-flex;
     width: 48px;
     height: 48px;
     border: 1px solid var(--color-borde-general);

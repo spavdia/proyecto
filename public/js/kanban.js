@@ -56,6 +56,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 2400);
     }
 
+    function marcarTarjeta(tarjeta, clase) {
+        if (!tarjeta) {
+            return;
+        }
+
+        tarjeta.classList.add(clase);
+
+        window.setTimeout(function () {
+            tarjeta.classList.remove(clase);
+        }, 900);
+    }
+
     function actualizarResumenColumnas() {
         const columnas = tablero.querySelectorAll('.kanban-columna');
 
@@ -266,6 +278,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         throw new Error(json.mensaje || 'No se ha podido actualizar el estado.');
                     }
 
+                    marcarTarjeta(tarjetaActiva, 'movido-ok');
                     mostrarMensaje(json.mensaje || 'Estado actualizado.', 'exito');
                     estadoOrigen = estadoDestino;
                 })
@@ -280,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         actualizarResumenColumnas();
                     }
 
+                    marcarTarjeta(tarjetaActiva, 'movido-error');
                     mostrarMensaje(error.message || 'Ha ocurrido un error.', 'error');
                 });
         });
@@ -294,6 +308,13 @@ document.addEventListener('DOMContentLoaded', function () {
         fondoMenu.addEventListener('click', function () {
             app.classList.remove('menu-abierto');
             botonMenu.setAttribute('aria-expanded', 'false');
+        });
+
+        document.addEventListener('keydown', function (evento) {
+            if (evento.key === 'Escape') {
+                app.classList.remove('menu-abierto');
+                botonMenu.setAttribute('aria-expanded', 'false');
+            }
         });
     }
 

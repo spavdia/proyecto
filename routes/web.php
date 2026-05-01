@@ -11,7 +11,7 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('/panel', [HomeController::class, 'panel']);
 Route::get('/pipeline', [HomeController::class, 'kanban']);
 
-Route::get('/login', [LoginController::class, 'mostrarLoginForm']);
+Route::get('/login', [LoginController::class, 'mostrarFormLogin']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::get('/logout', [LoginController::class, 'logout']);
 

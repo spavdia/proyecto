@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 $tituloPagina = 'PipelineDesk | Detalle del lead';
 $archivoCssVista = 'detalles.css';
-$archivoJsVista = 'panel.js';
+$archivoJsVista = 'detalles.js';
 $menuActivo = 'panel';
-$mostrarBotonMenu = true;
+$mostrarBotonMenu = false;
 
 require_once APP_ROOT . '/app/views/layouts/header.php';
 
@@ -118,7 +118,7 @@ $claseEstadoActual = $clasesEstado[$estadoActual] ?? 'estado-nuevo';
                 <section class="cabecera-detalle">
                     <div class="cabecera-superior">
                         <div>
-                            <p class="cabecera-etiqueta">Detalle del lead</p>
+                            <p class="cabecera-etiqueta">Detalles del lead</p>
                             <h1><?= htmlspecialchars($nombreLead) ?></h1>
                             <p class="cabecera-meta">
                                 Creado el <strong><?= htmlspecialchars($fechaCreacion ?: 'Sin fecha') ?></strong>
@@ -127,58 +127,72 @@ $claseEstadoActual = $clasesEstado[$estadoActual] ?? 'estado-nuevo';
                         </div>
 
                         <div class="cabecera-acciones">
-                            <a href="<?= BASE_URL . 'panel' ?>" class="boton boton-volver">Volver al panel</a>
+                            
+                                <button
+                                    type="button"
+                                    class="boton-menu"
+                                    id="botonMenu"
+                                    aria-controls="asidePanel"
+                                    aria-expanded="false"
+                                    aria-label="Abrir menú">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </button>
 
-                            <form action="<?= BASE_URL . 'leads/cambiar-estado/' . $leadId ?>" method="POST">
-                                <input type="hidden" name="estado" value="Ganado">
-                                <input type="hidden" name="volver_detalle" value="1">
-                                <button type="submit" class="boton boton-ganado">Ganado</button>
-                            </form>
+                                <a href="<?= BASE_URL . 'panel' ?>" class="boton boton-volver">Volver al panel</a>
 
-                            <form action="<?= BASE_URL . 'leads/cambiar-estado/' . $leadId ?>" method="POST">
-                                <input type="hidden" name="estado" value="Perdido">
-                                <input type="hidden" name="volver_detalle" value="1">
-                                <button type="submit" class="boton boton-perdido">Perdido</button>
-                            </form>
+                                <form action="<?= BASE_URL . 'leads/cambiar-estado/' . $leadId ?>" method="POST">
+                                    <input type="hidden" name="estado" value="Ganado">
+                                    <input type="hidden" name="volver_detalle" value="1">
+                                    <button type="submit" class="boton boton-ganado">Ganado</button>
+                                </form>
+
+                                <form action="<?= BASE_URL . 'leads/cambiar-estado/' . $leadId ?>" method="POST">
+                                    <input type="hidden" name="estado" value="Perdido">
+                                    <input type="hidden" name="volver_detalle" value="1">
+                                    <button type="submit" class="boton boton-perdido">Perdido</button>
+                                </form>
+                            </div>
                             <?php if (($usuario['rol'] ?? '') === 'admin'): ?> <form action="<?= BASE_URL . 'leads/' . $leadId . '/eliminar' ?>" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este lead?');">
                                     <button type="submit" class="boton boton-perdido">Eliminar</button>
                                 </form>
                             <?php
                             endif; ?>
                         </div>
-                    </div>
+                    
 
                     <div class="cabecera-etapas">
-    <div class="etapas-top">
-        <h2>Etapas del acuerdo</h2>
-        <span class="estado-actual <?= htmlspecialchars($claseEstadoActual) ?>">
-            <?= htmlspecialchars($estadoActual) ?>
-        </span>
-    </div>
+                        <div class="etapas-top">
+                            <h2>Etapas del acuerdo</h2>
+                            <span class="estado-actual <?= htmlspecialchars($claseEstadoActual) ?>">
+                                <?= htmlspecialchars($estadoActual) ?>
+                            </span>
+                        </div>
 
-    <?php
-    $indiceEstadoActual = array_search($estadoActual, $estadosEmbudo, true);
-    ?>
+                        <?php
+                        $indiceEstadoActual = array_search($estadoActual, $estadosEmbudo, true);
+                        ?>
 
-    <div class="barra-etapas" aria-label="Estado actual del lead en el embudo">
-        <?php foreach ($estadosEmbudo as $indice => $estadoItem): ?>
-            <?php
-            $clasePaso = 'paso pendiente';
+                        <div class="barra-etapas" aria-label="Estado actual del lead en el embudo">
+                            <?php foreach ($estadosEmbudo as $indice => $estadoItem): ?>
+                                <?php
+                                $clasePaso = 'paso pendiente';
 
-            if ($indiceEstadoActual !== false) {
-                if ($indice < $indiceEstadoActual) {
-                    $clasePaso = 'paso completado';
-                } elseif ($indice === $indiceEstadoActual) {
-                    $clasePaso = 'paso activo';
-                }
-            }
-            ?>
-            <div class="<?= $clasePaso ?>">
-                <span><?= htmlspecialchars($estadoItem) ?></span>
-            </div>
-        <?php endforeach; ?>
-    </div>
-</div>
+                                if ($indiceEstadoActual !== false) {
+                                    if ($indice < $indiceEstadoActual) {
+                                        $clasePaso = 'paso completado';
+                                    } elseif ($indice === $indiceEstadoActual) {
+                                        $clasePaso = 'paso activo';
+                                    }
+                                }
+                                ?>
+                                <div class="<?= $clasePaso ?>">
+                                    <span><?= htmlspecialchars($estadoItem) ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="detalle-grid">
@@ -400,7 +414,7 @@ $claseEstadoActual = $clasesEstado[$estadoActual] ?? 'estado-nuevo';
                     <div class="columna-actividad">
                         <section class="tarjeta tarjeta-nota">
                             <div class="tarjeta-top">
-                                <h2>Agregar actividad</h2>
+                                <h2>Actividad & Email</h2>
                             </div>
 
                             <?php if (!empty($mensajeFlash)): ?>
@@ -436,7 +450,7 @@ $claseEstadoActual = $clasesEstado[$estadoActual] ?? 'estado-nuevo';
 
                         <section class="tarjeta tarjeta-historial">
                             <div class="tarjeta-top">
-                                <h2>Historial y actividades</h2>
+                                <h2>Historial del lead</h2>
                             </div>
 
                             <?php if (empty($historial)): ?>

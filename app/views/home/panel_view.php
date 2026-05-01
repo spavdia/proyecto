@@ -72,10 +72,10 @@ $clasesServicios = [
     <main class="contenido">
         <header class="cabecera-panel">
             <div class="cabecera-info">
-                <p class="cabecera-etiqueta">CRM Pipeline</p>
-                <h1>Panel</h1>
+                <p class="cabecera-etiqueta">Pipeline</p>
+                <h1>CRM</h1>
                 <p class="cabecera-texto">
-                    PipelineDesk con los leads agrupados por estado del embudo.
+                    Leads agrupados por etapas.
                 </p>
             </div>
 
