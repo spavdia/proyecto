@@ -6,6 +6,7 @@ use Sergio\Lib\Route;
 use Sergio\App\Controllers\HomeController;
 use Sergio\App\Controllers\LoginController;
 use Sergio\App\Controllers\LeadController;
+use Sergio\App\Controllers\TareaController;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/panel', [HomeController::class, 'panel']);
@@ -30,4 +31,8 @@ Route::post('/leads/{id}/eliminar', [LeadController::class, 'eliminarLead']);
 Route::post('/leads/{id}/notas/guardar', [LeadController::class, 'nuevaNota']);
 Route::get('/leads/{id}', [LeadController::class, 'mostrarDetalle']);
 
+Route::get('/tareas', [TareaController::class, 'index']);
+Route::post('/tareas/guardar', [TareaController::class, 'guardar']);
+Route::post('/tareas/{id}/actualizar', [TareaController::class, 'actualizar']);
+Route::post('/tareas/{id}/eliminar', [TareaController::class, 'eliminar']);
 Route::handleRoute();

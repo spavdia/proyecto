@@ -4,6 +4,7 @@ namespace Sergio\App\Controllers;
 
 use Sergio\Lib\SessionManager;
 use Sergio\App\models\LeadModel;
+use Sergio\App\models\TareaModel;
 
 class LeadController extends Controller
 {
@@ -167,7 +168,7 @@ class LeadController extends Controller
         $errores = [];
 
         $usuario = SessionManager::get('usuario');
-        $usuarioId = (int)($usuario['id'] ?? 0);
+        $usuarioId = (int) ($usuario['id'] ?? 0);
 
         $leadNombre = trim($_POST['lead_nombre'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -177,7 +178,7 @@ class LeadController extends Controller
         $prioridad = trim($_POST['prioridad'] ?? PRIORIDAD_POR_DEFECTO);
         $valor = trim($_POST['valor'] ?? '');
         $estado = trim($_POST['estado'] ?? ESTADO_POR_DEFECTO);
-        $responsableId = (int)($_POST['responsable_id'] ?? USUARIO_POR_DEFECTO);
+        $responsableId = (int) ($_POST['responsable_id'] ?? USUARIO_POR_DEFECTO);
 
         if ($leadNombre === '') {
             $errores['lead_nombre'] = 'Error. Debes rellenar el nombre del lead.';
@@ -200,13 +201,13 @@ class LeadController extends Controller
         }
 
         $responsables = $lm->getResponsables();
-        $idsResponsables = array_map(static fn($r) => (int)$r['id'], $responsables);
+        $idsResponsables = array_map(static fn($r) => (int) $r['id'], $responsables);
 
         if (!in_array($responsableId, $idsResponsables, true)) {
             $errores['responsable_id'] = 'Error. Debes seleccionar un responsable válido.';
         }
 
-        if ($valor !== '' && (!is_numeric($valor) || (float)$valor < 0)) {
+        if ($valor !== '' && (!is_numeric($valor) || (float) $valor < 0)) {
             $errores['valor'] = 'Error. El valor debe ser un número positivo.';
         }
 
@@ -243,7 +244,7 @@ class LeadController extends Controller
             'lead_score'      => 0,
             'email'           => $email !== '' ? $email : null,
             'telefono'        => $telefono !== '' ? $telefono : null,
-            'valor'           => $valor !== '' ? (float)$valor : null,
+            'valor'           => $valor !== '' ? (float) $valor : null,
             'ultimo_contacto' => null,
             'prioridad'       => $prioridad,
             'origen'          => 'app_interna'
@@ -273,10 +274,28 @@ class LeadController extends Controller
             ]);
         }
 
+        $mensajeFlash = 'Lead creado correctamente.';
+        $iconoFlash = '✅';
+        $claseFlash = 'exito';
+
+        if ($leadId > 0 && $estado === 'Objeciones') {
+            $tareaCreada = self::crearTareaAutomaticaObjecion($leadId, $usuarioId);
+
+            if ($tareaCreada) {
+                $mensajeFlash = 'Lead creado en Objeciones. Se ha generado una tarea para resolver bloqueos desde Tareas.';
+                $iconoFlash = '⚠';
+                $claseFlash = 'info';
+            } else {
+                $mensajeFlash = 'Lead creado en Objeciones.';
+                $iconoFlash = '⚠';
+                $claseFlash = 'info';
+            }
+        }
+
         SessionManager::setMensajeFlash(
-            'Lead creado correctamente.',
-            '✅',
-            'exito'
+            $mensajeFlash,
+            $iconoFlash,
+            $claseFlash
         );
 
         header('Location: ' . BASE_URL . 'panel');
@@ -289,7 +308,7 @@ class LeadController extends Controller
         SessionManager::usuarioNoAutenticado('usuario', 'login');
 
         $usuario = SessionManager::get('usuario');
-        $usuarioId = (int)($usuario['id'] ?? 0);
+        $usuarioId = (int) ($usuario['id'] ?? 0);
 
         $lm = new LeadModel();
         $estadosValidos = $lm->getEstados();
@@ -317,7 +336,7 @@ class LeadController extends Controller
             exit();
         }
 
-        $estadoAnterior = (string)($leadActual['estado'] ?? '');
+        $estadoAnterior = (string) ($leadActual['estado'] ?? '');
         $actualizado = $lm->updateEstado($id, $estado);
 
         if (!$actualizado) {
@@ -342,10 +361,28 @@ class LeadController extends Controller
             ]);
         }
 
+        $mensajeFlash = 'Estado actualizado.';
+        $iconoFlash = '✅';
+        $claseFlash = 'exito';
+
+        if ($estadoAnterior !== 'Objeciones' && $estado === 'Objeciones') {
+            $tareaCreada = self::crearTareaAutomaticaObjecion($id, $usuarioId);
+
+            if ($tareaCreada) {
+                $mensajeFlash = 'El lead ha entrado en Objeciones. Debes resolver bloqueos desde Tareas.';
+                $iconoFlash = '⚠';
+                $claseFlash = 'info';
+            } else {
+                $mensajeFlash = 'El lead ha entrado en Objeciones.';
+                $iconoFlash = '⚠';
+                $claseFlash = 'info';
+            }
+        }
+
         SessionManager::setMensajeFlash(
-            'Estado actualizado.',
-            '✅',
-            'exito'
+            $mensajeFlash,
+            $iconoFlash,
+            $claseFlash
         );
 
         if (($_POST['volver_detalle'] ?? '') === '1') {
@@ -357,7 +394,6 @@ class LeadController extends Controller
         exit();
     }
 
-    //metodo GET URL con id o bien llamado con parametro URL id + ?editar=1
     public static function mostrarDetalle(int $id): void
     {
         SessionManager::iniciarSesion();
@@ -391,12 +427,12 @@ class LeadController extends Controller
 
         $notas = $lm->getNotasByLead($id);
         $historial = $lm->getHistorialByLead($id);
-        $diasEnPanel = $lm->getDiasEnPanel((string)($lead['created_at'] ?? ''));
+        $diasEnPanel = $lm->getDiasEnPanel((string) ($lead['created_at'] ?? ''));
         $esModoEdicion = isset($_GET['editar']) && $_GET['editar'] === '1';
 
         self::view('lead/detalles_view', [
             'tituloPagina'   => 'PipelineDesk | Detalle del lead',
-            'usuario' => $usuario,
+            'usuario'        => $usuario,
             'lead'           => $lead,
             'notas'          => $notas,
             'historial'      => $historial,
@@ -421,7 +457,7 @@ class LeadController extends Controller
         SessionManager::usuarioNoAutenticado('usuario', 'login');
 
         $usuario = SessionManager::get('usuario');
-        $usuarioId = (int)($usuario['id'] ?? 0);
+        $usuarioId = (int) ($usuario['id'] ?? 0);
         $tipoActividad = trim($_POST['tipo_actividad'] ?? '');
         $contenido = trim($_POST['contenido'] ?? '');
         $tiposValidos = ['Llamada', 'Email', 'Cita presencial'];
@@ -476,6 +512,8 @@ class LeadController extends Controller
             exit();
         }
 
+        $lm->updateUltimoContacto($id);
+
         $lm->createHistorial([
             'lead_id'         => $id,
             'usuario_id'      => $usuarioId,
@@ -496,10 +534,6 @@ class LeadController extends Controller
         exit();
     }
 
-    //Actualizar Lead
-
-
-    //post actualizar lead
     public static function actualizarLead(int $id): void
     {
         SessionManager::iniciarSesion();
@@ -507,7 +541,7 @@ class LeadController extends Controller
 
         $lm = new LeadModel();
         $usuario = SessionManager::get('usuario');
-        $usuarioId = (int)($usuario['id'] ?? 0);
+        $usuarioId = (int) ($usuario['id'] ?? 0);
         $esAdmin = (($usuario['rol'] ?? '') === 'admin');
 
         if ($id <= 0) {
@@ -541,7 +575,7 @@ class LeadController extends Controller
         $prioridad = trim($_POST['prioridad'] ?? PRIORIDAD_POR_DEFECTO);
         $valor = trim($_POST['valor'] ?? '');
         $estado = trim($_POST['estado'] ?? ESTADO_POR_DEFECTO);
-        $responsableId = (int)($_POST['responsable_id'] ?? USUARIO_POR_DEFECTO);
+        $responsableId = (int) ($_POST['responsable_id'] ?? USUARIO_POR_DEFECTO);
 
         if ($leadNombre === '') {
             $erroresEditar['lead_nombre'] = 'Error. Debes rellenar el nombre del lead.';
@@ -568,30 +602,27 @@ class LeadController extends Controller
         }
 
         $responsables = $lm->getResponsables();
-        $idsResponsables = array_map(static fn($r) => (int)$r['id'], $responsables);
+        $idsResponsables = array_map(static fn($r) => (int) $r['id'], $responsables);
 
         if (!in_array($responsableId, $idsResponsables, true)) {
             $erroresEditar['responsable_id'] = 'Error. Debes seleccionar un responsable válido.';
         }
 
-        if ($valor !== '' && (!is_numeric($valor) || (float)$valor < 0)) {
+        if ($valor !== '' && (!is_numeric($valor) || (float) $valor < 0)) {
             $erroresEditar['valor'] = 'Error. El valor debe ser un número positivo.';
         }
 
-        /*
-     * CAMPOS SOLO ADMIN
-     */
-        $leadScore = (string)($leadActual['lead_score'] ?? '0');
+        $leadScore = (string) ($leadActual['lead_score'] ?? '0');
         $ultimoContacto = '';
-        $indicaciones = (string)($leadActual['indicaciones'] ?? '');
-        $origen = (string)($leadActual['origen'] ?? '');
-        $createdAt = (string)($leadActual['created_at'] ?? '');
+        $indicaciones = (string) ($leadActual['indicaciones'] ?? '');
+        $origen = (string) ($leadActual['origen'] ?? '');
+        $createdAt = (string) ($leadActual['created_at'] ?? '');
 
         if ($esAdmin) {
-            $leadScore = trim($_POST['lead_score'] ?? (string)($leadActual['lead_score'] ?? '0'));
+            $leadScore = trim($_POST['lead_score'] ?? (string) ($leadActual['lead_score'] ?? '0'));
             $ultimoContacto = trim($_POST['ultimo_contacto'] ?? '');
             $indicaciones = trim($_POST['indicaciones'] ?? '');
-            $origen = trim($_POST['origen'] ?? (string)($leadActual['origen'] ?? ''));
+            $origen = trim($_POST['origen'] ?? (string) ($leadActual['origen'] ?? ''));
             $createdAt = trim($_POST['created_at'] ?? '');
 
             if ($leadScore === '' || !ctype_digit($leadScore)) {
@@ -620,25 +651,25 @@ class LeadController extends Controller
         }
 
         $leadForm = [
-            'lead_nombre'    => $leadNombre,
-            'email'          => $email,
-            'telefono'       => $telefono,
-            'servicios'      => $servicios,
-            'prioridad'      => $prioridad,
-            'valor'          => $valor,
-            'estado'         => $estado,
-            'responsable_id' => $responsableId,
-            'lead_score'     => $leadScore,
+            'lead_nombre'     => $leadNombre,
+            'email'           => $email,
+            'telefono'        => $telefono,
+            'servicios'       => $servicios,
+            'prioridad'       => $prioridad,
+            'valor'           => $valor,
+            'estado'          => $estado,
+            'responsable_id'  => $responsableId,
+            'lead_score'      => $leadScore,
             'ultimo_contacto' => $ultimoContacto,
-            'indicaciones'   => $indicaciones,
-            'origen'         => $origen,
-            'created_at'     => $createdAt
+            'indicaciones'    => $indicaciones,
+            'origen'          => $origen,
+            'created_at'      => $createdAt
         ];
 
         if (!empty($erroresEditar)) {
             $notas = $lm->getNotasByLead($id);
             $historial = $lm->getHistorialByLead($id);
-            $diasEnPanel = $lm->getDiasEnPanel((string)($leadActual['created_at'] ?? ''));
+            $diasEnPanel = $lm->getDiasEnPanel((string) ($leadActual['created_at'] ?? ''));
 
             self::view('lead/detalles_view', [
                 'tituloPagina'   => 'PipelineDesk | Detalle del lead',
@@ -671,19 +702,19 @@ class LeadController extends Controller
         }
 
         $datosUpdate = [
-            'lead_nombre'    => $leadNombre,
-            'estado'         => $estado,
-            'responsable_id' => $responsableId,
-            'servicios'      => $servicios,
-            'indicaciones'   => $esAdmin ? ($indicaciones !== '' ? $indicaciones : null) : ($leadActual['indicaciones'] ?? null),
-            'lead_score'     => $esAdmin ? (int)$leadScore : (int)($leadActual['lead_score'] ?? 0),
-            'email'          => $email !== '' ? $email : null,
-            'telefono'       => $telefono !== '' ? $telefono : null,
-            'valor'          => $valor !== '' ? (float)$valor : null,
+            'lead_nombre'     => $leadNombre,
+            'estado'          => $estado,
+            'responsable_id'  => $responsableId,
+            'servicios'       => $servicios,
+            'indicaciones'    => $esAdmin ? ($indicaciones !== '' ? $indicaciones : null) : ($leadActual['indicaciones'] ?? null),
+            'lead_score'      => $esAdmin ? (int) $leadScore : (int) ($leadActual['lead_score'] ?? 0),
+            'email'           => $email !== '' ? $email : null,
+            'telefono'        => $telefono !== '' ? $telefono : null,
+            'valor'           => $valor !== '' ? (float) $valor : null,
             'ultimo_contacto' => $ultimoContactoBd,
-            'prioridad'      => $prioridad,
-            'origen'         => $esAdmin ? $origen : (string)($leadActual['origen'] ?? ''),
-            'created_at'     => $createdAtBd
+            'prioridad'       => $prioridad,
+            'origen'          => $esAdmin ? $origen : (string) ($leadActual['origen'] ?? ''),
+            'created_at'      => $createdAtBd
         ];
 
         $actualizado = $lm->update($id, $datosUpdate);
@@ -701,37 +732,37 @@ class LeadController extends Controller
         $camposModificados = [];
 
         $mapaComparacion = [
-            'lead_nombre' => 'nombre',
-            'email' => 'email',
-            'telefono' => 'teléfono',
-            'servicios' => 'servicio',
-            'valor' => 'valor',
-            'prioridad' => 'prioridad',
-            'responsable_id' => 'responsable',
-            'lead_score' => 'lead score',
+            'lead_nombre'     => 'nombre',
+            'email'           => 'email',
+            'telefono'        => 'teléfono',
+            'servicios'       => 'servicio',
+            'valor'           => 'valor',
+            'prioridad'       => 'prioridad',
+            'responsable_id'  => 'responsable',
+            'lead_score'      => 'lead score',
             'ultimo_contacto' => 'último contacto',
-            'indicaciones' => 'indicaciones',
-            'origen' => 'origen',
-            'created_at' => 'fecha de creación'
+            'indicaciones'    => 'indicaciones',
+            'origen'          => 'origen',
+            'created_at'      => 'fecha de creación'
         ];
 
         foreach ($mapaComparacion as $campo => $texto) {
             $valorAnterior = $leadActual[$campo] ?? null;
             $valorNuevo = $datosUpdate[$campo] ?? null;
 
-            if ((string)$valorAnterior !== (string)$valorNuevo) {
+            if ((string) $valorAnterior !== (string) $valorNuevo) {
                 $camposModificados[] = $texto;
             }
         }
 
-        if ((string)($leadActual['estado'] ?? '') !== $estado) {
+        if ((string) ($leadActual['estado'] ?? '') !== $estado) {
             $lm->createHistorial([
                 'lead_id'         => $id,
                 'usuario_id'      => $usuarioId > 0 ? $usuarioId : null,
                 'tipo_evento'     => 'cambio_estado',
                 'titulo'          => 'Cambio de estado',
                 'descripcion'     => 'El estado se ha actualizado desde la ficha del lead.',
-                'estado_anterior' => (string)($leadActual['estado'] ?? ''),
+                'estado_anterior' => (string) ($leadActual['estado'] ?? ''),
                 'estado_nuevo'    => $estado
             ]);
         }
@@ -750,24 +781,41 @@ class LeadController extends Controller
             ]);
         }
 
+        $mensajeFlash = 'Lead actualizado correctamente.';
+        $iconoFlash = '✅';
+        $claseFlash = 'exito';
+
+        if ((string) ($leadActual['estado'] ?? '') !== 'Objeciones' && $estado === 'Objeciones') {
+            $tareaCreada = self::crearTareaAutomaticaObjecion($id, $usuarioId);
+
+            if ($tareaCreada) {
+                $mensajeFlash = 'Lead actualizado y enviado a Objeciones. Debes resolver bloqueos desde Tareas.';
+                $iconoFlash = '⚠';
+                $claseFlash = 'info';
+            } else {
+                $mensajeFlash = 'Lead actualizado y enviado a Objeciones.';
+                $iconoFlash = '⚠';
+                $claseFlash = 'info';
+            }
+        }
+
         SessionManager::setMensajeFlash(
-            'Lead actualizado correctamente.',
-            '✅',
-            'exito'
+            $mensajeFlash,
+            $iconoFlash,
+            $claseFlash
         );
 
         header('Location: ' . BASE_URL . 'leads/' . $id);
         exit();
     }
 
-    //eliminar solo con admin
     public static function eliminarLead(int $id): void
     {
         SessionManager::iniciarSesion();
         SessionManager::usuarioNoAutenticado('usuario', 'login');
 
         $usuario = SessionManager::get('usuario');
-        $rolUsuario = (string)($usuario['rol'] ?? '');
+        $rolUsuario = (string) ($usuario['rol'] ?? '');
 
         if ($rolUsuario !== 'admin') {
             SessionManager::setMensajeFlash(
@@ -825,7 +873,6 @@ class LeadController extends Controller
         exit();
     }
 
-    //kanban
     public static function cambiarEstadoKanban(): void
     {
         SessionManager::iniciarSesion();
@@ -842,9 +889,9 @@ class LeadController extends Controller
         }
 
         $usuario = SessionManager::get('usuario');
-        $usuarioId = (int)($usuario['id'] ?? 0);
+        $usuarioId = (int) ($usuario['id'] ?? 0);
 
-        $leadId = (int)($_POST['lead_id'] ?? 0);
+        $leadId = (int) ($_POST['lead_id'] ?? 0);
         $estadoNuevo = trim($_POST['estado'] ?? '');
 
         $lm = new LeadModel();
@@ -870,7 +917,7 @@ class LeadController extends Controller
             exit();
         }
 
-        $estadoAnterior = (string)($leadActual['estado'] ?? '');
+        $estadoAnterior = (string) ($leadActual['estado'] ?? '');
 
         if ($estadoAnterior === $estadoNuevo) {
             echo json_encode([
@@ -903,13 +950,31 @@ class LeadController extends Controller
             'estado_nuevo'    => $estadoNuevo
         ]);
 
+        $mensajeRespuesta = 'Estado actualizado correctamente.';
+
+        if ($estadoAnterior !== 'Objeciones' && $estadoNuevo === 'Objeciones') {
+            $tareaCreada = self::crearTareaAutomaticaObjecion($leadId, $usuarioId);
+
+            if ($tareaCreada) {
+                $mensajeRespuesta = 'Lead en Objeciones. Se ha creado una tarea de bloqueo en Tareas.';
+            } else {
+                $mensajeRespuesta = 'Lead en Objeciones.';
+            }
+        }
+
         echo json_encode([
             'ok' => true,
-            'mensaje' => 'Estado actualizado correctamente.',
+            'mensaje' => $mensajeRespuesta,
             'estadoAnterior' => $estadoAnterior,
             'estadoNuevo' => $estadoNuevo,
             'leadId' => $leadId
         ]);
         exit();
+    }
+
+    private static function crearTareaAutomaticaObjecion(int $leadId, int $usuarioId): bool
+    {
+        $tm = new TareaModel();
+        return $tm->createObjecionAutomatica($leadId, $usuarioId);
     }
 }

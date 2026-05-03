@@ -6,16 +6,11 @@ $tituloPagina = 'PipelineDesk | Panel';
 $archivoCssVista = 'panel.css';
 $archivoJsVista = 'panel.js';
 $menuActivo = 'panel';
-$mostrarBotonMenu = true;
 
 require_once APP_ROOT . '/app/views/layouts/header.php';
 
-/** @var array<string, mixed> $usuario */
-/** @var array<string, array<int, array<string, mixed>>> $leadsPorEstado */
-/** @var array<int, string> $estadosLista */
-
-$nombreUsuario = (string)($usuario['nombre'] ?? 'Usuario');
-$rolUsuario = (string)($usuario['rol'] ?? 'ventas');
+$nombreUsuario = (string) ($usuario['nombre'] ?? 'Usuario');
+$rolUsuario = (string) ($usuario['rol'] ?? 'ventas');
 
 $estadosPanel = [
     'Nuevo Lead' => [
@@ -72,14 +67,26 @@ $clasesServicios = [
     <main class="contenido">
         <header class="cabecera-panel">
             <div class="cabecera-info">
-                <p class="cabecera-etiqueta">Pipeline</p>
-                <h1>CRM</h1>
+                <p class="cabecera-etiqueta">CRM Pipeline</p>
+                <h1>Vista general del embudo comercial</h1>
                 <p class="cabecera-texto">
-                    Leads agrupados por etapas.
+                    Panel principal de PipelineDesk con los leads agrupados por estado del embudo.
                 </p>
             </div>
 
             <div class="cabecera-acciones">
+                <button
+                    type="button"
+                    class="boton-menu"
+                    id="botonMenu"
+                    aria-controls="asidePanel"
+                    aria-expanded="false"
+                    aria-label="Abrir menú">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
                     <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>
@@ -87,12 +94,22 @@ $clasesServicios = [
             </div>
         </header>
 
+        <?php if (!empty($tareasRetrasadasCount)): ?>
+            <div class="mensaje-flash mensaje-error" role="alert" aria-live="assertive">
+                <span class="icono-flash" aria-hidden="true">⏰</span>
+                <span>
+                    Tienes <?= (int) $tareasRetrasadasCount ?> tarea<?= ((int) $tareasRetrasadasCount === 1) ? '' : 's' ?> retrasada<?= ((int) $tareasRetrasadasCount === 1) ? '' : 's' ?>.
+                    <a href="<?= BASE_URL . 'tareas' ?>" style="font-weight:700; color:inherit; text-decoration:underline;">Ver tareas</a>
+                </span>
+            </div>
+        <?php endif; ?>
+
         <?php if (!empty($mensajeFlash)): ?>
-            <div class="mensaje-flash mensaje-<?= htmlspecialchars((string)($claseFlash ?? 'info')) ?>" role="alert" aria-live="assertive">
+            <div class="mensaje-flash mensaje-<?= htmlspecialchars((string) ($claseFlash ?? 'info')) ?>" role="alert" aria-live="assertive">
                 <?php if (!empty($iconoFlash)): ?>
-                    <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars((string)$iconoFlash) ?></span>
+                    <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars((string) $iconoFlash) ?></span>
                 <?php endif; ?>
-                <span><?= htmlspecialchars((string)$mensajeFlash) ?></span>
+                <span><?= htmlspecialchars((string) $mensajeFlash) ?></span>
             </div>
         <?php endif; ?>
 
@@ -129,35 +146,36 @@ $clasesServicios = [
                             <?php else: ?>
                                 <?php foreach ($leadsEstado as $lead): ?>
                                     <?php
-                                    $estadoActual = (string)($lead['estado'] ?? '');
+                                    $estadoActual = (string) ($lead['estado'] ?? '');
                                     $claseEstado = $estadosPanel[$estadoActual]['clase'] ?? '';
-                                    $servicioActual = (string)($lead['servicios'] ?? '');
+                                    $servicioActual = (string) ($lead['servicios'] ?? '');
                                     $claseServicio = $clasesServicios[$servicioActual] ?? 'servicio-general';
                                     ?>
                                     <tr>
                                         <td class="celda-lead <?= htmlspecialchars($claseEstado) ?>">
-                                            <a href="<?= BASE_URL . 'leads/' . (int)($lead['id'] ?? 0) ?>" class="enlace-lead">
-                                                <?= htmlspecialchars((string)($lead['lead_nombre'] ?? '')) ?>
+                                            <a href="<?= BASE_URL . 'leads/' . (int) ($lead['id'] ?? 0) ?>" class="enlace-lead">
+                                                <?= htmlspecialchars((string) ($lead['lead_nombre'] ?? '')) ?>
                                             </a>
                                         </td>
 
-                                        <td><?= htmlspecialchars((string)($lead['responsable_nombre'] ?? 'Sin asignar')) ?></td>
+                                        <td><?= htmlspecialchars((string) ($lead['responsable_nombre'] ?? 'Sin asignar')) ?></td>
 
                                         <td>
                                             <form
-                                                action="<?= BASE_URL . 'leads/cambiar-estado/' . (int)($lead['id'] ?? 0) ?>"
+                                                action="<?= BASE_URL . 'leads/cambiar-estado/' . (int) ($lead['id'] ?? 0) ?>"
                                                 method="POST"
                                                 class="form-estado">
                                                 <div class="estado-campo">
                                                     <select
                                                         name="estado"
                                                         class="selector-estado <?= htmlspecialchars($claseEstado) ?>"
-                                                        aria-label="Cambiar estado del lead <?= htmlspecialchars((string)($lead['lead_nombre'] ?? '')) ?>">
+                                                        aria-label="Cambiar estado del lead <?= htmlspecialchars((string) ($lead['lead_nombre'] ?? '')) ?>">
                                                         <?php foreach ($estadosLista as $estadoItem): ?>
+                                                            <?php $estadoItemTexto = (string) $estadoItem; ?>
                                                             <option
-                                                                value="<?= htmlspecialchars($estadoItem) ?>"
-                                                                <?= ($estadoActual === $estadoItem) ? 'selected' : '' ?>>
-                                                                <?= htmlspecialchars($estadoItem) ?>
+                                                                value="<?= htmlspecialchars($estadoItemTexto) ?>"
+                                                                <?= ($estadoActual === $estadoItemTexto) ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($estadoItemTexto) ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -171,17 +189,17 @@ $clasesServicios = [
                                             </span>
                                         </td>
 
-                                        <td><?= htmlspecialchars((string)($lead['telefono'] ?? '-')) ?></td>
+                                        <td><?= htmlspecialchars((string) ($lead['telefono'] ?? '-')) ?></td>
 
                                         <td class="texto-indicaciones">
                                             <?= !empty($lead['indicaciones'])
-                                                ? htmlspecialchars(mb_strimwidth((string)$lead['indicaciones'], 0, 70, '...'))
+                                                ? htmlspecialchars(mb_strimwidth((string) $lead['indicaciones'], 0, 70, '...'))
                                                 : '-' ?>
                                         </td>
 
                                         <td>
                                             <?= !empty($lead['ultimo_contacto'])
-                                                ? htmlspecialchars((string)$lead['ultimo_contacto'])
+                                                ? htmlspecialchars((string) ($lead['ultimo_contacto']))
                                                 : 'Sin contacto'; ?>
                                         </td>
 

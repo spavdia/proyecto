@@ -325,4 +325,18 @@ class LeadModel
 
         return $resultado !== false;
     }
+
+    public function updateUltimoContacto(int $leadId, ?string $fecha = null): bool
+{
+    $fechaContacto = $fecha ?? date('Y-m-d H:i:s');
+
+    $sql = "UPDATE leads
+            SET ultimo_contacto = ?,
+                updated_at = NOW()
+            WHERE id = ?";
+
+    $resultado = $this->db->executeUpdate($sql, [$fechaContacto, $leadId]);
+
+    return $resultado !== false;
+}
 }
