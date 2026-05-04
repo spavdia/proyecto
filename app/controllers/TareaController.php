@@ -53,7 +53,7 @@ class TareaController extends Controller
             $errores['tipo_actividad'] = 'Error. Debes seleccionar una actividad válida.';
         }
 
-        if ($descripcion === '') {
+        if ($tipoActividad !== 'Objeciones' && $descripcion === '') {
             $errores['descripcion'] = 'Error. Debes escribir la nota de la tarea.';
         }
 
@@ -107,6 +107,13 @@ class TareaController extends Controller
             return;
         }
 
+        $descripcionFinal = self::resolverDescripcionTarea(
+            $tipoActividad,
+            $tipoBloqueo,
+            $solucionBloqueo,
+            $descripcion
+        );
+
         $fechaFinalBd = $fechaFinal . ' 00:00:00';
 
         $guardada = $tm->create([
@@ -116,7 +123,7 @@ class TareaController extends Controller
             'tipo_actividad'      => $tipoActividad,
             'tipo_bloqueo'        => $tipoBloqueo,
             'solucion_bloqueo'    => $solucionBloqueo,
-            'descripcion'         => $descripcion,
+            'descripcion'         => $descripcionFinal,
             'fecha_final'         => $fechaFinalBd,
             'estado'              => $estado,
             'leida_asignado'      => ($usuarioId === $asignadoId) ? 1 : 0
@@ -197,7 +204,7 @@ class TareaController extends Controller
         $tipoBloqueo = trim($_POST['tipo_bloqueo'] ?? 'Definir');
         $solucionBloqueo = trim($_POST['solucion_bloqueo'] ?? 'Definir');
 
-        if ($descripcion === '') {
+        if ((string) ($tarea['tipo_actividad'] ?? '') !== 'Objeciones' && $descripcion === '') {
             $erroresEdicion['descripcion'] = 'Error. Debes escribir la nota.';
         }
 
@@ -244,10 +251,17 @@ class TareaController extends Controller
             return;
         }
 
+        $descripcionFinal = self::resolverDescripcionTarea(
+            (string) ($tarea['tipo_actividad'] ?? ''),
+            $tipoBloqueo,
+            $solucionBloqueo,
+            $descripcion
+        );
+
         $fechaFinalBd = $fechaFinal . ' 00:00:00';
 
         $actualizada = $tm->update($id, [
-            'descripcion'      => $descripcion,
+            'descripcion'      => $descripcionFinal,
             'fecha_final'      => $fechaFinalBd,
             'estado'           => $estado,
             'tipo_bloqueo'     => $tipoBloqueo,
@@ -363,6 +377,40 @@ class TareaController extends Controller
 
         return (int) ($tarea['usuario_asignado_id'] ?? 0) === $usuarioId
             || (int) ($tarea['usuario_creador_id'] ?? 0) === $usuarioId;
+    }
+
+    private static function resolverDescripcionTarea(
+        string $tipoActividad,
+        ?string $tipoBloqueo,
+        ?string $solucionBloqueo,
+        string $descripcionManual
+    ): string {
+        if ($tipoActividad !== 'Objeciones') {
+            return $descripcionManual;
+        }
+
+        if ($solucionBloqueo === null || $solucionBloqueo === '' || $solucionBloqueo === 'Definir') {
+            return 'Lead en fase de objeciones. Define el bloqueo y propone una solución para avanzar el embudo.';
+        }
+
+        return 'INFO: ' . self::getTextoInfoSolucion($solucionBloqueo, $tipoBloqueo ?? 'Definir');
+    }
+
+    private static function getTextoInfoSolucion(string $solucionBloqueo, string $tipoBloqueo): string
+    {
+        switch ($solucionBloqueo) {
+            case 'Reencuadre de valor':
+                return 'Relaciona el servicio con el bloqueo "' . $tipoBloqueo . '". Explica el beneficio clave y el coste de no avanzar. Cierra con una propuesta clara.';
+
+            case 'Facilidad y acompañamiento':
+                return 'Reduce la fricción del bloqueo "' . $tipoBloqueo . '". Ofrece un paso simple, apoyo cercano y una vía cómoda para continuar. Confirma el siguiente paso hoy.';
+
+            case 'Prueba o demostración':
+                return 'Valida la solución ante el bloqueo "' . $tipoBloqueo . '". Muestra un ejemplo breve o una prueba concreta. Pide decisión después de la demostración.';
+
+            default:
+                return 'Define el bloqueo real. Habla con el lead y concreta qué necesita para avanzar.';
+        }
     }
 
     private static function renderIndex(array $extra = []): void

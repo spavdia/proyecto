@@ -462,4 +462,158 @@ class TareaModel
 
         return $resultado !== false;
     }
+
+    private function buildTareaDashboardWhere(array $filtros, int $usuarioId, bool $esAdmin, string $tAlias = 't', string $lAlias = 'l'): array
+    {
+        $condiciones = [];
+        $params = [];
+
+        if ($esAdmin) {
+            $usuarioFiltro = (int) ($filtros['usuario_id'] ?? 0);
+            if ($usuarioFiltro > 0) {
+                $condiciones[] = $tAlias . ".usuario_asignado_id = ?";
+                $params[] = $usuarioFiltro;
+            }
+        } else {
+            $condiciones[] = $tAlias . ".usuario_asignado_id = ?";
+            $params[] = $usuarioId;
+        }
+
+        if (!empty($filtros['fecha_desde'])) {
+            $condiciones[] = "DATE(" . $tAlias . ".created_at) >= ?";
+            $params[] = $filtros['fecha_desde'];
+        }
+
+        if (!empty($filtros['fecha_hasta'])) {
+            $condiciones[] = "DATE(" . $tAlias . ".created_at) <= ?";
+            $params[] = $filtros['fecha_hasta'];
+        }
+
+        if (!empty($filtros['servicios'])) {
+            $condiciones[] = $lAlias . ".servicios = ?";
+            $params[] = $filtros['servicios'];
+        }
+
+        if (!empty($filtros['estado'])) {
+            $condiciones[] = $lAlias . ".estado = ?";
+            $params[] = $filtros['estado'];
+        }
+
+        if (!empty($filtros['origen'])) {
+            $condiciones[] = $lAlias . ".origen = ?";
+            $params[] = $filtros['origen'];
+        }
+
+        $where = '';
+        if (!empty($condiciones)) {
+            $where = ' WHERE ' . implode(' AND ', $condiciones);
+        }
+
+        return [$where, $params];
+    }
+
+    public function getResumenTareasDashboard(int $usuarioId, bool $esAdmin, array $filtros = []): array
+    {
+        [$where, $params] = $this->buildTareaDashboardWhere($filtros, $usuarioId, $esAdmin, 't', 'l');
+
+        $sql = "SELECT
+                    COUNT(*) AS total,
+                    SUM(CASE WHEN t.estado IN ('Pendiente', 'En curso') THEN 1 ELSE 0 END) AS pendientes,
+                    SUM(CASE WHEN t.estado = 'Terminada' THEN 1 ELSE 0 END) AS terminadas,
+                    SUM(CASE WHEN DATE(t.fecha_final) < CURDATE() AND t.estado <> 'Terminada' THEN 1 ELSE 0 END) AS retrasadas,
+                    SUM(CASE WHEN t.tipo_actividad = 'Objeciones' AND t.estado IN ('Pendiente', 'En curso') THEN 1 ELSE 0 END) AS objeciones_abiertas,
+                    SUM(CASE WHEN t.tipo_actividad = 'Objeciones' AND t.estado = 'Terminada' THEN 1 ELSE 0 END) AS objeciones_resueltas
+                FROM tareas_lead t
+                INNER JOIN leads l ON l.id = t.lead_id
+                $where";
+
+        $resultado = $this->db->executeQuery($sql, $params);
+        $fila = $resultado[0] ?? [];
+
+        return [
+            'total'               => (int) ($fila['total'] ?? 0),
+            'pendientes'          => (int) ($fila['pendientes'] ?? 0),
+            'terminadas'          => (int) ($fila['terminadas'] ?? 0),
+            'retrasadas'          => (int) ($fila['retrasadas'] ?? 0),
+            'objeciones_abiertas' => (int) ($fila['objeciones_abiertas'] ?? 0),
+            'objeciones_resueltas'=> (int) ($fila['objeciones_resueltas'] ?? 0)
+        ];
+    }
+
+    public function getObjecionesPorTipo(int $usuarioId, bool $esAdmin, array $filtros = [], int $limite = 6): array
+    {
+        [$whereBase, $params] = $this->buildTareaDashboardWhere($filtros, $usuarioId, $esAdmin, 't', 'l');
+
+        $extra = "t.tipo_actividad = 'Objeciones' AND t.tipo_bloqueo IS NOT NULL AND t.tipo_bloqueo <> ''";
+
+        $where = $whereBase === ''
+            ? ' WHERE ' . $extra
+            : $whereBase . ' AND ' . $extra;
+
+        $sql = "SELECT
+                    t.tipo_bloqueo,
+                    COUNT(*) AS total
+                FROM tareas_lead t
+                INNER JOIN leads l ON l.id = t.lead_id
+                $where
+                GROUP BY t.tipo_bloqueo
+                ORDER BY total DESC, t.tipo_bloqueo ASC
+                LIMIT " . (int) $limite;
+
+        return $this->db->executeQuery($sql, $params);
+    }
+
+    public function getSolucionesMasUsadas(int $usuarioId, bool $esAdmin, array $filtros = [], int $limite = 6): array
+    {
+        [$whereBase, $params] = $this->buildTareaDashboardWhere($filtros, $usuarioId, $esAdmin, 't', 'l');
+
+        $extra = "t.tipo_actividad = 'Objeciones'
+                  AND t.solucion_bloqueo IS NOT NULL
+                  AND t.solucion_bloqueo <> ''
+                  AND t.solucion_bloqueo <> 'Definir'";
+
+        $where = $whereBase === ''
+            ? ' WHERE ' . $extra
+            : $whereBase . ' AND ' . $extra;
+
+        $sql = "SELECT
+                    t.solucion_bloqueo,
+                    COUNT(*) AS total
+                FROM tareas_lead t
+                INNER JOIN leads l ON l.id = t.lead_id
+                $where
+                GROUP BY t.solucion_bloqueo
+                ORDER BY total DESC, t.solucion_bloqueo ASC
+                LIMIT " . (int) $limite;
+
+        return $this->db->executeQuery($sql, $params);
+    }
+
+    public function getSeguimientosUrgentes(int $usuarioId, bool $esAdmin, array $filtros = [], int $limite = 6): array
+    {
+        [$whereBase, $params] = $this->buildTareaDashboardWhere($filtros, $usuarioId, $esAdmin, 't', 'l');
+
+        $extra = "t.estado IN ('Pendiente', 'En curso')";
+
+        $where = $whereBase === ''
+            ? ' WHERE ' . $extra
+            : $whereBase . ' AND ' . $extra;
+
+        $sql = "SELECT
+                    t.id,
+                    t.tipo_actividad,
+                    t.fecha_final,
+                    t.estado,
+                    l.lead_nombre,
+                    l.estado AS lead_estado,
+                    u.nombre AS asignado_nombre
+                FROM tareas_lead t
+                INNER JOIN leads l ON l.id = t.lead_id
+                INNER JOIN usuarios u ON u.id = t.usuario_asignado_id
+                $where
+                ORDER BY t.fecha_final ASC
+                LIMIT " . (int) $limite;
+
+        return $this->db->executeQuery($sql, $params);
+    }
 }

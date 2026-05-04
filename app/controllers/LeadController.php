@@ -282,7 +282,7 @@ class LeadController extends Controller
             $tareaCreada = self::crearTareaAutomaticaObjecion($leadId, $usuarioId);
 
             if ($tareaCreada) {
-                $mensajeFlash = 'Lead creado en Objeciones. Se ha generado una tarea para resolver bloqueos desde Tareas.';
+                $mensajeFlash = 'Lead creado en Objeciones. Debes definir la objeción pendiente desde Tareas.';
                 $iconoFlash = '⚠';
                 $claseFlash = 'info';
             } else {
@@ -369,7 +369,7 @@ class LeadController extends Controller
             $tareaCreada = self::crearTareaAutomaticaObjecion($id, $usuarioId);
 
             if ($tareaCreada) {
-                $mensajeFlash = 'El lead ha entrado en Objeciones. Debes resolver bloqueos desde Tareas.';
+                $mensajeFlash = 'El lead ha entrado en Objeciones. Debes definir la objeción pendiente desde Tareas.';
                 $iconoFlash = '⚠';
                 $claseFlash = 'info';
             } else {
@@ -789,7 +789,7 @@ class LeadController extends Controller
             $tareaCreada = self::crearTareaAutomaticaObjecion($id, $usuarioId);
 
             if ($tareaCreada) {
-                $mensajeFlash = 'Lead actualizado y enviado a Objeciones. Debes resolver bloqueos desde Tareas.';
+                $mensajeFlash = 'Lead actualizado y enviado a Objeciones. Debes definir la objeción pendiente desde Tareas.';
                 $iconoFlash = '⚠';
                 $claseFlash = 'info';
             } else {
@@ -956,7 +956,7 @@ class LeadController extends Controller
             $tareaCreada = self::crearTareaAutomaticaObjecion($leadId, $usuarioId);
 
             if ($tareaCreada) {
-                $mensajeRespuesta = 'Lead en Objeciones. Se ha creado una tarea de bloqueo en Tareas.';
+                $mensajeRespuesta = 'Lead en Objeciones. Debes definir la objeción pendiente desde Tareas.';
             } else {
                 $mensajeRespuesta = 'Lead en Objeciones.';
             }

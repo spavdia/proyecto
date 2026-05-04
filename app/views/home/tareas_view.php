@@ -7,36 +7,62 @@ $archivoCssVista = 'tareas.css';
 $archivoJsVista = 'tareas.js';
 $menuActivo = 'tareas';
 
+$__ctx = get_defined_vars();
+
+$usuario = (isset($__ctx['usuario']) && is_array($__ctx['usuario'])) ? $__ctx['usuario'] : [];
+$tareas = (isset($__ctx['tareas']) && is_array($__ctx['tareas'])) ? $__ctx['tareas'] : [];
+$usuarios = (isset($__ctx['usuarios']) && is_array($__ctx['usuarios'])) ? $__ctx['usuarios'] : [];
+$leads = (isset($__ctx['leads']) && is_array($__ctx['leads'])) ? $__ctx['leads'] : [];
+$tiposActividad = (isset($__ctx['tiposActividad']) && is_array($__ctx['tiposActividad'])) ? $__ctx['tiposActividad'] : [];
+$tiposBloqueo = (isset($__ctx['tiposBloqueo']) && is_array($__ctx['tiposBloqueo'])) ? $__ctx['tiposBloqueo'] : [];
+$solucionesBloqueo = (isset($__ctx['solucionesBloqueo']) && is_array($__ctx['solucionesBloqueo'])) ? $__ctx['solucionesBloqueo'] : [];
+$estadosTarea = (isset($__ctx['estadosTarea']) && is_array($__ctx['estadosTarea'])) ? $__ctx['estadosTarea'] : [];
+$nuevasAsignadas = (isset($__ctx['nuevasAsignadas']) && is_array($__ctx['nuevasAsignadas'])) ? $__ctx['nuevasAsignadas'] : [];
+$resumenUsuariosAdmin = (isset($__ctx['resumenUsuariosAdmin']) && is_array($__ctx['resumenUsuariosAdmin'])) ? $__ctx['resumenUsuariosAdmin'] : [];
+$proximosSeguimientos = (isset($__ctx['proximosSeguimientos']) && is_array($__ctx['proximosSeguimientos'])) ? $__ctx['proximosSeguimientos'] : [];
+$errores = (isset($__ctx['errores']) && is_array($__ctx['errores'])) ? $__ctx['errores'] : [];
+$datosForm = (isset($__ctx['datosForm']) && is_array($__ctx['datosForm'])) ? $__ctx['datosForm'] : [];
+$erroresEdicion = (isset($__ctx['erroresEdicion']) && is_array($__ctx['erroresEdicion'])) ? $__ctx['erroresEdicion'] : [];
+$datosEdicion = (isset($__ctx['datosEdicion']) && is_array($__ctx['datosEdicion'])) ? $__ctx['datosEdicion'] : [];
+$bloqueosResumen = (isset($__ctx['bloqueosResumen']) && is_array($__ctx['bloqueosResumen'])) ? $__ctx['bloqueosResumen'] : [];
+$resumenEstados = (isset($__ctx['resumenEstados']) && is_array($__ctx['resumenEstados'])) ? $__ctx['resumenEstados'] : [];
+
+$mensajeFlash = isset($__ctx['mensajeFlash']) ? $__ctx['mensajeFlash'] : null;
+$iconoFlash = isset($__ctx['iconoFlash']) ? $__ctx['iconoFlash'] : null;
+$claseFlash = isset($__ctx['claseFlash']) ? (string) $__ctx['claseFlash'] : 'info';
+$mostrarFormulario = isset($__ctx['mostrarFormulario']) ? (bool) $__ctx['mostrarFormulario'] : false;
+$editarId = isset($__ctx['editarId']) ? (int) $__ctx['editarId'] : 0;
+$retrasadasCount = isset($__ctx['retrasadasCount']) ? (int) $__ctx['retrasadasCount'] : 0;
+
 require_once APP_ROOT . '/app/views/layouts/header.php';
 
 $nombreUsuario = (string) ($usuario['nombre'] ?? 'Usuario');
 $rolUsuario = (string) ($usuario['rol'] ?? 'ventas');
-$mostrarFormulario = (bool) ($mostrarFormulario ?? false);
-$errores = $errores ?? [];
-$datosForm = $datosForm ?? [];
-$editarId = (int) ($editarId ?? 0);
-$erroresEdicion = $erroresEdicion ?? [];
-$datosEdicion = $datosEdicion ?? [];
 $usuarioActualId = (int) ($usuario['id'] ?? 0);
 $esAdmin = (($usuario['rol'] ?? '') === 'admin');
 
-function valor_form(array $datosForm, string $clave, string $defecto = ''): string
-{
-    return (string) ($datosForm[$clave] ?? $defecto);
+if (!function_exists('tareas_valor_form')) {
+    function tareas_valor_form(array $datos, string $clave, string $defecto = ''): string
+    {
+        return (string) ($datos[$clave] ?? $defecto);
+    }
 }
 
-function fecha_simple(?string $fecha): string
-{
-    if (empty($fecha)) {
-        return '-';
-    }
+if (!function_exists('tareas_fecha_simple')) {
+    function tareas_fecha_simple(?string $fecha): string
+    {
+        if (empty($fecha)) {
+            return '-';
+        }
 
-    $timestamp = strtotime($fecha);
-    return $timestamp ? date('d/m/Y', $timestamp) : (string) $fecha;
+        $timestamp = strtotime($fecha);
+        return $timestamp ? date('d/m/Y', $timestamp) : (string) $fecha;
+    }
 }
 
 $leadEstadoSeleccionado = '';
 $leadIdForm = (int) ($datosForm['lead_id'] ?? 0);
+
 foreach ($leads as $leadItem) {
     if ((int) ($leadItem['id'] ?? 0) === $leadIdForm) {
         $leadEstadoSeleccionado = (string) ($leadItem['estado'] ?? '');
@@ -44,25 +70,27 @@ foreach ($leads as $leadItem) {
     }
 }
 
-$mostrarObjecionesForm = (valor_form($datosForm, 'tipo_actividad') === 'Objeciones' && $leadEstadoSeleccionado === 'Objeciones');
+$mostrarObjecionesForm = (tareas_valor_form($datosForm, 'tipo_actividad') === 'Objeciones' && $leadEstadoSeleccionado === 'Objeciones');
 
-$bloqueosResumen = $bloqueosResumen ?? [
+$bloqueosResumen = array_merge([
     'abiertos' => 0,
     'resueltos' => 0,
     'porcentaje' => 0,
     'total' => 0
-];
+], $bloqueosResumen);
 
-$resumenEstados = $resumenEstados ?? [
+$resumenEstados = array_merge([
     'Pendiente' => 0,
     'En curso'  => 0,
     'Terminada' => 0
-];
+], $resumenEstados);
 
-$totalEstados = (int) (($resumenEstados['Pendiente'] ?? 0) + ($resumenEstados['En curso'] ?? 0) + ($resumenEstados['Terminada'] ?? 0));
-$porcentajePendiente = $totalEstados > 0 ? (int) round((($resumenEstados['Pendiente'] ?? 0) / $totalEstados) * 100) : 0;
-$porcentajeCurso = $totalEstados > 0 ? (int) round((($resumenEstados['En curso'] ?? 0) / $totalEstados) * 100) : 0;
-$porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Terminada'] ?? 0) / $totalEstados) * 100) : 0;
+$pendientes = (int) ($resumenEstados['Pendiente'] ?? 0);
+$enCurso = (int) ($resumenEstados['En curso'] ?? 0);
+$terminadas = (int) ($resumenEstados['Terminada'] ?? 0);
+$totalEstados = $pendientes + $enCurso + $terminadas;
+$porcentajeSemaforo = $totalEstados > 0 ? (int) round(($terminadas / $totalEstados) * 100) : 0;
+$posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 ?>
 
 <div class="panel" id="tareasApp">
@@ -112,7 +140,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
         </header>
 
         <?php if (!empty($mensajeFlash)): ?>
-            <div class="mensaje-flash mensaje-<?= htmlspecialchars((string) ($claseFlash ?? 'info')) ?>" role="alert" aria-live="assertive">
+            <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash) ?>" role="alert" aria-live="assertive">
                 <?php if (!empty($iconoFlash)): ?>
                     <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars((string) $iconoFlash) ?></span>
                 <?php endif; ?>
@@ -167,40 +195,48 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
             <article class="resumen-card resumen-estados">
                 <div class="resumen-card-top">
                     <h2>Tareas por estado</h2>
-                    <span>Gráfico</span>
+                    <span>Semáforo KPI</span>
                 </div>
 
-                <div class="grafico-estados">
-                    <div class="grafico-fila">
-                        <div class="grafico-etiqueta">
-                            <span class="punto punto-pendiente"></span>
-                            <strong>Pendiente</strong>
-                            <small><?= (int) ($resumenEstados['Pendiente'] ?? 0) ?></small>
+                <div class="semaforo-kpi" aria-label="Indicador semáforo del porcentaje de tareas terminadas">
+                    <div class="semaforo-kpi-top">
+                        <small>Indicador</small>
+                        <strong><?= $porcentajeSemaforo ?>%</strong>
+                    </div>
+
+                    <div class="semaforo-kpi-panel">
+                        <div class="semaforo-indicador" style="left: <?= $posicionIndicador ?>%;">
+                            <span class="semaforo-indicador-triangulo"></span>
                         </div>
-                        <div class="grafico-barra">
-                            <div class="grafico-barra-valor barra-pendiente" style="width: <?= $porcentajePendiente ?>%;"></div>
+
+                        <div class="semaforo-kpi-barra">
+                            <div class="tramo tramo-rojo" aria-hidden="true"></div>
+                            <div class="tramo tramo-amarillo" aria-hidden="true"></div>
+                            <div class="tramo tramo-verde" aria-hidden="true"></div>
+                        </div>
+
+                        <div class="semaforo-kpi-escala" aria-hidden="true">
+                            <span>0%</span>
+                            <span>50%</span>
+                            <span>80%</span>
+                            <span>100%</span>
                         </div>
                     </div>
 
-                    <div class="grafico-fila">
-                        <div class="grafico-etiqueta">
-                            <span class="punto punto-curso"></span>
-                            <strong>En curso</strong>
-                            <small><?= (int) ($resumenEstados['En curso'] ?? 0) ?></small>
+                    <div class="semaforo-kpi-leyenda">
+                        <div class="leyenda-pill leyenda-pill-rojo">
+                            <span><span class="leyenda-dot"></span> Pendientes</span>
+                            <strong><?= $pendientes ?></strong>
                         </div>
-                        <div class="grafico-barra">
-                            <div class="grafico-barra-valor barra-curso" style="width: <?= $porcentajeCurso ?>%;"></div>
-                        </div>
-                    </div>
 
-                    <div class="grafico-fila">
-                        <div class="grafico-etiqueta">
-                            <span class="punto punto-terminada"></span>
-                            <strong>Terminada</strong>
-                            <small><?= (int) ($resumenEstados['Terminada'] ?? 0) ?></small>
+                        <div class="leyenda-pill leyenda-pill-amarillo">
+                            <span><span class="leyenda-dot"></span> En curso</span>
+                            <strong><?= $enCurso ?></strong>
                         </div>
-                        <div class="grafico-barra">
-                            <div class="grafico-barra-valor barra-terminada" style="width: <?= $porcentajeTerminada ?>%;"></div>
+
+                        <div class="leyenda-pill leyenda-pill-verde">
+                            <span><span class="leyenda-dot"></span> Terminadas</span>
+                            <strong><?= $terminadas ?></strong>
                         </div>
                     </div>
                 </div>
@@ -218,7 +254,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                     <ul class="seguimiento-lista">
                         <?php foreach ($proximosSeguimientos as $seguimiento): ?>
                             <li>
-                                <span class="seguimiento-fecha"><?= htmlspecialchars(fecha_simple((string) ($seguimiento['fecha_final'] ?? ''))) ?></span>
+                                <span class="seguimiento-fecha"><?= htmlspecialchars(tareas_fecha_simple((string) ($seguimiento['fecha_final'] ?? ''))) ?></span>
                                 <div class="seguimiento-contenido">
                                     <strong><?= htmlspecialchars((string) ($seguimiento['lead_nombre'] ?? 'Lead')) ?></strong>
                                     <small><?= htmlspecialchars((string) ($seguimiento['tipo_actividad'] ?? 'Actividad')) ?></small>
@@ -237,7 +273,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
 
                 <div class="retrasadas-box">
                     <span class="retrasadas-icono" aria-hidden="true">⏰</span>
-                    <strong><?= (int) ($retrasadasCount ?? 0) ?></strong>
+                    <strong><?= $retrasadasCount ?></strong>
                 </div>
             </article>
         </section>
@@ -265,9 +301,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                 </p>
 
                                 <div class="barra-progreso">
-                                    <div
-                                        class="barra-progreso-valor"
-                                        style="width: <?= (int) ($filaUsuario['porcentaje_terminadas'] ?? 0) ?>%;"></div>
+                                    <div class="barra-progreso-valor" style="width: <?= (int) ($filaUsuario['porcentaje_terminadas'] ?? 0) ?>%;"></div>
                                 </div>
 
                                 <p class="usuario-tareas-porcentaje">
@@ -281,10 +315,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
         <?php endif; ?>
 
         <section class="tareas-layout <?= $mostrarFormulario ? 'con-formulario' : '' ?>" id="tareasLayout">
-            <aside
-                class="panel-formulario-tarea"
-                id="panelFormularioTarea"
-                <?= $mostrarFormulario ? '' : 'hidden' ?>>
+            <aside class="panel-formulario-tarea" id="panelFormularioTarea" <?= $mostrarFormulario ? '' : 'hidden' ?>>
                 <div class="bloque">
                     <div class="bloque-top">
                         <h2>Nueva tarea</h2>
@@ -298,10 +329,10 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                 <option value="">Selecciona un lead</option>
                                 <?php foreach ($leads as $lead): ?>
                                     <option
-                                        value="<?= (int) $lead['id'] ?>"
+                                        value="<?= (int) ($lead['id'] ?? 0) ?>"
                                         data-estado="<?= htmlspecialchars((string) ($lead['estado'] ?? '')) ?>"
-                                        <?= ((int) valor_form($datosForm, 'lead_id') === (int) $lead['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars((string) $lead['lead_nombre']) ?> - <?= htmlspecialchars((string) $lead['estado']) ?>
+                                        <?= ((int) tareas_valor_form($datosForm, 'lead_id') === (int) ($lead['id'] ?? 0)) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars((string) ($lead['lead_nombre'] ?? '')) ?> - <?= htmlspecialchars((string) ($lead['estado'] ?? '')) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -310,14 +341,14 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
 
                         <div class="campo">
                             <label for="usuario_asignado_id">Asignar a</label>
+                            <?php $asignadoSeleccionado = (int) ($datosForm['usuario_asignado_id'] ?? $usuarioActualId); ?>
                             <select id="usuario_asignado_id" name="usuario_asignado_id">
-                                <?php $asignadoSeleccionado = (int) ($datosForm['usuario_asignado_id'] ?? $usuarioActualId); ?>
                                 <option value="">Selecciona un usuario</option>
                                 <?php foreach ($usuarios as $usuarioItem): ?>
                                     <option
-                                        value="<?= (int) $usuarioItem['id'] ?>"
-                                        <?= ($asignadoSeleccionado === (int) $usuarioItem['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars((string) $usuarioItem['nombre']) ?> (<?= htmlspecialchars((string) $usuarioItem['rol']) ?>)
+                                        value="<?= (int) ($usuarioItem['id'] ?? 0) ?>"
+                                        <?= ($asignadoSeleccionado === (int) ($usuarioItem['id'] ?? 0)) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars((string) ($usuarioItem['nombre'] ?? '')) ?> (<?= htmlspecialchars((string) ($usuarioItem['rol'] ?? '')) ?>)
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -330,9 +361,9 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                 <option value="">Selecciona una actividad</option>
                                 <?php foreach ($tiposActividad as $tipo): ?>
                                     <option
-                                        value="<?= htmlspecialchars($tipo) ?>"
-                                        <?= (valor_form($datosForm, 'tipo_actividad') === $tipo) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($tipo) ?>
+                                        value="<?= htmlspecialchars((string) $tipo) ?>"
+                                        <?= (tareas_valor_form($datosForm, 'tipo_actividad') === (string) $tipo) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars((string) $tipo) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -348,9 +379,9 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                     <select id="tipo_bloqueo" name="tipo_bloqueo">
                                         <?php foreach ($tiposBloqueo as $bloqueo): ?>
                                             <option
-                                                value="<?= htmlspecialchars($bloqueo) ?>"
-                                                <?= (valor_form($datosForm, 'tipo_bloqueo', 'Definir') === $bloqueo) ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($bloqueo) ?>
+                                                value="<?= htmlspecialchars((string) $bloqueo) ?>"
+                                                <?= (tareas_valor_form($datosForm, 'tipo_bloqueo', 'Definir') === (string) $bloqueo) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars((string) $bloqueo) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -362,9 +393,9 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                     <select id="solucion_bloqueo" name="solucion_bloqueo">
                                         <?php foreach ($solucionesBloqueo as $solucion): ?>
                                             <option
-                                                value="<?= htmlspecialchars($solucion) ?>"
-                                                <?= (valor_form($datosForm, 'solucion_bloqueo', 'Definir') === $solucion) ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($solucion) ?>
+                                                value="<?= htmlspecialchars((string) $solucion) ?>"
+                                                <?= (tareas_valor_form($datosForm, 'solucion_bloqueo', 'Definir') === (string) $solucion) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars((string) $solucion) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -377,19 +408,19 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
 
                         <div class="campo">
                             <label for="fecha_final">Fecha final</label>
-                            <input type="date" id="fecha_final" name="fecha_final" value="<?= htmlspecialchars(valor_form($datosForm, 'fecha_final')) ?>">
+                            <input type="date" id="fecha_final" name="fecha_final" value="<?= htmlspecialchars(tareas_valor_form($datosForm, 'fecha_final')) ?>">
                             <span class="error-campo"><?= !empty($errores['fecha_final']) ? htmlspecialchars((string) $errores['fecha_final']) : '' ?></span>
                         </div>
 
                         <div class="campo">
                             <label for="estado">Estado</label>
-                            <?php $estadoSeleccionado = valor_form($datosForm, 'estado', 'Pendiente'); ?>
+                            <?php $estadoSeleccionado = tareas_valor_form($datosForm, 'estado', 'Pendiente'); ?>
                             <select id="estado" name="estado">
                                 <?php foreach ($estadosTarea as $estadoItem): ?>
                                     <option
-                                        value="<?= htmlspecialchars($estadoItem) ?>"
-                                        <?= ($estadoSeleccionado === $estadoItem) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($estadoItem) ?>
+                                        value="<?= htmlspecialchars((string) $estadoItem) ?>"
+                                        <?= ($estadoSeleccionado === (string) $estadoItem) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars((string) $estadoItem) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -398,7 +429,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
 
                         <div class="campo">
                             <label for="descripcion">Nota</label>
-                            <textarea id="descripcion" name="descripcion" rows="5"><?= htmlspecialchars(valor_form($datosForm, 'descripcion')) ?></textarea>
+                            <textarea id="descripcion" name="descripcion" rows="5"><?= htmlspecialchars(tareas_valor_form($datosForm, 'descripcion')) ?></textarea>
                             <span class="error-campo"><?= !empty($errores['descripcion']) ? htmlspecialchars((string) $errores['descripcion']) : '' ?></span>
                         </div>
 
@@ -445,11 +476,11 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                             : (!empty($tarea['fecha_final']) ? date('Y-m-d', strtotime((string) $tarea['fecha_final'])) : '');
 
                                         $descripcionEdit = $esEditando
-                                            ? (string) ($datosEdicion['descripcion'] ?? (string) $tarea['descripcion'])
+                                            ? (string) ($datosEdicion['descripcion'] ?? (string) ($tarea['descripcion'] ?? ''))
                                             : '';
 
                                         $estadoEdit = $esEditando
-                                            ? (string) ($datosEdicion['estado'] ?? (string) $tarea['estado'])
+                                            ? (string) ($datosEdicion['estado'] ?? (string) ($tarea['estado'] ?? ''))
                                             : '';
 
                                         $tipoBloqueoEdit = $esEditando
@@ -476,6 +507,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                         );
 
                                         $esTareaObjecion = ((string) ($tarea['tipo_actividad'] ?? '') === 'Objeciones');
+                                        $claseLeadObjecion = ((string) ($tarea['lead_estado'] ?? '') === 'Objeciones') ? 'lead-objecion' : '';
                                         ?>
 
                                         <?php if ($esEditando): ?>
@@ -483,7 +515,9 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                         <?php endif; ?>
 
                                         <tr class="<?= trim(($esEditando ? 'fila-edicion ' : '') . ($esRetrasada ? 'fila-tarea-retrasada' : '')) ?>">
-                                            <td><?= htmlspecialchars((string) ($tarea['lead_nombre'] ?? '-')) ?></td>
+                                            <td class="celda-lead-tarea <?= htmlspecialchars($claseLeadObjecion) ?>">
+                                                <?= htmlspecialchars((string) ($tarea['lead_nombre'] ?? '-')) ?>
+                                            </td>
 
                                             <td><?= htmlspecialchars((string) ($tarea['tipo_actividad'] ?? '-')) ?></td>
 
@@ -498,7 +532,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                                         value="<?= htmlspecialchars($fechaInput) ?>">
                                                     <span class="error-campo"><?= !empty($erroresEdicion['fecha_final']) ? htmlspecialchars((string) $erroresEdicion['fecha_final']) : '' ?></span>
                                                 <?php else: ?>
-                                                    <?= htmlspecialchars(fecha_simple((string) ($tarea['fecha_final'] ?? ''))) ?>
+                                                    <?= htmlspecialchars(tareas_fecha_simple((string) ($tarea['fecha_final'] ?? ''))) ?>
                                                 <?php endif; ?>
                                             </td>
 
@@ -507,9 +541,9 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                                     <select name="estado" form="<?= htmlspecialchars($formId) ?>">
                                                         <?php foreach ($estadosTarea as $estadoItem): ?>
                                                             <option
-                                                                value="<?= htmlspecialchars($estadoItem) ?>"
-                                                                <?= ($estadoEdit === $estadoItem) ? 'selected' : '' ?>>
-                                                                <?= htmlspecialchars($estadoItem) ?>
+                                                                value="<?= htmlspecialchars((string) $estadoItem) ?>"
+                                                                <?= ($estadoEdit === (string) $estadoItem) ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars((string) $estadoItem) ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -530,9 +564,9 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                                                 <select name="tipo_bloqueo" form="<?= htmlspecialchars($formId) ?>">
                                                                     <?php foreach ($tiposBloqueo as $bloqueo): ?>
                                                                         <option
-                                                                            value="<?= htmlspecialchars($bloqueo) ?>"
-                                                                            <?= ($tipoBloqueoEdit === $bloqueo) ? 'selected' : '' ?>>
-                                                                            <?= htmlspecialchars($bloqueo) ?>
+                                                                            value="<?= htmlspecialchars((string) $bloqueo) ?>"
+                                                                            <?= ($tipoBloqueoEdit === (string) $bloqueo) ? 'selected' : '' ?>>
+                                                                            <?= htmlspecialchars((string) $bloqueo) ?>
                                                                         </option>
                                                                     <?php endforeach; ?>
                                                                 </select>
@@ -544,9 +578,9 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                                                 <select name="solucion_bloqueo" form="<?= htmlspecialchars($formId) ?>">
                                                                     <?php foreach ($solucionesBloqueo as $solucion): ?>
                                                                         <option
-                                                                            value="<?= htmlspecialchars($solucion) ?>"
-                                                                            <?= ($solucionBloqueoEdit === $solucion) ? 'selected' : '' ?>>
-                                                                            <?= htmlspecialchars($solucion) ?>
+                                                                            value="<?= htmlspecialchars((string) $solucion) ?>"
+                                                                            <?= ($solucionBloqueoEdit === (string) $solucion) ? 'selected' : '' ?>>
+                                                                            <?= htmlspecialchars((string) $solucion) ?>
                                                                         </option>
                                                                     <?php endforeach; ?>
                                                                 </select>
@@ -565,7 +599,7 @@ $porcentajeTerminada = $totalEstados > 0 ? (int) round((($resumenEstados['Termin
                                                         </div>
                                                     <?php endif; ?>
 
-                                                    <?= htmlspecialchars(mb_strimwidth((string) ($tarea['descripcion'] ?? ''), 0, 90, '...')) ?>
+                                                    <?= htmlspecialchars(mb_strimwidth((string) ($tarea['descripcion'] ?? ''), 0, 140, '...')) ?>
                                                 <?php endif; ?>
                                             </td>
 
