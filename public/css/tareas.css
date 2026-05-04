@@ -997,6 +997,50 @@ body {
     color: #166534;
 }
 
+.form-estado-rapido {
+    margin: 0;
+}
+
+.selector-estado-tabla {
+    min-width: 145px;
+    width: 100%;
+    border: 1px solid var(--color-borde-general);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font: inherit;
+    font-weight: 700;
+    background: #ffffff;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.selector-estado-tabla:hover {
+    transform: translateY(-1px);
+}
+
+.selector-estado-tabla:focus {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 1px;
+}
+
+.selector-estado-tabla.estado-pendiente {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+.selector-estado-tabla.estado-curso {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-color: #93c5fd;
+}
+
+.selector-estado-tabla.estado-terminada {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #86efac;
+}
+
 .acciones-celda {
     white-space: nowrap;
 }
@@ -1116,5 +1160,9 @@ body {
     .leyenda-pill {
         flex-wrap: wrap;
         justify-content: flex-start;
+    }
+
+    .selector-estado-tabla {
+        min-width: 100%;
     }
 }

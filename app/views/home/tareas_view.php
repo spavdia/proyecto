@@ -508,6 +508,11 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 
                                         $esTareaObjecion = ((string) ($tarea['tipo_actividad'] ?? '') === 'Objeciones');
                                         $claseLeadObjecion = ((string) ($tarea['lead_estado'] ?? '') === 'Objeciones') ? 'lead-objecion' : '';
+
+                                        $descripcionRapida = (string) ($tarea['descripcion'] ?? '');
+                                        $fechaRapida = !empty($tarea['fecha_final']) ? date('Y-m-d', strtotime((string) $tarea['fecha_final'])) : '';
+                                        $tipoBloqueoRapido = (string) ($tarea['tipo_bloqueo'] ?? 'Definir');
+                                        $solucionBloqueoRapido = (string) ($tarea['solucion_bloqueo'] ?? 'Definir');
                                         ?>
 
                                         <?php if ($esEditando): ?>
@@ -549,9 +554,26 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                                                     </select>
                                                     <span class="error-campo"><?= !empty($erroresEdicion['estado']) ? htmlspecialchars((string) $erroresEdicion['estado']) : '' ?></span>
                                                 <?php else: ?>
-                                                    <span class="<?= htmlspecialchars($claseEstado) ?>">
-                                                        <?= htmlspecialchars((string) ($tarea['estado'] ?? '-')) ?>
-                                                    </span>
+                                                    <form action="<?= BASE_URL . 'tareas/' . $tareaId . '/actualizar' ?>" method="POST" class="form-estado-rapido">
+                                                        <input type="hidden" name="quick_update" value="1">
+                                                        <input type="hidden" name="descripcion" value="<?= htmlspecialchars($descripcionRapida, ENT_QUOTES, 'UTF-8') ?>">
+                                                        <input type="hidden" name="fecha_final" value="<?= htmlspecialchars($fechaRapida, ENT_QUOTES, 'UTF-8') ?>">
+
+                                                        <?php if ($esTareaObjecion): ?>
+                                                            <input type="hidden" name="tipo_bloqueo" value="<?= htmlspecialchars($tipoBloqueoRapido, ENT_QUOTES, 'UTF-8') ?>">
+                                                            <input type="hidden" name="solucion_bloqueo" value="<?= htmlspecialchars($solucionBloqueoRapido, ENT_QUOTES, 'UTF-8') ?>">
+                                                        <?php endif; ?>
+
+                                                        <select name="estado" class="selector-estado-tabla <?= htmlspecialchars($claseEstado) ?>" data-autosubmit-estado="1" aria-label="Cambiar estado de la tarea">
+                                                            <?php foreach ($estadosTarea as $estadoItem): ?>
+                                                                <option
+                                                                    value="<?= htmlspecialchars((string) $estadoItem) ?>"
+                                                                    <?= (((string) ($tarea['estado'] ?? '')) === (string) $estadoItem) ? 'selected' : '' ?>>
+                                                                    <?= htmlspecialchars((string) $estadoItem) ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </form>
                                                 <?php endif; ?>
                                             </td>
 

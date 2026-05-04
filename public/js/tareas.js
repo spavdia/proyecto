@@ -5,107 +5,134 @@ document.addEventListener('DOMContentLoaded', function () {
     const botonNuevaTarea = document.getElementById('botonNuevaTarea');
     const botonCerrarFormulario = document.getElementById('botonCerrarFormulario');
     const panelFormulario = document.getElementById('panelFormularioTarea');
-    const layout = document.getElementById('tareasLayout');
-    const formulariosEliminar = document.querySelectorAll('.form-eliminar-tarea');
-
-    const selectorActividad = document.getElementById('tipo_actividad');
-    const selectorLead = document.getElementById('lead_id');
+    const tareasLayout = document.getElementById('tareasLayout');
+    const selectTipoActividad = document.getElementById('tipo_actividad');
+    const selectLead = document.getElementById('lead_id');
     const bloqueObjeciones = document.getElementById('bloqueObjecionesFormulario');
 
+    function abrirMenu() {
+        if (!app || !botonMenu) {
+            return;
+        }
+        app.classList.add('menu-abierto');
+        botonMenu.setAttribute('aria-expanded', 'true');
+    }
+
+    function cerrarMenu() {
+        if (!app || !botonMenu) {
+            return;
+        }
+        app.classList.remove('menu-abierto');
+        botonMenu.setAttribute('aria-expanded', 'false');
+    }
+
+    if (botonMenu) {
+        botonMenu.addEventListener('click', function () {
+            if (!app) {
+                return;
+            }
+
+            const abierto = app.classList.toggle('menu-abierto');
+            botonMenu.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        });
+    }
+
+    if (fondoMenu) {
+        fondoMenu.addEventListener('click', cerrarMenu);
+    }
+
+    document.addEventListener('keydown', function (evento) {
+        if (evento.key === 'Escape') {
+            cerrarMenu();
+        }
+    });
+
     function abrirFormulario() {
-        if (!panelFormulario || !layout || !botonNuevaTarea) {
+        if (!panelFormulario || !tareasLayout || !botonNuevaTarea) {
             return;
         }
 
-        panelFormulario.removeAttribute('hidden');
-        layout.classList.add('con-formulario');
+        panelFormulario.hidden = false;
+        tareasLayout.classList.add('con-formulario');
         botonNuevaTarea.setAttribute('aria-expanded', 'true');
     }
 
     function cerrarFormulario() {
-        if (!panelFormulario || !layout || !botonNuevaTarea) {
+        if (!panelFormulario || !tareasLayout || !botonNuevaTarea) {
             return;
         }
 
-        panelFormulario.setAttribute('hidden', '');
-        layout.classList.remove('con-formulario');
+        panelFormulario.hidden = true;
+        tareasLayout.classList.remove('con-formulario');
         botonNuevaTarea.setAttribute('aria-expanded', 'false');
-    }
-
-    function actualizarBloqueObjeciones() {
-        if (!selectorActividad || !selectorLead || !bloqueObjeciones) {
-            return;
-        }
-
-        const opcionLead = selectorLead.options[selectorLead.selectedIndex];
-        const estadoLead = opcionLead ? (opcionLead.dataset.estado || '') : '';
-        const esObjecion = selectorActividad.value === 'Objeciones' && estadoLead === 'Objeciones';
-
-        if (esObjecion) {
-            bloqueObjeciones.removeAttribute('hidden');
-            bloqueObjeciones.classList.add('visible');
-        } else {
-            bloqueObjeciones.setAttribute('hidden', '');
-            bloqueObjeciones.classList.remove('visible');
-        }
-    }
-
-    if (panelFormulario && !panelFormulario.hasAttribute('hidden') && layout) {
-        layout.classList.add('con-formulario');
     }
 
     if (botonNuevaTarea) {
         botonNuevaTarea.addEventListener('click', function () {
-            if (panelFormulario && panelFormulario.hasAttribute('hidden')) {
+            if (!panelFormulario || panelFormulario.hidden) {
                 abrirFormulario();
-            } else {
-                cerrarFormulario();
+                return;
             }
-        });
-    }
 
-    if (botonCerrarFormulario) {
-        botonCerrarFormulario.addEventListener('click', function () {
             cerrarFormulario();
         });
     }
 
-    if (selectorActividad) {
-        selectorActividad.addEventListener('change', actualizarBloqueObjeciones);
+    if (botonCerrarFormulario) {
+        botonCerrarFormulario.addEventListener('click', cerrarFormulario);
     }
 
-    if (selectorLead) {
-        selectorLead.addEventListener('change', actualizarBloqueObjeciones);
+    function actualizarBloqueObjeciones() {
+        if (!selectTipoActividad || !selectLead || !bloqueObjeciones) {
+            return;
+        }
+
+        const tipoActividad = selectTipoActividad.value;
+        const opcionLead = selectLead.options[selectLead.selectedIndex];
+        const estadoLead = opcionLead ? (opcionLead.dataset.estado || '') : '';
+        const mostrar = tipoActividad === 'Objeciones' && estadoLead === 'Objeciones';
+
+        bloqueObjeciones.hidden = !mostrar;
+        bloqueObjeciones.classList.toggle('visible', mostrar);
+    }
+
+    if (selectTipoActividad) {
+        selectTipoActividad.addEventListener('change', actualizarBloqueObjeciones);
+    }
+
+    if (selectLead) {
+        selectLead.addEventListener('change', actualizarBloqueObjeciones);
     }
 
     actualizarBloqueObjeciones();
 
-    if (app && botonMenu && fondoMenu) {
-        botonMenu.addEventListener('click', function () {
-            const abierto = app.classList.toggle('menu-abierto');
-            botonMenu.setAttribute('aria-expanded', abierto ? 'true' : 'false');
-        });
+    const selectoresEstadoTabla = document.querySelectorAll('.selector-estado-tabla');
 
-        fondoMenu.addEventListener('click', function () {
-            app.classList.remove('menu-abierto');
-            botonMenu.setAttribute('aria-expanded', 'false');
-        });
+    function aplicarClaseEstadoSelect(select) {
+        select.classList.remove('estado-pendiente', 'estado-curso', 'estado-terminada');
 
-        document.addEventListener('keydown', function (evento) {
-            if (evento.key === 'Escape') {
-                app.classList.remove('menu-abierto');
-                botonMenu.setAttribute('aria-expanded', 'false');
-            }
-        });
+        if (select.value === 'Pendiente') {
+            select.classList.add('estado-pendiente');
+        } else if (select.value === 'En curso') {
+            select.classList.add('estado-curso');
+        } else if (select.value === 'Terminada') {
+            select.classList.add('estado-terminada');
+        }
     }
 
-    formulariosEliminar.forEach(function (formulario) {
-        formulario.addEventListener('submit', function (evento) {
-            const confirmado = window.confirm('¿Seguro que deseas eliminar esta tarea?');
+    selectoresEstadoTabla.forEach(function (select) {
+        aplicarClaseEstadoSelect(select);
 
-            if (!confirmado) {
-                evento.preventDefault();
+        select.addEventListener('change', function () {
+            aplicarClaseEstadoSelect(select);
+
+            const formulario = select.closest('form');
+            if (!formulario) {
+                return;
             }
+
+            select.classList.add('guardando');
+            formulario.submit();
         });
     });
 });
