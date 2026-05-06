@@ -9,6 +9,11 @@ $menuActivo = 'panel';
 
 require_once APP_ROOT . '/app/views/layouts/header.php';
 
+$usuario = (isset($usuario) && is_array($usuario)) ? $usuario : [];
+$leadsPorEstado = (isset($leadsPorEstado) && is_array($leadsPorEstado)) ? $leadsPorEstado : [];
+$estadosLista = (isset($estadosLista) && is_array($estadosLista)) ? $estadosLista : [];
+$tareasRetrasadasCount = (int) ($tareasRetrasadasCount ?? 0);
+
 $nombreUsuario = (string) ($usuario['nombre'] ?? 'Usuario');
 $rolUsuario = (string) ($usuario['rol'] ?? 'ventas');
 

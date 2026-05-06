@@ -1,10 +1,10 @@
 "use strict";
-//boton hamburguesa
+
 document.addEventListener('DOMContentLoaded', function () {
-    const panel = document.querySelector('#panelApp');
-    const boton = document.querySelector('#botonMenu');
-    const aside = document.querySelector('#asidePanel');
-    const fondo = document.querySelector('#fondoMenu');
+    const panel = document.getElementById('panelApp');
+    const boton = document.getElementById('botonMenu');
+    const aside = document.getElementById('asidePanel');
+    const fondo = document.getElementById('fondoMenu');
 
     if (!panel || !boton || !aside || !fondo) {
         return;
@@ -23,27 +23,27 @@ document.addEventListener('DOMContentLoaded', function () {
     boton.addEventListener('click', function () {
         if (panel.classList.contains('menu-abierto')) {
             cerrarMenu();
-        } else {
-            abrirMenu();
+            return;
         }
+
+        abrirMenu();
     });
 
     fondo.addEventListener('click', cerrarMenu);
 
     aside.addEventListener('click', function (evento) {
-        if (evento.target.closest('a') && window.innerWidth <= 768) {
+        if (evento.target.closest('a')) {
             cerrarMenu();
         }
     });
 
-    window.addEventListener('resize', function () {
-        if (window.innerWidth > 768) {
+    document.addEventListener('keydown', function (evento) {
+        if (evento.key === 'Escape') {
             cerrarMenu();
         }
     });
 });
 
-//cambiar estado con Selector, haciendo submit del form
 document.addEventListener('DOMContentLoaded', function () {
     const panel = document.getElementById('panelApp');
 

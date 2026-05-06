@@ -579,4 +579,67 @@ class LeadModel
 
         return $filas;
     }
+
+    public function getListadoFiltrado(int $usuarioId, bool $esAdmin, array $filtros = []): array
+    {
+        [$where, $params] = $this->buildLeadDashboardWhere($filtros, $usuarioId, $esAdmin, 'l');
+
+        $sql = $this->getListadoSelectSql() . "
+                $where
+                ORDER BY l.created_at DESC, l.id DESC";
+
+        return $this->db->executeQuery($sql, $params);
+    }
+
+    public function getListado(): array
+    {
+        return $this->getListadoFiltrado(0, true, []);
+    }
+
+    public function getListadoVendedor(int $id): array
+    {
+        return $this->getListadoFiltrado(0, true, [
+            'usuario_id' => $id
+        ]);
+    }
+
+    public function getListadoEstado(string $estado): array
+    {
+        return $this->getListadoFiltrado(0, true, [
+            'estado' => $estado
+        ]);
+    }
+
+    public function getListadoFecha(string $inicio, string $fin): array
+    {
+        return $this->getListadoFiltrado(0, true, [
+            'fecha_desde' => substr($inicio, 0, 10),
+            'fecha_hasta' => substr($fin, 0, 10)
+        ]);
+    }
+
+    private function getListadoSelectSql(): string
+    {
+        return "SELECT
+                    l.id,
+                    l.lead_nombre,
+                    l.estado,
+                    l.responsable_id,
+                    l.servicios,
+                    l.indicaciones,
+                    l.lead_score,
+                    l.email,
+                    l.telefono,
+                    l.valor,
+                    l.ultimo_contacto,
+                    l.prioridad,
+                    l.origen,
+                    l.created_at,
+                    l.updated_at,
+                    u.nombre AS responsable_nombre
+                FROM leads l
+                LEFT JOIN usuarios u ON l.responsable_id = u.id";
+    }
+
+
 }

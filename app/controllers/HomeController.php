@@ -63,7 +63,6 @@ class HomeController extends Controller
 
         $lm = new LeadModel();
         $leadsPorEstado = $lm->obtenerAgrupadosPorEstado();
-        $estadosLista = $lm->getEstados();
 
         self::view('home/kanban_view', [
             'tituloPagina'   => 'PipelineDesk | Pipeline',
@@ -72,7 +71,6 @@ class HomeController extends Controller
             'iconoFlash'     => $flash['icono'] ?? null,
             'claseFlash'     => $flash['clase'] ?? 'info',
             'leadsPorEstado' => is_array($leadsPorEstado) ? $leadsPorEstado : [],
-            'estadosLista'   => is_array($estadosLista) ? $estadosLista : []
         ]);
     }
 

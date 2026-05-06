@@ -31,6 +31,8 @@ Route::post('/leads/{id}/eliminar', [LeadController::class, 'eliminarLead']);
 
 Route::post('/leads/{id}/notas/guardar', [LeadController::class, 'nuevaNota']);
 Route::get('/leads/{id}', [LeadController::class, 'mostrarDetalle']);
+Route::get('/leads/listado', [LeadController::class, 'mostrarListado']);
+
 
 Route::get('/tareas', [TareaController::class, 'index']);
 Route::post('/tareas/guardar', [TareaController::class, 'guardar']);
