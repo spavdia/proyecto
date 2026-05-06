@@ -131,7 +131,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                     aria-controls="panelFormularioTarea">
                     Nueva tarea
                 </button>
-
+                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>  
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
                     <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>
@@ -325,7 +325,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                     <form action="<?= BASE_URL . 'tareas/guardar' ?>" method="POST" class="form-tarea">
                         <div class="campo">
                             <label for="lead_id">Lead</label>
-                            <select id="lead_id" name="lead_id">
+                            <select id="lead_id" name="lead_id" class="">
                                 <option value="">Selecciona un lead</option>
                                 <?php foreach ($leads as $lead): ?>
                                     <option
@@ -342,7 +342,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                         <div class="campo">
                             <label for="usuario_asignado_id">Asignar a</label>
                             <?php $asignadoSeleccionado = (int) ($datosForm['usuario_asignado_id'] ?? $usuarioActualId); ?>
-                            <select id="usuario_asignado_id" name="usuario_asignado_id">
+                            <select id="usuario_asignado_id" name="usuario_asignado_id" class="">
                                 <option value="">Selecciona un usuario</option>
                                 <?php foreach ($usuarios as $usuarioItem): ?>
                                     <option
@@ -357,7 +357,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 
                         <div class="campo">
                             <label for="tipo_actividad">Actividad</label>
-                            <select id="tipo_actividad" name="tipo_actividad">
+                            <select id="tipo_actividad" name="tipo_actividad" class="">
                                 <option value="">Selecciona una actividad</option>
                                 <?php foreach ($tiposActividad as $tipo): ?>
                                     <option
@@ -376,7 +376,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                             <div class="objeciones-grid">
                                 <div>
                                     <label for="tipo_bloqueo" class="sub-label">Tipo de bloqueo</label>
-                                    <select id="tipo_bloqueo" name="tipo_bloqueo">
+                                    <select id="tipo_bloqueo" name="tipo_bloqueo" class="">
                                         <?php foreach ($tiposBloqueo as $bloqueo): ?>
                                             <option
                                                 value="<?= htmlspecialchars((string) $bloqueo) ?>"
@@ -390,7 +390,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 
                                 <div>
                                     <label for="solucion_bloqueo" class="sub-label">Solución propuesta</label>
-                                    <select id="solucion_bloqueo" name="solucion_bloqueo">
+                                    <select id="solucion_bloqueo" name="solucion_bloqueo" class="">
                                         <?php foreach ($solucionesBloqueo as $solucion): ?>
                                             <option
                                                 value="<?= htmlspecialchars((string) $solucion) ?>"
@@ -415,7 +415,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                         <div class="campo">
                             <label for="estado">Estado</label>
                             <?php $estadoSeleccionado = tareas_valor_form($datosForm, 'estado', 'Pendiente'); ?>
-                            <select id="estado" name="estado">
+                            <select id="estado" name="estado" class="">
                                 <?php foreach ($estadosTarea as $estadoItem): ?>
                                     <option
                                         value="<?= htmlspecialchars((string) $estadoItem) ?>"
@@ -543,7 +543,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 
                                             <td>
                                                 <?php if ($esEditando): ?>
-                                                    <select name="estado" form="<?= htmlspecialchars($formId) ?>">
+                                                    <select name="estado" class="" form="<?= htmlspecialchars($formId) ?>">
                                                         <?php foreach ($estadosTarea as $estadoItem): ?>
                                                             <option
                                                                 value="<?= htmlspecialchars((string) $estadoItem) ?>"
@@ -583,7 +583,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                                                         <div class="objeciones-inline">
                                                             <div>
                                                                 <label class="sub-label">Bloqueo</label>
-                                                                <select name="tipo_bloqueo" form="<?= htmlspecialchars($formId) ?>">
+                                                                <select class="" name="tipo_bloqueo" form="<?= htmlspecialchars($formId) ?>">
                                                                     <?php foreach ($tiposBloqueo as $bloqueo): ?>
                                                                         <option
                                                                             value="<?= htmlspecialchars((string) $bloqueo) ?>"
@@ -597,7 +597,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 
                                                             <div>
                                                                 <label class="sub-label">Solución</label>
-                                                                <select name="solucion_bloqueo" form="<?= htmlspecialchars($formId) ?>">
+                                                                <select class="" name="solucion_bloqueo" form="<?= htmlspecialchars($formId) ?>">
                                                                     <?php foreach ($solucionesBloqueo as $solucion): ?>
                                                                         <option
                                                                             value="<?= htmlspecialchars((string) $solucion) ?>"

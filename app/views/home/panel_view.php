@@ -95,7 +95,7 @@ $mostrarEnlaceTareasFlash = !empty($mensajeFlash)
                     <span></span>
                     <span></span>
                 </button>
-
+                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
                     <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>

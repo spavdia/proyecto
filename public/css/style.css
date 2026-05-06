@@ -20,7 +20,27 @@
 
     --color-foco: rgba(95, 92, 241, 0.18);
 }
+.dark {
+    --color-fondo-app: #0f172a;
+    --color-fondo-suave: #020617;
+    --color-fondo-superficie: #111827;
+    --color-fondo-cabecera: #0f172a;
+    --color-fondo-oscuro: #000000;
 
+    --color-texto-principal: #f8fafc;
+    --color-texto-secundario: #cbd5e1;
+    --color-texto-suave: #94a3b8;
+    --color-texto-invertido: #ffffff;
+
+    --color-borde-suave: #334155;
+    --color-borde-general: #1f2937;
+    --color-borde-input: #334155;
+
+    --color-marca: #818cf8;
+    --color-marca-hover: #6366f1;
+
+    --color-foco: rgba(129, 140, 248, 0.24);
+}
 /* RESETEO */
 *,
 *::before,

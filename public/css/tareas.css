@@ -97,7 +97,7 @@ body {
 }
 
 .cabecera-tareas {
-    background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
+    background: var(--color-fondo-superficie);
     border-radius: 22px;
     padding: 28px 24px;
     margin-bottom: 24px;
@@ -165,7 +165,7 @@ body {
 
 .usuario {
     min-width: 180px;
-    background: #f8f9ff;
+    background: var(--color-fondo-suave);
     border: 1px solid var(--color-borde-general);
     border-radius: 16px;
     padding: 14px 16px;
@@ -211,8 +211,8 @@ body {
 }
 
 .boton-volver {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--color-fondo-suave);
+    color: var(--color-texto-principal);
 }
 
 .mensaje-flash {
@@ -371,7 +371,7 @@ body {
     width: 100%;
     height: 12px;
     border-radius: 999px;
-    background: #eceff5;
+    background: var(--color-fondo-suave);
     overflow: hidden;
 }
 
@@ -412,7 +412,7 @@ body {
     min-height: 38px;
     padding: 6px 12px;
     border-radius: 12px;
-    background: #eef2ff;
+    background: var(--color-fondo-suave);
     color: #1e3a8a;
     font-weight: 800;
     font-size: 1rem;
@@ -422,10 +422,10 @@ body {
 .semaforo-kpi-panel {
     position: relative;
     width: 100%;
-    border: 1px solid #d6d9e0;
+    border: 1px solid var(--color-borde-general);
     border-radius: 22px;
     padding: 46px 14px 14px;
-    background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+    background: var(--color-fondo-superficie);
     box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
@@ -444,7 +444,7 @@ body {
     height: 0;
     border-left: 12px solid transparent;
     border-right: 12px solid transparent;
-    border-top: 30px solid #111827;
+    border-top: 30px solid var(--color-texto-principal);
     filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.18));
 }
 
@@ -452,10 +452,10 @@ body {
     width: 100%;
     height: 56px;
     border-radius: 12px;
-    border: 1px solid #d6d9e0;
+    border: 1px solid var(--color-borde-general);
     overflow: hidden;
     display: flex;
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
 }
 
 .tramo {
@@ -591,7 +591,7 @@ body {
     align-items: center;
     padding: 10px 12px;
     border-radius: 14px;
-    background: #f8faff;
+    background: var(--color-fondo-suave);
     border: 1px solid var(--color-borde-general);
 }
 
@@ -603,7 +603,7 @@ body {
     min-height: 32px;
     padding: 4px 10px;
     border-radius: 999px;
-    background: #eef2ff;
+    background: var(--color-fondo-suave);
     color: #4338ca;
     font-size: 0.86rem;
     font-weight: 700;
@@ -680,7 +680,7 @@ body {
 }
 
 .usuario-tareas-card {
-    background: #f8faff;
+    background: var(--color-fondo-suave);
     border: 1px solid var(--color-borde-general);
     border-radius: 16px;
     padding: 14px;
@@ -715,7 +715,7 @@ body {
     width: 100%;
     height: 10px;
     border-radius: 999px;
-    background: #e5e7eb;
+    background: var(--color-fondo-suave);
     overflow: hidden;
 }
 
@@ -778,7 +778,7 @@ body {
     height: 40px;
     border: 1px solid var(--color-borde-general);
     border-radius: 10px;
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
     cursor: pointer;
     font-size: 1rem;
 }
@@ -807,7 +807,7 @@ body {
     padding: 12px 14px;
     font: inherit;
     color: var(--color-texto-principal);
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
     box-sizing: border-box;
 }
 
@@ -882,7 +882,7 @@ body {
 }
 
 .tabla-panel th {
-    background: #f8f9ff;
+    background: var(--color-fondo-suave);
     color: var(--color-texto-secundario);
     font-size: 0.95rem;
     font-weight: 700;
@@ -894,7 +894,7 @@ body {
 }
 
 .tabla-panel tbody tr:hover td {
-    background: #f8faff;
+    background: var(--color-fondo-suave);
 }
 
 .fila-edicion td {
@@ -1009,7 +1009,7 @@ body {
     padding: 8px 12px;
     font: inherit;
     font-weight: 700;
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
     cursor: pointer;
     transition: border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 }
@@ -1050,7 +1050,7 @@ body {
     height: 38px;
     border: 1px solid var(--color-borde-general);
     border-radius: 10px;
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -1072,7 +1072,7 @@ body {
 }
 
 .boton-icono.cancelar {
-    color: #374151;
+    color: var(--color-texto-principal);
 }
 
 .form-eliminar-tarea {

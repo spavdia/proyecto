@@ -94,6 +94,7 @@ $clasesPrioridadCampo = [
                     aria-label="Configurar campos visibles de las tarjetas">
                     <span aria-hidden="true">⚙</span>
                 </button>
+                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
 
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>

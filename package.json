@@ -1,0 +1,31 @@
+{
+  "name": "crm-pipeline",
+  "version": "1.0.0",
+  "description": "CRM Pipeline desarrollado con **PHP**, **MySQL**, **HTML5**, **CSS3** y **JavaScript**, siguiendo una arquitectura **MVC** y pensado para ejecutarse en **Windows + XAMPP + Visual Studio Code**.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spavdia/proyecto.git"
+  },
+  "keywords": [],
+  "author": "Sergio Pavon Diaz",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/spavdia/proyecto/issues"
+  },
+  "homepage": "https://github.com/spavdia/proyecto#readme",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.4",
+    "tailwindcss": "^4.2.4"
+  },
+  "scripts": {
+    "tw:build": "npx @tailwindcss/cli -i ./public/css/tailwind-source.css -o ./public/css/tailwind.css --minify",
+    "tw:watch": "npx @tailwindcss/cli -i ./public/css/tailwind-source.css -o ./public/css/tailwind.css --watch"
+  }
+
+}

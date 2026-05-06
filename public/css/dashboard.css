@@ -97,7 +97,7 @@ body {
 }
 
 .cabecera-dashboard {
-    background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
+    background: var(--color-fondo-superficie);
     border-radius: 22px;
     padding: 28px 24px;
     margin-bottom: 24px;
@@ -142,7 +142,7 @@ body {
 
 .usuario {
     min-width: 180px;
-    background: #f8f9ff;
+    background: var(--color-fondo-suave);
     border: 1px solid var(--color-borde-general);
     border-radius: 16px;
     padding: 14px 16px;
@@ -211,8 +211,8 @@ body {
 }
 
 .boton-volver {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--color-fondo-suave);
+    color: var(--color-texto-principal);
 }
 
 .mensaje-flash {
@@ -298,7 +298,7 @@ body {
     padding: 12px 14px;
     font: inherit;
     color: var(--color-texto-principal);
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
     box-sizing: border-box;
 }
 
@@ -317,7 +317,7 @@ body {
 }
 
 .metrica-card {
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
     border: 1px solid var(--color-borde-general);
     border-radius: 18px;
     padding: 18px;
@@ -352,7 +352,7 @@ body {
     border: 1px solid var(--color-borde-general);
     border-radius: 18px;
     padding: 16px;
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
 }
 
 .pipeline-top {
@@ -385,7 +385,7 @@ body {
     width: 100%;
     height: 10px;
     border-radius: 999px;
-    background: rgba(15, 23, 42, 0.08);
+    background: var(--color-fondo-suave);
     overflow: hidden;
     margin-top: 12px;
 }
@@ -446,7 +446,7 @@ body {
 }
 
 .mini-card {
-    background: #f8faff;
+    background: var(--color-fondo-suave);
     border: 1px solid var(--color-borde-general);
     border-radius: 16px;
     padding: 14px;
@@ -534,7 +534,7 @@ body {
     padding: 14px;
     border: 1px solid var(--color-borde-general);
     border-radius: 16px;
-    background: #f8faff;
+    background: var(--color-fondo-suave);
 }
 
 .item-operativo h3 {
@@ -593,7 +593,7 @@ body {
 }
 
 .tabla-dashboard th {
-    background: #f8f9ff;
+    background: var(--color-fondo-suave);
     color: var(--color-texto-secundario);
     font-size: 0.95rem;
     font-weight: 700;
@@ -632,7 +632,7 @@ body {
 }
 
 .usuario-card {
-    background: #f8faff;
+    background: var(--color-fondo-suave);
     border: 1px solid var(--color-borde-general);
     border-radius: 18px;
     padding: 16px;

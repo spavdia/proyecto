@@ -131,6 +131,7 @@ foreach ($solucionesMasUsadas as $fila) {
                 </button>
 
                 <a href="<?= BASE_URL . 'panel' ?>" class="boton boton-volver">Volver al panel</a>
+                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
 
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
@@ -157,7 +158,7 @@ foreach ($solucionesMasUsadas as $fila) {
                 <?php if ($esAdmin): ?>
                     <div class="campo">
                         <label for="usuario_id">Usuario</label>
-                        <select id="usuario_id" name="usuario_id">
+                        <select id="usuario_id" name="usuario_id" class="">
                             <option value="0">Todos</option>
                             <?php foreach ($usuariosLista as $usuarioItem): ?>
                                 <option
@@ -172,17 +173,17 @@ foreach ($solucionesMasUsadas as $fila) {
 
                 <div class="campo">
                     <label for="fecha_desde">Desde</label>
-                    <input type="date" id="fecha_desde" name="fecha_desde" value="<?= htmlspecialchars((string) ($filtros['fecha_desde'] ?? '')) ?>">
+                    <input class="" type="date" id="fecha_desde" name="fecha_desde" value="<?= htmlspecialchars((string) ($filtros['fecha_desde'] ?? '')) ?>">
                 </div>
 
                 <div class="campo">
                     <label for="fecha_hasta">Hasta</label>
-                    <input type="date" id="fecha_hasta" name="fecha_hasta" value="<?= htmlspecialchars((string) ($filtros['fecha_hasta'] ?? '')) ?>">
+                    <input class="" type="date" id="fecha_hasta" name="fecha_hasta" value="<?= htmlspecialchars((string) ($filtros['fecha_hasta'] ?? '')) ?>">
                 </div>
 
                 <div class="campo">
                     <label for="servicios">Servicio</label>
-                    <select id="servicios" name="servicios">
+                    <select id="servicios" name="servicios" class="">
                         <option value="">Todos</option>
                         <?php foreach ($serviciosLista as $servicio): ?>
                             <option
@@ -196,7 +197,7 @@ foreach ($solucionesMasUsadas as $fila) {
 
                 <div class="campo">
                     <label for="estado">Estado del lead</label>
-                    <select id="estado" name="estado">
+                    <select id="estado" name="estado" class="">
                         <option value="">Todos</option>
                         <?php foreach ($estadosLista as $estado): ?>
                             <option
@@ -210,7 +211,7 @@ foreach ($solucionesMasUsadas as $fila) {
 
                 <div class="campo">
                     <label for="origen">Origen</label>
-                    <select id="origen" name="origen">
+                    <select id="origen" name="origen" class="">
                         <option value="">Todos</option>
                         <option value="formulario_web" <?= (($filtros['origen'] ?? '') === 'formulario_web') ? 'selected' : '' ?>>Web</option>
                         <option value="app_interna" <?= (($filtros['origen'] ?? '') === 'app_interna') ? 'selected' : '' ?>>Interna</option>

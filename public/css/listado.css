@@ -143,7 +143,7 @@ a {
 
 /* CABECERA */
 .cabecera-listado {
-    background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
+    background: var(--color-fondo-superficie);
     border: 1px solid var(--color-borde-general);
     border-radius: 22px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
@@ -191,7 +191,7 @@ a {
 
 .usuario {
     min-width: 180px;
-    background: #f8f9ff;
+    background: var(--color-fondo-suave);
     border: 1px solid var(--color-borde-general);
     border-radius: 16px;
     padding: 14px 16px;
@@ -232,8 +232,8 @@ a {
 }
 
 .boton-secundario {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--color-fondo-suave);
+    color: var(--color-texto-principal);
 }
 
 .boton-principal {
@@ -242,8 +242,8 @@ a {
 }
 
 .boton-volver {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--color-fondo-suave);
+    color: var(--color-texto-principal);
 }
 
 /* BOTÓN HAMBURGUESA */
@@ -332,7 +332,7 @@ a {
     padding: 12px 14px;
     font: inherit;
     color: var(--color-texto-principal);
-    background: #ffffff;
+    background: var(--color-fondo-superficie);
     box-sizing: border-box;
 }
 
@@ -370,7 +370,7 @@ a {
 }
 
 .tabla-listado th {
-    background: #f8f9ff;
+    background: var(--color-fondo-suave);
     color: var(--color-texto-secundario);
     font-size: 0.95rem;
     font-weight: 700;
@@ -382,7 +382,7 @@ a {
 }
 
 .tabla-listado tbody tr:hover td {
-    background: #f8faff;
+    background: var(--color-fondo-suave);
 }
 
 .tabla-vacia {

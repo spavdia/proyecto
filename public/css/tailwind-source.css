@@ -1,0 +1,44 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@source "../../app/views";
+@source "../js";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Utilidades base sin alterar componentes del CRM */
+@utility crm-card {
+    @apply rounded-2xl border shadow-sm;
+}
+
+@utility crm-btn-ghost {
+    @apply inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm font-semibold transition hover:-translate-y-px;
+}
+
+@utility crm-btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white transition hover:-translate-y-px;
+}
+
+/* IMPORTANTE:
+   por ahora NO estilizamos inputs/selects del CRM con dark mode
+   porque deben mantener el diseño actual del proyecto */
+@utility crm-input {
+    @apply w-full;
+}
+
+@utility crm-select {
+    @apply w-full;
+}
+
+@utility crm-badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+}
+
+:root {
+    color-scheme: light;
+}
+
+.dark {
+    color-scheme: dark;
+}

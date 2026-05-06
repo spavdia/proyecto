@@ -177,7 +177,7 @@
 /* USUARIO */
 .usuario {
     min-width: 180px;
-    background: #f8f9ff;
+    background: var(--color-fondo-suave);
     border: 1px solid var(--color-borde-general);
     border-radius: 16px;
     padding: 14px 16px;
@@ -325,7 +325,7 @@
     text-align: left;
     vertical-align: middle;
     color: var(--color-texto-principal);
-    background: #f3f4f6;
+    background: var(--color-fondo-suave);
     border: none;
     line-height: 1.35;
 }
@@ -341,14 +341,14 @@
 }
 
 .tabla-panel tbody tr:hover td {
-    background: #eceff3;
+    background: var(--color-fondo-suave);
 }
 
 .tabla-vacia {
     text-align: center;
     color: var(--color-texto-suave);
     font-style: italic;
-    background: #f8fafc !important;
+    background: var(--color-fondo-suave) !important;
 }
 
 /* CELDA LEAD */
@@ -413,8 +413,8 @@
     min-height: 30px;
     padding: 4px 10px;
     border-radius: 999px;
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--color-fondo-suave);
+    color: var(--color-texto-principal);
     font-size: 0.82rem;
     font-weight: 700;
 }
@@ -433,8 +433,8 @@
 }
 
 .servicio-general {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--color-fondo-suave);
+    color: var(--color-texto-principal);
 }
 
 .servicio-b1 {
@@ -530,8 +530,8 @@
 }
 
 .selector-estado option {
-    background: #ffffff;
-    color: #111827;
+    background: var(--color-fondo-superficie);
+    color: var(--color-texto-principal);
     font-weight: 700;
 }
 

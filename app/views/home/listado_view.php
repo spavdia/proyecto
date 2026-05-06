@@ -73,11 +73,6 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
             </div>
 
             <div class="cabecera-listado-acciones">
-                <div class="usuario">
-                    <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
-                    <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>
-                </div>
-
                 <button
                     type="button"
                     class="boton-menu"
@@ -91,6 +86,13 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
                 </button>
 
                 <a href="<?= BASE_URL . 'panel' ?>" class="boton boton-secundario">Volver al panel</a>
+
+                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
+
+                <div class="usuario">
+                    <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
+                    <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>
+                </div>
             </div>
         </header>
 
@@ -115,7 +117,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
                 <?php if ($esAdmin): ?>
                     <div class="campo">
                         <label for="usuario_id">Usuario</label>
-                        <select id="usuario_id" name="usuario_id">
+                        <select class="" id="usuario_id" name="usuario_id">
                             <option value="0">Todos</option>
                             <?php foreach ($usuariosLista as $usuarioItem): ?>
                                 <option
@@ -140,7 +142,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
 
                 <div class="campo">
                     <label for="servicios">Servicio</label>
-                    <select id="servicios" name="servicios">
+                    <select class=""id="servicios" name="servicios">
                         <option value="">Todos</option>
                         <?php foreach ($serviciosLista as $servicio): ?>
                             <option
@@ -154,7 +156,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
 
                 <div class="campo">
                     <label for="estado">Estado del lead</label>
-                    <select id="estado" name="estado">
+                    <select class="" id="estado" name="estado">
                         <option value="">Todos</option>
                         <?php foreach ($estadosLista as $estado): ?>
                             <option
@@ -168,7 +170,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
 
                 <div class="campo">
                     <label for="origen">Origen</label>
-                    <select id="origen" name="origen">
+                    <select class="" id="origen" name="origen">
                         <option value="">Todos</option>
                         <option value="formulario_web" <?= (($filtros['origen'] ?? '') === 'formulario_web') ? 'selected' : '' ?>>Web</option>
                         <option value="app_interna" <?= (($filtros['origen'] ?? '') === 'app_interna') ? 'selected' : '' ?>>Interna</option>
