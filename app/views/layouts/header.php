@@ -27,6 +27,7 @@ declare(strict_types=1);
     </script>
     <link rel="stylesheet" href="<?= BASE_URL ?>css/tailwind.css">
     <link rel="stylesheet" href="<?= BASE_URL . 'css/style.css' ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/flash-toast.css">
     <?php if (!empty($archivoCssVista)): ?>
         <link rel="stylesheet" href="<?= BASE_URL . 'css/' . htmlspecialchars($archivoCssVista) ?>">
     <?php endif; ?>

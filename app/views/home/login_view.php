@@ -26,21 +26,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
                     Introduce tus credenciales para acceder a PipelineDesk.
                 </p>
             </div>
-            <!-- Mensaje Flash-->
-            <?php if (!empty($mensajeFlash)): ?>
-                <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash ?? 'error') ?>" role="alert" aria-live="assertive">
-                    <?php if (!empty($iconoFlash)): ?>
-                        <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars($iconoFlash) ?></span>
-                    <?php endif; ?>
-                    <span><?= htmlspecialchars($mensajeFlash) ?></span>
-                </div>
-            <?php endif; ?>
-            <!-- Error general-->
-            <?php if (!empty($errores['general'])): ?>
-                <div class="mensaje-flash mensaje-error" role="alert" aria-live="assertive">
-                    <span><?= htmlspecialchars($errores['general']) ?></span>
-                </div>
-            <?php endif; ?>
+            
 
             <!-- Formulario Login-->
             <form class="formulario-login" action="<?= BASE_URL . 'login' ?>" method="POST" novalidate>

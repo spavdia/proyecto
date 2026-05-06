@@ -9,6 +9,10 @@ $menuActivo = 'nuevo_lead';
 $mostrarBotonMenu = true;
 
 $errores = $errores ?? [];
+$serviciosLista = (isset($serviciosLista) && is_array($serviciosLista)) ? $serviciosLista : [];
+$responsables = (isset($responsables) && is_array($responsables)) ? $responsables : [];
+$estadosLista = (isset($estadosLista) && is_array($estadosLista)) ? $estadosLista : [];
+$prioridades = (isset($prioridades) && is_array($prioridades)) ? $prioridades : [];
 
 require_once APP_ROOT . '/app/views/layouts/header.php';
 ?>
@@ -35,14 +39,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
 
         <section class="nuevo-lead">
             <div class="caja-lead">
-                <?php if (!empty($mensajeFlash)): ?>
-                    <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash ?? 'info') ?>" role="alert" aria-live="assertive">
-                        <?php if (!empty($iconoFlash)): ?>
-                            <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars($iconoFlash) ?></span>
-                        <?php endif; ?>
-                        <span><?= htmlspecialchars($mensajeFlash) ?></span>
-                    </div>
-                <?php endif; ?>
+                
 
                 <form class="formulario-lead" action="<?= BASE_URL . 'leads/guardar' ?>" method="POST" novalidate>
                     <div class="campo">

@@ -140,14 +140,7 @@ foreach ($solucionesMasUsadas as $fila) {
             </div>
         </header>
 
-        <?php if (!empty($mensajeFlash)): ?>
-            <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash) ?>" role="alert" aria-live="assertive">
-                <?php if (!empty($iconoFlash)): ?>
-                    <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars((string) $iconoFlash) ?></span>
-                <?php endif; ?>
-                <span><?= htmlspecialchars((string) $mensajeFlash) ?></span>
-            </div>
-        <?php endif; ?>
+    
 
         <section class="bloque bloque-filtros">
             <div class="bloque-top">

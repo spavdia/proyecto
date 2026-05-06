@@ -172,14 +172,7 @@ $clasesPrioridadCampo = [
             </div>
         </header>
 
-        <?php if (!empty($mensajeFlash)): ?>
-            <div class="mensaje-flash mensaje-<?= htmlspecialchars((string)($claseFlash ?? 'info')) ?>" role="alert" aria-live="assertive">
-                <?php if (!empty($iconoFlash)): ?>
-                    <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars((string)$iconoFlash) ?></span>
-                <?php endif; ?>
-                <span><?= htmlspecialchars((string)$mensajeFlash) ?></span>
-            </div>
-        <?php endif; ?>
+       
 
         <section class="kanban-tablero" id="kanbanTablero" aria-label="Tablero kanban del pipeline">
             <?php foreach ($estadosPanel as $estadoClave => $configEstado): ?>

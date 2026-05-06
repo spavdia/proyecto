@@ -417,15 +417,7 @@ $claseEstadoActual = $clasesEstado[$estadoActual] ?? 'estado-nuevo';
                                 <h2>Actividad & Email</h2>
                             </div>
 
-                            <?php if (!empty($mensajeFlash)): ?>
-                                <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash ?? 'info') ?>" role="alert" aria-live="assertive">
-                                    <?php if (!empty($iconoFlash)): ?>
-                                        <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars($iconoFlash) ?></span>
-                                    <?php endif; ?>
-                                    <span><?= htmlspecialchars($mensajeFlash) ?></span>
-                                </div>
-                            <?php endif; ?>
-
+                           
                             <form action="<?= BASE_URL . 'leads/' . $leadId . '/notas/guardar' ?>" method="POST" class="form-nota">
                                 <div class="campo">
                                     <label for="tipo_actividad">Actividad</label>

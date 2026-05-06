@@ -96,14 +96,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
             </div>
         </header>
 
-        <?php if (!empty($mensajeFlash)): ?>
-            <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash) ?>" role="alert" aria-live="assertive">
-                <?php if (!empty($iconoFlash)): ?>
-                    <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars((string) $iconoFlash) ?></span>
-                <?php endif; ?>
-                <span><?= htmlspecialchars((string) $mensajeFlash) ?></span>
-            </div>
-        <?php endif; ?>
+       
 
         <section class="bloque-listado bloque-filtros-listado">
             <div class="bloque-listado-top">
