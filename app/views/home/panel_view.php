@@ -12,7 +12,8 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
 $usuario = (isset($usuario) && is_array($usuario)) ? $usuario : [];
 $leadsPorEstado = (isset($leadsPorEstado) && is_array($leadsPorEstado)) ? $leadsPorEstado : [];
 $estadosLista = (isset($estadosLista) && is_array($estadosLista)) ? $estadosLista : [];
-$tareasRetrasadasCount = (int) ($tareasRetrasadasCount ?? 0);
+$notificacionTarea = (isset($notificacionTarea) && is_array($notificacionTarea)) ? $notificacionTarea : null;
+$tareasRetrasadasCount = isset($tareasRetrasadasCount) ? (int) $tareasRetrasadasCount : 0;
 
 $nombreUsuario = (string) ($usuario['nombre'] ?? 'Usuario');
 $rolUsuario = (string) ($usuario['rol'] ?? 'ventas');
@@ -62,7 +63,6 @@ $clasesServicios = [
     'Selectividad' => 'servicio-selectividad',
     'Acceso Univ+25' => 'servicio-univ25'
 ];
-
 ?>
 
 <div class="panel" id="panelApp">
@@ -71,46 +71,79 @@ $clasesServicios = [
     <div class="fondo-menu" id="fondoMenu" aria-hidden="true"></div>
 
     <main class="contenido">
-        <?php if (!empty($notificacionTarea)): ?>
-            <section class="notificacion-panel" id="notificacionTareaPanel" role="alert" aria-live="polite">
-                <div class="notificacion-panel-titulo">
-                    <span>Nueva tarea asignada</span>
-                </div>
-
-                <div class="notificacion-panel-cuerpo">
-                    <div class="notificacion-panel-avatar">
-                        <img
-                            src="<?= BASE_URL . 'img/' . htmlspecialchars((string) $notificacionTarea['imagen']) ?>"
-                            alt="Imagen de <?= htmlspecialchars((string) $notificacionTarea['creador_nombre']) ?>">
+        <div class="panel-notificaciones">
+            <?php if (!empty($notificacionTarea)): ?>
+                <section class="notificacion-panel" role="alert" aria-live="polite">
+                    <div class="notificacion-panel-titulo">
+                        <span>Nueva tarea asignada</span>
                     </div>
 
-                    <div class="notificacion-panel-info">
-                        <p class="notificacion-panel-usuario">
-                            <?= htmlspecialchars((string) $notificacionTarea['creador_nombre']) ?>
-                        </p>
+                    <div class="notificacion-panel-cuerpo">
+                        <div class="notificacion-panel-avatar">
+                            <img
+                                src="<?= BASE_URL . 'img/' . htmlspecialchars((string) $notificacionTarea['imagen']) ?>"
+                                alt="Imagen de <?= htmlspecialchars((string) $notificacionTarea['creador_nombre']) ?>">
+                        </div>
 
-                        <p class="notificacion-panel-texto">
-                            Te ha asignado una tarea de tipo
-                            <strong><?= htmlspecialchars((string) $notificacionTarea['tipo_actividad']) ?></strong>
-                            para el lead
-                            <strong><?= htmlspecialchars((string) $notificacionTarea['lead_nombre']) ?></strong>.
-                        </p>
-
-                        <?php if (!empty($notificacionTarea['fecha_final'])): ?>
-                            <p class="notificacion-panel-fecha">
-                                Seguimiento: <?= htmlspecialchars((string) date('d/m/Y', strtotime((string) $notificacionTarea['fecha_final']))) ?>
+                        <div class="notificacion-panel-info">
+                            <p class="notificacion-panel-usuario">
+                                <?= htmlspecialchars((string) $notificacionTarea['creador_nombre']) ?>
                             </p>
-                        <?php endif; ?>
-                    </div>
-                </div>
 
-                <div class="notificacion-panel-acciones">
-                    <button type="button" class="boton-cerrar-notificacion" id="cerrarNotificacionTarea">
-                        Cerrar
-                    </button>
-                </div>
-            </section>
-        <?php endif; ?>
+                            <p class="notificacion-panel-texto">
+                                Te ha asignado una tarea de tipo
+                                <strong><?= htmlspecialchars((string) $notificacionTarea['tipo_actividad']) ?></strong>
+                                para el lead
+                                <strong><?= htmlspecialchars((string) $notificacionTarea['lead_nombre']) ?></strong>.
+                            </p>
+
+                            <?php if (!empty($notificacionTarea['fecha_final'])): ?>
+                                <p class="notificacion-panel-fecha">
+                                    Seguimiento: <?= htmlspecialchars((string) date('d/m/Y', strtotime((string) $notificacionTarea['fecha_final']))) ?>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="notificacion-panel-acciones">
+                        <button type="button" class="boton-cerrar-notificacion" data-cerrar-notificacion>
+                            Cerrar
+                        </button>
+                    </div>
+                </section>
+            <?php endif; ?>
+
+            <?php if ($tareasRetrasadasCount > 0): ?>
+                <section class="notificacion-panel notificacion-panel-alerta" role="alert" aria-live="polite">
+                    <div class="notificacion-panel-titulo">
+                        <span>Tareas retrasadas</span>
+                    </div>
+
+                    <div class="notificacion-panel-cuerpo">
+                        <div class="notificacion-panel-icono" aria-hidden="true">⏰</div>
+
+                        <div class="notificacion-panel-info">
+                            <p class="notificacion-panel-usuario">Aviso comercial</p>
+                            <p class="notificacion-panel-texto">
+                                Tienes <strong><?= $tareasRetrasadasCount ?></strong>
+                                tarea<?= ($tareasRetrasadasCount !== 1) ? 's' : '' ?>
+                                retrasada<?= ($tareasRetrasadasCount !== 1) ? 's' : '' ?> que requieren seguimiento.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="notificacion-panel-acciones">
+                        <a href="<?= BASE_URL . 'tareas' ?>" class="enlace-notificacion-panel">
+                            Ver tareas
+                        </a>
+                        <button type="button" class="boton-cerrar-notificacion" data-cerrar-notificacion>
+                            Cerrar
+                        </button>
+                    </div>
+                </section>
+            <?php endif; ?>
+        </div>
+
         <header class="cabecera-panel">
             <div class="cabecera-info">
                 <p class="cabecera-etiqueta">CRM Pipeline</p>
@@ -132,25 +165,15 @@ $clasesServicios = [
                     <span></span>
                     <span></span>
                 </button>
-                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
+
+               <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
+
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
                     <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>
                 </div>
             </div>
         </header>
-
-        <?php if (!empty($tareasRetrasadasCount)): ?>
-            <div class="mensaje-flash mensaje-error" role="alert" aria-live="assertive">
-                <span class="icono-flash" aria-hidden="true">⏰</span>
-                <span>
-                    Tienes <?= (int) $tareasRetrasadasCount ?> tarea<?= ((int) $tareasRetrasadasCount === 1) ? '' : 's' ?> retrasada<?= ((int) $tareasRetrasadasCount === 1) ? '' : 's' ?>.
-                    <a href="<?= BASE_URL . 'tareas' ?>" style="font-weight:700; color:inherit; text-decoration:underline;">Ver tareas</a>
-                </span>
-            </div>
-        <?php endif; ?>
-
-
 
         <?php foreach ($estadosPanel as $estadoClave => $configEstado): ?>
             <?php $leadsEstado = $leadsPorEstado[$estadoClave] ?? []; ?>

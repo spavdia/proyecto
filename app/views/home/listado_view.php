@@ -16,10 +16,6 @@ $usuariosLista = (isset($__ctx['usuariosLista']) && is_array($__ctx['usuariosLis
 $serviciosLista = (isset($__ctx['serviciosLista']) && is_array($__ctx['serviciosLista'])) ? $__ctx['serviciosLista'] : [];
 $estadosLista = (isset($__ctx['estadosLista']) && is_array($__ctx['estadosLista'])) ? $__ctx['estadosLista'] : [];
 
-$mensajeFlash = isset($__ctx['mensajeFlash']) ? $__ctx['mensajeFlash'] : null;
-$iconoFlash = isset($__ctx['iconoFlash']) ? $__ctx['iconoFlash'] : null;
-$claseFlash = isset($__ctx['claseFlash']) ? (string) $__ctx['claseFlash'] : 'info';
-
 $nombreUsuario = (string) ($usuario['nombre'] ?? 'Usuario');
 $rolUsuario = (string) ($usuario['rol'] ?? 'ventas');
 $esAdmin = (($usuario['rol'] ?? '') === 'admin');

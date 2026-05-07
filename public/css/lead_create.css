@@ -101,36 +101,6 @@
     box-shadow: 0 0 0 4px var(--color-foco);
 }
 
-/* MENSAJES */
-.mensaje-flash {
-    margin-bottom: 20px;
-    border-radius: 14px;
-    padding: 14px 16px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    font-size: 0.98rem;
-    line-height: 1.5;
-}
-
-.mensaje-error {
-    background-color: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
-}
-
-.mensaje-exito {
-    background-color: #ecfdf5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
-}
-
-.mensaje-info {
-    background-color: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-}
-
 .icono-flash {
     flex-shrink: 0;
 }

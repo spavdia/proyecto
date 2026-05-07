@@ -301,40 +301,6 @@ body {
     text-transform: capitalize;
 }
 
-/* MENSAJES */
-.mensaje-flash {
-    margin-bottom: 20px;
-    border-radius: 14px;
-    padding: 14px 16px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    font-size: 0.98rem;
-    line-height: 1.5;
-}
-
-.mensaje-error {
-    background-color: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
-}
-
-.mensaje-exito {
-    background-color: #ecfdf5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
-}
-
-.mensaje-info {
-    background-color: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-}
-
-.icono-flash {
-    flex-shrink: 0;
-}
-
 /* TABLERO */
 .kanban-tablero {
     display: grid;
@@ -719,7 +685,65 @@ body {
 .estado-perdido .kanban-columna-top {
     border-bottom-color: #fecaca;
 }
+.dark .estado-nuevo.kanban-columna {
+    background: rgba(76, 29, 149, 0.28);
+    border-color: rgba(196, 181, 253, 0.35);
+}
 
+.dark .estado-contactado.kanban-columna {
+    background: rgba(30, 58, 138, 0.28);
+    border-color: rgba(147, 197, 253, 0.35);
+}
+
+.dark .estado-progreso.kanban-columna {
+    background: rgba(12, 74, 110, 0.28);
+    border-color: rgba(125, 211, 252, 0.35);
+}
+
+.dark .estado-objeciones.kanban-columna {
+    background: rgba(120, 53, 15, 0.28);
+    border-color: rgba(253, 230, 138, 0.35);
+}
+
+.dark .estado-ganado.kanban-columna {
+    background: rgba(20, 83, 45, 0.28);
+    border-color: rgba(187, 247, 208, 0.35);
+}
+
+.dark .estado-perdido.kanban-columna {
+    background: rgba(127, 29, 29, 0.28);
+    border-color: rgba(254, 202, 202, 0.35);
+}
+
+.dark .estado-nuevo .kanban-flecha {
+    background: #4c1d95;
+    color: #e9d5ff;
+}
+
+.dark .estado-contactado .kanban-flecha {
+    background: #1e3a8a;
+    color: #dbeafe;
+}
+
+.dark .estado-progreso .kanban-flecha {
+    background: #0c4a6e;
+    color: #d9f1ff;
+}
+
+.dark .estado-objeciones .kanban-flecha {
+    background: #78350f;
+    color: #fde68a;
+}
+
+.dark .estado-ganado .kanban-flecha {
+    background: #14532d;
+    color: #dcfce7;
+}
+
+.dark .estado-perdido .kanban-flecha {
+    background: #7f1d1d;
+    color: #fee2e2;
+}
 /* ESCRITORIO REDUCIDO */
 @media (max-width: 1024px) {
     .contenido {

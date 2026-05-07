@@ -50,15 +50,6 @@ $serviciosLista = $serviciosLista ?? [];
             $errores = $errores ?? [];
             ?>
 
-            <?php if (!empty($mensajeFlash)): ?>
-                <div class="mensaje-flash mensaje-<?= htmlspecialchars($claseFlash ?? 'info') ?>" role="alert" aria-live="assertive">
-                    <?php if (!empty($iconoFlash)): ?>
-                        <span class="icono-flash" aria-hidden="true"><?= htmlspecialchars($iconoFlash) ?></span>
-                    <?php endif; ?>
-                    <span><?= htmlspecialchars($mensajeFlash) ?></span>
-                </div>
-            <?php endif; ?>
-
             <form class="formulario" action="<?= BASE_URL . 'contacto' ?>" method="POST" novalidate>
                 <div class="campo">
                     <label for="lead_nombre">Nombre completo</label>

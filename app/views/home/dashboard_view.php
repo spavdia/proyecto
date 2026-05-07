@@ -23,10 +23,6 @@ $seguimientosUrgentes = (isset($__ctx['seguimientosUrgentes']) && is_array($__ct
 $leadsSinContacto = (isset($__ctx['leadsSinContacto']) && is_array($__ctx['leadsSinContacto'])) ? $__ctx['leadsSinContacto'] : [];
 $resumenUsuarios = (isset($__ctx['resumenUsuarios']) && is_array($__ctx['resumenUsuarios'])) ? $__ctx['resumenUsuarios'] : [];
 
-$mensajeFlash = isset($__ctx['mensajeFlash']) ? $__ctx['mensajeFlash'] : null;
-$iconoFlash = isset($__ctx['iconoFlash']) ? $__ctx['iconoFlash'] : null;
-$claseFlash = isset($__ctx['claseFlash']) ? (string) $__ctx['claseFlash'] : 'info';
-
 require_once APP_ROOT . '/app/views/layouts/header.php';
 
 $nombreUsuario = (string) ($usuario['nombre'] ?? 'Usuario');

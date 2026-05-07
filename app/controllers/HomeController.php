@@ -40,9 +40,7 @@ class HomeController extends Controller
         $estadosLista = $lm->getEstados();
         $tareasRetrasadasCount = $tm->getRetrasadasCount($usuarioId, $esAdmin);
 
-        $tm = new TareaModel();
-
-        $nuevasTareas = $tm->getNuevasAsignadasByUsuario((int) $usuario['id']);
+        $nuevasTareas = $tm->getNuevasAsignadasByUsuario($usuarioId);
         $notificacionTarea = null;
 
         if (!empty($nuevasTareas)) {
@@ -67,9 +65,9 @@ class HomeController extends Controller
                 'imagen'         => $imagenesUsuarios[$usuarioCreadorId] ?? 'user1.png'
             ];
 
-            // Marcamos como leídas después de cargarlas para que solo salgan una vez
-            $tm->markNuevasComoLeidas((int) $usuario['id']);
+            $tm->markNuevasComoLeidas($usuarioId);
         }
+
         self::view('home/panel_view', [
             'tituloPagina'          => 'PipelineDesk | Panel',
             'usuario'               => $usuario,
@@ -79,7 +77,7 @@ class HomeController extends Controller
             'leadsPorEstado'        => is_array($leadsPorEstado) ? $leadsPorEstado : [],
             'estadosLista'          => is_array($estadosLista) ? $estadosLista : [],
             'tareasRetrasadasCount' => (int) $tareasRetrasadasCount,
-            'notificacionTarea' => $notificacionTarea,
+            'notificacionTarea'     => $notificacionTarea
         ]);
     }
 

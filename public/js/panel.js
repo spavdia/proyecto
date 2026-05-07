@@ -36,18 +36,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('click', function (evento) {
-        const botonCerrar = evento.target.closest('#cerrarNotificacionTarea');
+        const botonCerrar = evento.target.closest('[data-cerrar-notificacion]');
 
         if (!botonCerrar) {
             return;
         }
 
-        const notificacion = document.getElementById('notificacionTareaPanel');
+        const notificacion = botonCerrar.closest('.notificacion-panel');
 
-        if (!notificacion) {
-            return;
+        if (notificacion) {
+            notificacion.remove();
         }
-
-        notificacion.remove();
     });
 });

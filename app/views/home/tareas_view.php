@@ -27,9 +27,6 @@ $datosEdicion = (isset($__ctx['datosEdicion']) && is_array($__ctx['datosEdicion'
 $bloqueosResumen = (isset($__ctx['bloqueosResumen']) && is_array($__ctx['bloqueosResumen'])) ? $__ctx['bloqueosResumen'] : [];
 $resumenEstados = (isset($__ctx['resumenEstados']) && is_array($__ctx['resumenEstados'])) ? $__ctx['resumenEstados'] : [];
 
-$mensajeFlash = isset($__ctx['mensajeFlash']) ? $__ctx['mensajeFlash'] : null;
-$iconoFlash = isset($__ctx['iconoFlash']) ? $__ctx['iconoFlash'] : null;
-$claseFlash = isset($__ctx['claseFlash']) ? (string) $__ctx['claseFlash'] : 'info';
 $mostrarFormulario = isset($__ctx['mostrarFormulario']) ? (bool) $__ctx['mostrarFormulario'] : false;
 $editarId = isset($__ctx['editarId']) ? (int) $__ctx['editarId'] : 0;
 $retrasadasCount = isset($__ctx['retrasadasCount']) ? (int) $__ctx['retrasadasCount'] : 0;
@@ -131,7 +128,8 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                     aria-controls="panelFormularioTarea">
                     Nueva tarea
                 </button>
-                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>  
+                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
+
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
                     <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>

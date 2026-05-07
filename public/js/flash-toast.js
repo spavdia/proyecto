@@ -14,11 +14,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }, delay);
 
         function cerrarToast(elemento) {
+            if (!elemento || elemento.dataset.cerrando === '1') {
+                return;
+            }
+
+            elemento.dataset.cerrando = '1';
             elemento.classList.remove('app-toast-visible');
             elemento.classList.add('app-toast-saliendo');
 
             setTimeout(function () {
-                if (elemento && elemento.parentNode) {
+                if (elemento.parentNode) {
                     elemento.parentNode.removeChild(elemento);
                 }
             }, 260);

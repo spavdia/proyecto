@@ -6,39 +6,7 @@ body {
 a {
     text-decoration: none
 }
-/* MENSAJES */
-.mensaje-flash {
-    margin-bottom: 20px;
-    border-radius: 14px;
-    padding: 14px 16px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    font-size: 0.98rem;
-    line-height: 1.5;
-}
 
-.mensaje-error {
-    background-color: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
-}
-
-.mensaje-exito {
-    background-color: #ecfdf5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
-}
-
-.mensaje-info {
-    background-color: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-}
-
-.icono-flash {
-    flex-shrink: 0;
-}
 .panel {
     display: grid;
     grid-template-columns: 1fr;
@@ -447,7 +415,35 @@ a {
     background: #fecaca;
     color: #991b1b;
 }
+.dark .estado-nuevo {
+    background: #4c1d95;
+    color: #e9d5ff;
+}
 
+.dark .estado-contactado {
+    background: #1e3a8a;
+    color: #dbeafe;
+}
+
+.dark .estado-progreso {
+    background: #0c4a6e;
+    color: #d9f1ff;
+}
+
+.dark .estado-objeciones {
+    background: #78350f;
+    color: #fde68a;
+}
+
+.dark .estado-ganado {
+    background: #14532d;
+    color: #dcfce7;
+}
+
+.dark .estado-perdido {
+    background: #7f1d1d;
+    color: #fee2e2;
+}
 /* RESPONSIVE */
 @media (max-width: 1024px) {
     .contenido,
