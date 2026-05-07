@@ -63,9 +63,6 @@ $clasesServicios = [
     'Acceso Univ+25' => 'servicio-univ25'
 ];
 
-$mostrarEnlaceTareasFlash = !empty($mensajeFlash)
-    && (string) ($claseFlash ?? 'info') === 'info'
-    && mb_stripos((string) $mensajeFlash, 'objeción pendiente') !== false;
 ?>
 
 <div class="panel" id="panelApp">
@@ -74,6 +71,46 @@ $mostrarEnlaceTareasFlash = !empty($mensajeFlash)
     <div class="fondo-menu" id="fondoMenu" aria-hidden="true"></div>
 
     <main class="contenido">
+        <?php if (!empty($notificacionTarea)): ?>
+            <section class="notificacion-panel" id="notificacionTareaPanel" role="alert" aria-live="polite">
+                <div class="notificacion-panel-titulo">
+                    <span>Nueva tarea asignada</span>
+                </div>
+
+                <div class="notificacion-panel-cuerpo">
+                    <div class="notificacion-panel-avatar">
+                        <img
+                            src="<?= BASE_URL . 'img/' . htmlspecialchars((string) $notificacionTarea['imagen']) ?>"
+                            alt="Imagen de <?= htmlspecialchars((string) $notificacionTarea['creador_nombre']) ?>">
+                    </div>
+
+                    <div class="notificacion-panel-info">
+                        <p class="notificacion-panel-usuario">
+                            <?= htmlspecialchars((string) $notificacionTarea['creador_nombre']) ?>
+                        </p>
+
+                        <p class="notificacion-panel-texto">
+                            Te ha asignado una tarea de tipo
+                            <strong><?= htmlspecialchars((string) $notificacionTarea['tipo_actividad']) ?></strong>
+                            para el lead
+                            <strong><?= htmlspecialchars((string) $notificacionTarea['lead_nombre']) ?></strong>.
+                        </p>
+
+                        <?php if (!empty($notificacionTarea['fecha_final'])): ?>
+                            <p class="notificacion-panel-fecha">
+                                Seguimiento: <?= htmlspecialchars((string) date('d/m/Y', strtotime((string) $notificacionTarea['fecha_final']))) ?>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="notificacion-panel-acciones">
+                    <button type="button" class="boton-cerrar-notificacion" id="cerrarNotificacionTarea">
+                        Cerrar
+                    </button>
+                </div>
+            </section>
+        <?php endif; ?>
         <header class="cabecera-panel">
             <div class="cabecera-info">
                 <p class="cabecera-etiqueta">CRM Pipeline</p>
@@ -113,7 +150,7 @@ $mostrarEnlaceTareasFlash = !empty($mensajeFlash)
             </div>
         <?php endif; ?>
 
-       
+
 
         <?php foreach ($estadosPanel as $estadoClave => $configEstado): ?>
             <?php $leadsEstado = $leadsPorEstado[$estadoClave] ?? []; ?>

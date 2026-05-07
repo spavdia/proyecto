@@ -350,22 +350,27 @@ class TareaModel
     }
 
     public function getNuevasAsignadasByUsuario(int $usuarioId, int $limite = 3): array
-    {
-        $sql = "SELECT
-                    t.id,
-                    t.tipo_actividad,
-                    t.fecha_final,
-                    l.lead_nombre
-                FROM tareas_lead t
-                INNER JOIN leads l ON l.id = t.lead_id
-                WHERE t.usuario_asignado_id = ?
-                  AND t.leida_asignado = 0
-                  AND t.usuario_creador_id <> t.usuario_asignado_id
-                ORDER BY t.created_at DESC
-                LIMIT " . (int) $limite;
+{
+    $sql = "SELECT
+                t.id,
+                t.lead_id,
+                t.tipo_actividad,
+                t.fecha_final,
+                t.created_at,
+                t.usuario_creador_id,
+                l.lead_nombre,
+                uc.nombre AS creador_nombre
+            FROM tareas_lead t
+            INNER JOIN leads l ON l.id = t.lead_id
+            INNER JOIN usuarios uc ON uc.id = t.usuario_creador_id
+            WHERE t.usuario_asignado_id = ?
+              AND t.leida_asignado = 0
+              AND t.usuario_creador_id <> t.usuario_asignado_id
+            ORDER BY t.created_at DESC
+            LIMIT " . (int) $limite;
 
-        return $this->db->executeQuery($sql, [$usuarioId]);
-    }
+    return $this->db->executeQuery($sql, [$usuarioId]);
+}
 
     public function markNuevasComoLeidas(int $usuarioId): void
     {

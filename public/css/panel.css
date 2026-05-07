@@ -21,6 +21,104 @@
 .enlace-lead:hover {
     text-decoration: underline;
 }
+/* NOTIFICACION DE TAREA NUEVA */
+.notificacion-panel {
+    max-width: 360px;
+    margin: 0 0 22px auto;
+    padding: 14px;
+    background: var(--color-fondo-superficie);
+    border: 1px solid var(--color-borde-general);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.notificacion-panel-titulo {
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    background: var(--color-fondo-suave);
+    border-radius: 10px;
+}
+
+.notificacion-panel-titulo span {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--color-texto-principal);
+}
+
+.notificacion-panel-cuerpo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.notificacion-panel-avatar {
+    flex-shrink: 0;
+}
+
+.notificacion-panel-avatar img {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 999px;
+    border: 2px solid var(--color-borde-general);
+    display: block;
+}
+
+.notificacion-panel-info {
+    min-width: 0;
+}
+
+.notificacion-panel-usuario {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-texto-principal);
+}
+
+.notificacion-panel-texto {
+    margin: 0 0 6px;
+    font-size: 0.94rem;
+    line-height: 1.5;
+    color: var(--color-texto-secundario);
+}
+
+.notificacion-panel-fecha {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--color-marca);
+    font-weight: 600;
+}
+
+.notificacion-panel-acciones {
+    margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+
+.boton-cerrar-notificacion {
+    min-height: 36px;
+    padding: 8px 14px;
+    border: 1px solid var(--color-borde-general);
+    border-radius: 10px;
+    background: var(--color-fondo-suave);
+    color: var(--color-texto-principal);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.boton-cerrar-notificacion:hover {
+    background: var(--color-fondo-app);
+    transform: translateY(-1px);
+}
+
+.boton-cerrar-notificacion:focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 2px;
+}
+
 
 /* ASIDE */
 .aside {
@@ -729,6 +827,10 @@
 
     .selector-estado {
         min-width: 145px;
+    }
+    .notificacion-panel {
+        max-width: 100%;
+        margin: 0 0 20px;
     }
 }
 

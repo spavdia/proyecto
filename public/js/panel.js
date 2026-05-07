@@ -1,67 +1,53 @@
 "use strict";
 
 document.addEventListener('DOMContentLoaded', function () {
-    const panel = document.getElementById('panelApp');
-    const boton = document.getElementById('botonMenu');
-    const aside = document.getElementById('asidePanel');
-    const fondo = document.getElementById('fondoMenu');
+    const panelApp = document.getElementById('panelApp');
+    const botonMenu = document.getElementById('botonMenu');
+    const fondoMenu = document.getElementById('fondoMenu');
 
-    if (!panel || !boton || !aside || !fondo) {
-        return;
+    if (botonMenu && panelApp) {
+        botonMenu.addEventListener('click', function () {
+            const abierto = panelApp.classList.toggle('menu-abierto');
+            botonMenu.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        });
     }
 
-    function abrirMenu() {
-        panel.classList.add('menu-abierto');
-        boton.setAttribute('aria-expanded', 'true');
+    if (fondoMenu && panelApp && botonMenu) {
+        fondoMenu.addEventListener('click', function () {
+            panelApp.classList.remove('menu-abierto');
+            botonMenu.setAttribute('aria-expanded', 'false');
+        });
     }
 
-    function cerrarMenu() {
-        panel.classList.remove('menu-abierto');
-        boton.setAttribute('aria-expanded', 'false');
+    if (panelApp) {
+        panelApp.addEventListener('change', function (evento) {
+            const selector = evento.target.closest('.selector-estado');
+
+            if (!selector) {
+                return;
+            }
+
+            const formulario = selector.closest('.form-estado');
+
+            if (formulario) {
+                formulario.submit();
+            }
+        });
     }
 
-    boton.addEventListener('click', function () {
-        if (panel.classList.contains('menu-abierto')) {
-            cerrarMenu();
+    document.addEventListener('click', function (evento) {
+        const botonCerrar = evento.target.closest('#cerrarNotificacionTarea');
+
+        if (!botonCerrar) {
             return;
         }
 
-        abrirMenu();
-    });
+        const notificacion = document.getElementById('notificacionTareaPanel');
 
-    fondo.addEventListener('click', cerrarMenu);
-
-    aside.addEventListener('click', function (evento) {
-        if (evento.target.closest('a')) {
-            cerrarMenu();
-        }
-    });
-
-    document.addEventListener('keydown', function (evento) {
-        if (evento.key === 'Escape') {
-            cerrarMenu();
-        }
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const panel = document.getElementById('panelApp');
-
-    if (!panel) {
-        return;
-    }
-
-    panel.addEventListener('change', function (evento) {
-        const selector = evento.target.closest('.selector-estado');
-
-        if (!selector) {
+        if (!notificacion) {
             return;
         }
 
-        const formulario = selector.closest('.form-estado');
-
-        if (formulario) {
-            formulario.submit();
-        }
+        notificacion.remove();
     });
 });

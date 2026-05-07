@@ -40,6 +40,36 @@ class HomeController extends Controller
         $estadosLista = $lm->getEstados();
         $tareasRetrasadasCount = $tm->getRetrasadasCount($usuarioId, $esAdmin);
 
+        $tm = new TareaModel();
+
+        $nuevasTareas = $tm->getNuevasAsignadasByUsuario((int) $usuario['id']);
+        $notificacionTarea = null;
+
+        if (!empty($nuevasTareas)) {
+            $tareaNueva = $nuevasTareas[0];
+
+            $imagenesUsuarios = [
+                1 => 'user1.png', // admin
+                2 => 'user2.png', // Ana
+                3 => 'user3.png'  // Juan
+            ];
+
+            $usuarioCreadorId = (int) ($tareaNueva['usuario_creador_id'] ?? 0);
+
+            $notificacionTarea = [
+                'id'             => (int) ($tareaNueva['id'] ?? 0),
+                'lead_id'        => (int) ($tareaNueva['lead_id'] ?? 0),
+                'lead_nombre'    => (string) ($tareaNueva['lead_nombre'] ?? ''),
+                'tipo_actividad' => (string) ($tareaNueva['tipo_actividad'] ?? ''),
+                'fecha_final'    => (string) ($tareaNueva['fecha_final'] ?? ''),
+                'created_at'     => (string) ($tareaNueva['created_at'] ?? ''),
+                'creador_nombre' => (string) ($tareaNueva['creador_nombre'] ?? 'Usuario'),
+                'imagen'         => $imagenesUsuarios[$usuarioCreadorId] ?? 'user1.png'
+            ];
+
+            // Marcamos como leídas después de cargarlas para que solo salgan una vez
+            $tm->markNuevasComoLeidas((int) $usuario['id']);
+        }
         self::view('home/panel_view', [
             'tituloPagina'          => 'PipelineDesk | Panel',
             'usuario'               => $usuario,
@@ -48,7 +78,8 @@ class HomeController extends Controller
             'claseFlash'            => $flash['clase'] ?? 'info',
             'leadsPorEstado'        => is_array($leadsPorEstado) ? $leadsPorEstado : [],
             'estadosLista'          => is_array($estadosLista) ? $estadosLista : [],
-            'tareasRetrasadasCount' => (int) $tareasRetrasadasCount
+            'tareasRetrasadasCount' => (int) $tareasRetrasadasCount,
+            'notificacionTarea' => $notificacionTarea,
         ]);
     }
 
