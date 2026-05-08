@@ -116,13 +116,9 @@ $objetivoPorcentaje = (float) ($objetivoMes['porcentaje'] ?? 0);
 $objetivoPosicion = max(2, min(98, $objetivoPorcentaje));
 $nombreMesObjetivo = [1=>'enero',2=>'febrero',3=>'marzo',4=>'abril',5=>'mayo',6=>'junio',7=>'julio',8=>'agosto',9=>'septiembre',10=>'octubre',11=>'noviembre',12=>'diciembre'];
 $labelMesObjetivo = $nombreMesObjetivo[(int) ($objetivoMes['mes'] ?? (int) date('n'))] ?? 'mes actual';
-$objetivoMediaAnterior = (float) ($objetivoMes['media_anterior'] ?? 0);
-$objetivoMediaActual = (float) ($objetivoMes['media_actual'] ?? 0);
 $objetivoReferenciaAnterior = (int) ($objetivoMes['ganados_mes_anterior'] ?? $objetivoObjetivo);
 $objetivoEtiquetaEstado = $objetivoPorcentaje >= 100 ? 'Meta igualada o superada' : ($objetivoPorcentaje >= 70 ? 'Buen ritmo comercial' : 'Impulso necesario');
 $objetivoPorcentajeTexto = rtrim(rtrim(number_format($objetivoPorcentaje, 1, ',', '.'), '0'), ',');
-$objetivoMediaAnteriorTexto = number_format($objetivoMediaAnterior, 2, ',', '.');
-$objetivoMediaActualTexto = number_format($objetivoMediaActual, 2, ',', '.');
 ?>
 
 <div class="panel" id="dashboardApp">
@@ -185,12 +181,6 @@ $objetivoMediaActualTexto = number_format($objetivoMediaActual, 2, ',', '.');
                     <small>Cierres logrados en el mes anterior</small>
                 </div>
 
-                <div class="objetivo-resumen-dato">
-                    <span>Media diaria anterior</span>
-                    <strong><?= htmlspecialchars($objetivoMediaAnteriorTexto) ?></strong>
-                    <small>Promedio diario de cierres del mes anterior</small>
-                </div>
-
                 <div class="objetivo-resumen-dato objetivo-resumen-dato-progreso">
                     <span>Progreso</span>
                     <strong><?= htmlspecialchars($objetivoPorcentajeTexto) ?>%</strong>
@@ -200,8 +190,8 @@ $objetivoMediaActualTexto = number_format($objetivoMediaActual, 2, ',', '.');
 
             <div class="objetivo-semaforo">
                 <div class="objetivo-semaforo-top">
-                    <small>Ritmo del mes actual</small>
-                    <strong><?= htmlspecialchars($objetivoMediaActualTexto) ?> / día</strong>
+                    <small>Ganados este mes / Mes anterior</small>
+                    <strong><?= $objetivoGanados ?> / <?= $objetivoReferenciaAnterior ?></strong>
                 </div>
 
                 <div class="objetivo-semaforo-panel">

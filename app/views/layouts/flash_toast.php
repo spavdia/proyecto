@@ -25,28 +25,34 @@ $usuarioToastId = (int) ($usuarioToast['id'] ?? 0);
 
 if ($usuarioToastId > 0) {
     $leadToastModel = new LeadModel();
-    $logroToast = $leadToastModel->getPendingGanadoNotificationByUsuario($usuarioToastId);
+    $logrosToast = $leadToastModel->getPendingGanadoNotificationsByUsuario($usuarioToastId);
 
-    if (is_array($logroToast)) {
+    if (!empty($logrosToast)) {
         $imagenesUsuarios = [
             1 => 'user1.png',
             2 => 'user2.png',
             3 => 'user3.png'
         ];
 
-        $usuarioOrigenId = (int) ($logroToast['usuario_origen_id'] ?? 0);
-        $leadToastModel->markNotificationAsRead((int) ($logroToast['id'] ?? 0));
+        $idsLeidos = [];
 
-        $toastItems[] = [
-            'mensaje' => (string) ($logroToast['mensaje'] ?? ''),
-            'tipo' => 'exito',
-            'rich' => true,
-            'titulo' => (string) ($logroToast['titulo'] ?? '¡Felicidades!'),
-            'imagen' => (string) ($imagenesUsuarios[$usuarioOrigenId] ?? 'user1.png'),
-            'origen_nombre' => (string) ($logroToast['origen_nombre'] ?? 'Equipo comercial'),
-            'enlace' => (string) (($logroToast['enlace'] ?? '') !== '' ? $logroToast['enlace'] : ('leads/' . (int) ($logroToast['lead_id'] ?? 0))),
-            'cta' => 'Ver detalles'
-        ];
+        foreach ($logrosToast as $logroToast) {
+            $usuarioOrigenId = (int) ($logroToast['usuario_origen_id'] ?? 0);
+            $idsLeidos[] = (int) ($logroToast['id'] ?? 0);
+
+            $toastItems[] = [
+                'mensaje' => (string) ($logroToast['mensaje'] ?? ''),
+                'tipo' => 'exito',
+                'rich' => true,
+                'titulo' => (string) ($logroToast['titulo'] ?? 'FELICIDADES'),
+                'imagen' => (string) ($imagenesUsuarios[$usuarioOrigenId] ?? 'user1.png'),
+                'origen_nombre' => (string) ($logroToast['origen_nombre'] ?? 'Equipo comercial'),
+                'enlace' => (string) (($logroToast['enlace'] ?? '') !== '' ? $logroToast['enlace'] : ('leads/' . (int) ($logroToast['lead_id'] ?? 0))),
+                'cta' => 'Ver detalles'
+            ];
+        }
+
+        $leadToastModel->markNotificationsAsReadByIds($idsLeidos);
     }
 }
 
