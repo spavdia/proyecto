@@ -88,6 +88,11 @@ $terminadas = (int) ($resumenEstados['Terminada'] ?? 0);
 $totalEstados = $pendientes + $enCurso + $terminadas;
 $porcentajeSemaforo = $totalEstados > 0 ? (int) round(($terminadas / $totalEstados) * 100) : 0;
 $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
+
+$claseInputEditar = 'w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/20';
+$claseSelectEditar = 'w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/20';
+$claseTextareaEditar = 'w-full rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-800 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/20 resize-y min-h-[110px]';
+$claseLabelEditar = 'mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400';
 ?>
 
 <div class="panel" id="tareasApp">
@@ -128,6 +133,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                     aria-controls="panelFormularioTarea">
                     Nueva tarea
                 </button>
+
                 <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
 
                 <div class="usuario">
@@ -136,8 +142,6 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                 </div>
             </div>
         </header>
-
-        
 
         <?php if (!empty($nuevasAsignadas)): ?>
             <section class="aviso-tareas">
@@ -316,7 +320,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                     <form action="<?= BASE_URL . 'tareas/guardar' ?>" method="POST" class="form-tarea">
                         <div class="campo">
                             <label for="lead_id">Lead</label>
-                            <select id="lead_id" name="lead_id" class="">
+                            <select id="lead_id" name="lead_id">
                                 <option value="">Selecciona un lead</option>
                                 <?php foreach ($leads as $lead): ?>
                                     <option
@@ -333,7 +337,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                         <div class="campo">
                             <label for="usuario_asignado_id">Asignar a</label>
                             <?php $asignadoSeleccionado = (int) ($datosForm['usuario_asignado_id'] ?? $usuarioActualId); ?>
-                            <select id="usuario_asignado_id" name="usuario_asignado_id" class="">
+                            <select id="usuario_asignado_id" name="usuario_asignado_id">
                                 <option value="">Selecciona un usuario</option>
                                 <?php foreach ($usuarios as $usuarioItem): ?>
                                     <option
@@ -348,7 +352,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 
                         <div class="campo">
                             <label for="tipo_actividad">Actividad</label>
-                            <select id="tipo_actividad" name="tipo_actividad" class="">
+                            <select id="tipo_actividad" name="tipo_actividad">
                                 <option value="">Selecciona una actividad</option>
                                 <?php foreach ($tiposActividad as $tipo): ?>
                                     <option
@@ -367,7 +371,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                             <div class="objeciones-grid">
                                 <div>
                                     <label for="tipo_bloqueo" class="sub-label">Tipo de bloqueo</label>
-                                    <select id="tipo_bloqueo" name="tipo_bloqueo" class="">
+                                    <select id="tipo_bloqueo" name="tipo_bloqueo">
                                         <?php foreach ($tiposBloqueo as $bloqueo): ?>
                                             <option
                                                 value="<?= htmlspecialchars((string) $bloqueo) ?>"
@@ -381,7 +385,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 
                                 <div>
                                     <label for="solucion_bloqueo" class="sub-label">Solución propuesta</label>
-                                    <select id="solucion_bloqueo" name="solucion_bloqueo" class="">
+                                    <select id="solucion_bloqueo" name="solucion_bloqueo">
                                         <?php foreach ($solucionesBloqueo as $solucion): ?>
                                             <option
                                                 value="<?= htmlspecialchars((string) $solucion) ?>"
@@ -406,7 +410,7 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                         <div class="campo">
                             <label for="estado">Estado</label>
                             <?php $estadoSeleccionado = tareas_valor_form($datosForm, 'estado', 'Pendiente'); ?>
-                            <select id="estado" name="estado" class="">
+                            <select id="estado" name="estado">
                                 <?php foreach ($estadosTarea as $estadoItem): ?>
                                     <option
                                         value="<?= htmlspecialchars((string) $estadoItem) ?>"
@@ -519,22 +523,30 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
 
                                             <td><?= htmlspecialchars((string) ($tarea['asignado_nombre'] ?? '-')) ?></td>
 
-                                            <td class="<?= $esRetrasada ? 'fecha-retrasada' : '' ?>">
+                                            <td>
                                                 <?php if ($esEditando): ?>
+                                                    <label class="<?= $claseLabelEditar ?>">Fecha final</label>
                                                     <input
                                                         type="date"
                                                         name="fecha_final"
                                                         form="<?= htmlspecialchars($formId) ?>"
+                                                        class="<?= $claseInputEditar ?>"
                                                         value="<?= htmlspecialchars($fechaInput) ?>">
                                                     <span class="error-campo"><?= !empty($erroresEdicion['fecha_final']) ? htmlspecialchars((string) $erroresEdicion['fecha_final']) : '' ?></span>
                                                 <?php else: ?>
-                                                    <?= htmlspecialchars(tareas_fecha_simple((string) ($tarea['fecha_final'] ?? ''))) ?>
+                                                    <span class="<?= $esRetrasada ? 'fecha-retrasada' : '' ?>">
+                                                        <?= htmlspecialchars(tareas_fecha_simple((string) ($tarea['fecha_final'] ?? ''))) ?>
+                                                    </span>
                                                 <?php endif; ?>
                                             </td>
 
                                             <td>
                                                 <?php if ($esEditando): ?>
-                                                    <select name="estado" class="" form="<?= htmlspecialchars($formId) ?>">
+                                                    <label class="<?= $claseLabelEditar ?>">Estado</label>
+                                                    <select
+                                                        name="estado"
+                                                        form="<?= htmlspecialchars($formId) ?>"
+                                                        class="<?= $claseSelectEditar ?>">
                                                         <?php foreach ($estadosTarea as $estadoItem): ?>
                                                             <option
                                                                 value="<?= htmlspecialchars((string) $estadoItem) ?>"
@@ -571,10 +583,13 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                                             <td class="texto-nota">
                                                 <?php if ($esEditando): ?>
                                                     <?php if ($esTareaObjecion): ?>
-                                                        <div class="objeciones-inline">
+                                                        <div class="grid gap-3 mb-3 md:grid-cols-2">
                                                             <div>
-                                                                <label class="sub-label">Bloqueo</label>
-                                                                <select class="" name="tipo_bloqueo" form="<?= htmlspecialchars($formId) ?>">
+                                                                <label class="<?= $claseLabelEditar ?>">Bloqueo</label>
+                                                                <select
+                                                                    name="tipo_bloqueo"
+                                                                    form="<?= htmlspecialchars($formId) ?>"
+                                                                    class="<?= $claseSelectEditar ?>">
                                                                     <?php foreach ($tiposBloqueo as $bloqueo): ?>
                                                                         <option
                                                                             value="<?= htmlspecialchars((string) $bloqueo) ?>"
@@ -587,8 +602,11 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                                                             </div>
 
                                                             <div>
-                                                                <label class="sub-label">Solución</label>
-                                                                <select class="" name="solucion_bloqueo" form="<?= htmlspecialchars($formId) ?>">
+                                                                <label class="<?= $claseLabelEditar ?>">Solución</label>
+                                                                <select
+                                                                    name="solucion_bloqueo"
+                                                                    form="<?= htmlspecialchars($formId) ?>"
+                                                                    class="<?= $claseSelectEditar ?>">
                                                                     <?php foreach ($solucionesBloqueo as $solucion): ?>
                                                                         <option
                                                                             value="<?= htmlspecialchars((string) $solucion) ?>"
@@ -602,7 +620,12 @@ $posicionIndicador = max(2, min(98, $porcentajeSemaforo));
                                                         </div>
                                                     <?php endif; ?>
 
-                                                    <textarea name="descripcion" form="<?= htmlspecialchars($formId) ?>" rows="3"><?= htmlspecialchars($descripcionEdit) ?></textarea>
+                                                    <label class="<?= $claseLabelEditar ?>">Nota</label>
+                                                    <textarea
+                                                        name="descripcion"
+                                                        form="<?= htmlspecialchars($formId) ?>"
+                                                        rows="4"
+                                                        class="<?= $claseTextareaEditar ?>"><?= htmlspecialchars($descripcionEdit) ?></textarea>
                                                     <span class="error-campo"><?= !empty($erroresEdicion['descripcion']) ? htmlspecialchars((string) $erroresEdicion['descripcion']) : '' ?></span>
                                                 <?php else: ?>
                                                     <?php if ($esTareaObjecion): ?>

@@ -51,6 +51,23 @@ $estadosPanel = [
     ]
 ];
 
+$estadosDisponibles = [];
+foreach ($estadosLista as $estadoItem) {
+    $estadoTexto = trim((string) $estadoItem);
+    if ($estadoTexto === '') {
+        continue;
+    }
+    if (!array_key_exists($estadoTexto, $estadosPanel)) {
+        continue;
+    }
+    if (!in_array($estadoTexto, $estadosDisponibles, true)) {
+        $estadosDisponibles[] = $estadoTexto;
+    }
+}
+if (empty($estadosDisponibles)) {
+    $estadosDisponibles = array_keys($estadosPanel);
+}
+
 $clasesServicios = [
     'B1 Inglés' => 'servicio-b1',
     'B2 Inglés' => 'servicio-b2',
@@ -166,7 +183,13 @@ $clasesServicios = [
                     <span></span>
                 </button>
 
-               <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
+                <a href="<?= BASE_URL . 'tareas' ?>" class="boton boton-volver">Ver tareas</a>
+
+                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
+
+                <a href="<?= BASE_URL . 'logout' ?>" class="boton boton-volver" aria-label="Cerrar sesión" title="Cerrar sesión">
+                    Salir
+                </a>
 
                 <div class="usuario">
                     <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
@@ -209,7 +232,7 @@ $clasesServicios = [
                                 <?php foreach ($leadsEstado as $lead): ?>
                                     <?php
                                     $estadoActual = (string) ($lead['estado'] ?? '');
-                                    $claseEstado = $estadosPanel[$estadoActual]['clase'] ?? '';
+                                    $claseEstado = $estadosPanel[$estadoActual]['clase'] ?? 'estado-nuevo';
                                     $servicioActual = (string) ($lead['servicios'] ?? '');
                                     $claseServicio = $clasesServicios[$servicioActual] ?? 'servicio-general';
                                     ?>
@@ -227,20 +250,40 @@ $clasesServicios = [
                                                 action="<?= BASE_URL . 'leads/cambiar-estado/' . (int) ($lead['id'] ?? 0) ?>"
                                                 method="POST"
                                                 class="form-estado">
+
                                                 <div class="estado-campo">
-                                                    <select
-                                                        name="estado"
-                                                        class="selector-estado <?= htmlspecialchars($claseEstado) ?>"
-                                                        aria-label="Cambiar estado del lead <?= htmlspecialchars((string) ($lead['lead_nombre'] ?? '')) ?>">
-                                                        <?php foreach ($estadosLista as $estadoItem): ?>
-                                                            <?php $estadoItemTexto = (string) $estadoItem; ?>
-                                                            <option
-                                                                value="<?= htmlspecialchars($estadoItemTexto) ?>"
-                                                                <?= ($estadoActual === $estadoItemTexto) ? 'selected' : '' ?>>
-                                                                <?= htmlspecialchars($estadoItemTexto) ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
+                                                    <div
+                                                        class="selector-estado-custom"
+                                                        data-selector-estado
+                                                        data-selector-actual="<?= htmlspecialchars($estadoActual) ?>">
+
+                                                        <input type="hidden" name="estado" value="<?= htmlspecialchars($estadoActual) ?>" data-selector-input>
+
+                                                        <button
+                                                            type="button"
+                                                            class="selector-estado-trigger <?= htmlspecialchars($claseEstado) ?>"
+                                                            data-selector-trigger
+                                                            aria-haspopup="listbox"
+                                                            aria-expanded="false">
+                                                            <span class="selector-estado-trigger-texto"><?= htmlspecialchars($estadoActual) ?></span>
+                                                            <span class="selector-estado-trigger-icono" aria-hidden="true">▾</span>
+                                                        </button>
+
+                                                        <div class="selector-estado-template" data-selector-template hidden>
+                                                            <?php foreach ($estadosDisponibles as $estadoItem): ?>
+                                                                <?php
+                                                                $estadoItemTexto = (string) $estadoItem;
+                                                                $claseEstadoItem = $estadosPanel[$estadoItemTexto]['clase'] ?? 'estado-nuevo';
+                                                                ?>
+                                                                <button
+                                                                    type="button"
+                                                                    class="selector-estado-opcion <?= htmlspecialchars($claseEstadoItem) ?>"
+                                                                    data-estado="<?= htmlspecialchars($estadoItemTexto) ?>">
+                                                                    <?= htmlspecialchars($estadoItemTexto) ?>
+                                                                </button>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </form>
                                         </td>

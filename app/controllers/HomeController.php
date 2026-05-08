@@ -47,9 +47,9 @@ class HomeController extends Controller
             $tareaNueva = $nuevasTareas[0];
 
             $imagenesUsuarios = [
-                1 => 'user1.png', // admin
-                2 => 'user2.png', // Ana
-                3 => 'user3.png'  // Juan
+                1 => 'user1.png',
+                2 => 'user2.png',
+                3 => 'user3.png'
             ];
 
             $usuarioCreadorId = (int) ($tareaNueva['usuario_creador_id'] ?? 0);
@@ -175,6 +175,22 @@ class HomeController extends Controller
             'seguimientosUrgentes' => is_array($seguimientosUrgentes) ? $seguimientosUrgentes : [],
             'leadsSinContacto'     => is_array($leadsSinContacto) ? $leadsSinContacto : [],
             'resumenUsuarios'      => is_array($resumenUsuarios) ? $resumenUsuarios : []
+        ]);
+    }
+
+    public static function politicaPrivacidad(): void
+    {
+        SessionManager::iniciarSesion();
+        $flash = SessionManager::getMensajeFlash();
+        $usuario = SessionManager::get('usuario');
+        $usuario = is_array($usuario) ? $usuario : [];
+
+        self::view('home/privacy_view', [
+            'tituloPagina' => 'PipelineDesk | Política de privacidad',
+            'usuario'      => $usuario,
+            'mensajeFlash' => $flash['mensaje'] ?? null,
+            'iconoFlash'   => $flash['icono'] ?? null,
+            'claseFlash'   => $flash['clase'] ?? 'info'
         ]);
     }
 }

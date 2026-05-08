@@ -12,6 +12,7 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('/panel', [HomeController::class, 'panel']);
 Route::get('/pipeline', [HomeController::class, 'kanban']);
 Route::get('/dashboard', [HomeController::class, 'dashboard']);
+Route::get('/politica-privacidad', [HomeController::class, 'politicaPrivacidad']);
 
 Route::get('/login', [LoginController::class, 'mostrarFormLogin']);
 Route::post('/login', [LoginController::class, 'login']);
@@ -33,9 +34,9 @@ Route::post('/leads/{id}/notas/guardar', [LeadController::class, 'nuevaNota']);
 Route::get('/leads/{id}', [LeadController::class, 'mostrarDetalle']);
 Route::get('/leads/listado', [LeadController::class, 'mostrarListado']);
 
-
 Route::get('/tareas', [TareaController::class, 'index']);
 Route::post('/tareas/guardar', [TareaController::class, 'guardar']);
 Route::post('/tareas/{id}/actualizar', [TareaController::class, 'actualizar']);
 Route::post('/tareas/{id}/eliminar', [TareaController::class, 'eliminar']);
+
 Route::handleRoute();

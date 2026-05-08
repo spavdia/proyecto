@@ -127,12 +127,8 @@ foreach ($solucionesMasUsadas as $fila) {
                 </button>
 
                 <a href="<?= BASE_URL . 'panel' ?>" class="boton boton-volver">Volver al panel</a>
-                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
 
-                <div class="usuario">
-                    <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
-                    <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>
-                </div>
+                <?php require APP_ROOT . '/app/views/layouts/user_toolbar.php'; ?>
             </div>
         </header>
 

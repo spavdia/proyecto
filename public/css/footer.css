@@ -1,0 +1,130 @@
+.footer-app {
+    margin-top: 40px;
+    border-top: 1px solid var(--color-borde-general);
+    background: var(--color-fondo-superficie);
+}
+
+.footer-contenedor {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 24px 24px;
+    box-sizing: border-box;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+.footer-bloque {
+    background: var(--color-fondo-suave);
+    border: 1px solid var(--color-borde-general);
+    border-radius: 18px;
+    padding: 20px 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    min-height: 100%;
+}
+
+.footer-titulo {
+    margin: 0 0 14px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-marca);
+}
+
+.footer-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.footer-lista li {
+    color: var(--color-texto-secundario);
+    font-size: 0.96rem;
+    line-height: 1.5;
+}
+
+.footer-lista a {
+    color: var(--color-texto-principal);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.footer-lista a:hover {
+    color: var(--color-marca-hover);
+}
+
+.footer-dato {
+    color: var(--color-texto-principal);
+    font-weight: 700;
+}
+
+.footer-legal {
+    margin-top: 20px;
+    width: 100%;
+    background: var(--color-fondo-suave);
+    border: 1px solid var(--color-borde-general);
+    border-radius: 18px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.footer-legal p {
+    margin: 0;
+    color: var(--color-texto-secundario);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 1100px) {
+    .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-contenedor {
+        padding: 24px 14px 20px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-bloque,
+    .footer-legal {
+        border-radius: 16px;
+    }
+
+    .footer-legal {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-contenedor {
+        padding: 20px 10px 18px;
+    }
+
+    .footer-bloque {
+        padding: 16px 14px;
+    }
+
+    .footer-legal {
+        padding: 14px;
+    }
+}
