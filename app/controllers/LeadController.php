@@ -2,7 +2,6 @@
 
 namespace Sergio\App\Controllers;
 
-use Sergio\App\model\LoginModel;
 use Sergio\Lib\SessionManager;
 use Sergio\App\models\LeadModel;
 use Sergio\App\models\TareaModel;
@@ -280,17 +279,11 @@ class LeadController extends Controller
         $claseFlash = 'exito';
 
         if ($leadId > 0 && $estado === 'Objeciones') {
-            $tareaCreada = self::crearTareaAutomaticaObjecion($leadId, $usuarioId);
+            self::crearTareaAutomaticaObjecion($leadId, $usuarioId);
 
-            if ($tareaCreada) {
-                $mensajeFlash = 'Lead creado en Objeciones. Debes definir la objeción pendiente desde Tareas.';
-                $iconoFlash = '⚠';
-                $claseFlash = 'info';
-            } else {
-                $mensajeFlash = 'Lead creado en Objeciones.';
-                $iconoFlash = '⚠';
-                $claseFlash = 'info';
-            }
+            $mensajeFlash = 'Lead creado en Objeciones. Se ha generado una tarea para resolver bloqueos desde Tareas.';
+            $iconoFlash = '⚠';
+            $claseFlash = 'info';
         }
 
         SessionManager::setMensajeFlash(
@@ -367,17 +360,11 @@ class LeadController extends Controller
         $claseFlash = 'exito';
 
         if ($estadoAnterior !== 'Objeciones' && $estado === 'Objeciones') {
-            $tareaCreada = self::crearTareaAutomaticaObjecion($id, $usuarioId);
+            self::crearTareaAutomaticaObjecion($id, $usuarioId);
 
-            if ($tareaCreada) {
-                $mensajeFlash = 'El lead ha entrado en Objeciones. Debes definir la objeción pendiente desde Tareas.';
-                $iconoFlash = '⚠';
-                $claseFlash = 'info';
-            } else {
-                $mensajeFlash = 'El lead ha entrado en Objeciones.';
-                $iconoFlash = '⚠';
-                $claseFlash = 'info';
-            }
+            $mensajeFlash = 'El lead ha entrado en Objeciones. Debes resolver bloqueos desde Tareas.';
+            $iconoFlash = '⚠';
+            $claseFlash = 'info';
         }
 
         SessionManager::setMensajeFlash(
@@ -524,6 +511,19 @@ class LeadController extends Controller
             'estado_anterior' => null,
             'estado_nuevo'    => null
         ]);
+
+        $estadoAnterior = (string) ($lead['estado'] ?? '');
+        $estadoNuevoAutomatico = null;
+
+        if ($estadoAnterior === 'Nuevo Lead') {
+            $estadoNuevoAutomatico = 'Contactado';
+        } elseif ($estadoAnterior === 'Contactado') {
+            $estadoNuevoAutomatico = 'En Progreso';
+        }
+
+        if ($estadoNuevoAutomatico !== null) {
+            $lm->updateEstado($id, $estadoNuevoAutomatico);
+        }
 
         SessionManager::setMensajeFlash(
             'Actividad guardada correctamente.',
@@ -787,17 +787,11 @@ class LeadController extends Controller
         $claseFlash = 'exito';
 
         if ((string) ($leadActual['estado'] ?? '') !== 'Objeciones' && $estado === 'Objeciones') {
-            $tareaCreada = self::crearTareaAutomaticaObjecion($id, $usuarioId);
+            self::crearTareaAutomaticaObjecion($id, $usuarioId);
 
-            if ($tareaCreada) {
-                $mensajeFlash = 'Lead actualizado y enviado a Objeciones. Debes definir la objeción pendiente desde Tareas.';
-                $iconoFlash = '⚠';
-                $claseFlash = 'info';
-            } else {
-                $mensajeFlash = 'Lead actualizado y enviado a Objeciones.';
-                $iconoFlash = '⚠';
-                $claseFlash = 'info';
-            }
+            $mensajeFlash = 'Lead actualizado y enviado a Objeciones. Debes resolver bloqueos desde Tareas.';
+            $iconoFlash = '⚠';
+            $claseFlash = 'info';
         }
 
         SessionManager::setMensajeFlash(
@@ -954,13 +948,8 @@ class LeadController extends Controller
         $mensajeRespuesta = 'Estado actualizado correctamente.';
 
         if ($estadoAnterior !== 'Objeciones' && $estadoNuevo === 'Objeciones') {
-            $tareaCreada = self::crearTareaAutomaticaObjecion($leadId, $usuarioId);
-
-            if ($tareaCreada) {
-                $mensajeRespuesta = 'Lead en Objeciones. Debes definir la objeción pendiente desde Tareas.';
-            } else {
-                $mensajeRespuesta = 'Lead en Objeciones.';
-            }
+            self::crearTareaAutomaticaObjecion($leadId, $usuarioId);
+            $mensajeRespuesta = 'Lead en Objeciones. Se ha creado una tarea de bloqueo en Tareas.';
         }
 
         echo json_encode([
@@ -973,113 +962,9 @@ class LeadController extends Controller
         exit();
     }
 
-    private static function crearTareaAutomaticaObjecion(int $leadId, int $usuarioId): bool
+    private static function crearTareaAutomaticaObjecion(int $leadId, int $usuarioId): void
     {
         $tm = new TareaModel();
-        return $tm->createObjecionAutomatica($leadId, $usuarioId);
+        $tm->createObjecionAutomatica($leadId, $usuarioId);
     }
-
-    //Contactos
-    public static function mostrarListado(): void
-    {
-        SessionManager::iniciarSesion();
-        SessionManager::usuarioNoAutenticado('usuario', 'login');
-
-        $flash = SessionManager::getMensajeFlash();
-        $usuario = SessionManager::get('usuario');
-        $usuario = is_array($usuario) ? $usuario : [];
-
-        $usuarioId = (int) ($usuario['id'] ?? 0);
-        $esAdmin = (($usuario['rol'] ?? '') === 'admin');
-
-        $lm = new LeadModel();
-
-        $usuariosLista = $lm->getResponsables();
-        $serviciosValidos = $lm->getServicios();
-        $estadosValidos = $lm->getEstados();
-        $origenesValidos = ['formulario_web', 'app_interna'];
-
-        $filtros = [
-            'usuario_id'  => $esAdmin ? (int) ($_GET['usuario_id'] ?? 0) : $usuarioId,
-            'fecha_desde' => trim($_GET['fecha_desde'] ?? ''),
-            'fecha_hasta' => trim($_GET['fecha_hasta'] ?? ''),
-            'servicios'   => trim($_GET['servicios'] ?? ''),
-            'estado'      => trim($_GET['estado'] ?? ''),
-            'origen'      => trim($_GET['origen'] ?? '')
-        ];
-
-        if (!$esAdmin) {
-            $filtros['usuario_id'] = $usuarioId;
-        }
-
-        if ($filtros['servicios'] !== '' && !in_array($filtros['servicios'], $serviciosValidos, true)) {
-            $filtros['servicios'] = '';
-        }
-
-        if ($filtros['estado'] !== '' && !in_array($filtros['estado'], $estadosValidos, true)) {
-            $filtros['estado'] = '';
-        }
-
-        if ($filtros['origen'] !== '' && !in_array($filtros['origen'], $origenesValidos, true)) {
-            $filtros['origen'] = '';
-        }
-
-        if ($filtros['fecha_desde'] !== '' && !self::fechaFiltroValida($filtros['fecha_desde'])) {
-            $filtros['fecha_desde'] = '';
-        }
-
-        if ($filtros['fecha_hasta'] !== '' && !self::fechaFiltroValida($filtros['fecha_hasta'])) {
-            $filtros['fecha_hasta'] = '';
-        }
-
-        if (
-            $filtros['fecha_desde'] !== ''
-            && $filtros['fecha_hasta'] !== ''
-            && $filtros['fecha_desde'] > $filtros['fecha_hasta']
-        ) {
-            [$filtros['fecha_desde'], $filtros['fecha_hasta']] = [$filtros['fecha_hasta'], $filtros['fecha_desde']];
-        }
-
-        $leadListados = $lm->getListadoFiltrado($usuarioId, $esAdmin, $filtros);
-
-        self::view('home/listado_view', [
-            'leadListados'   => is_array($leadListados) ? $leadListados : [],
-            'filtros'        => is_array($filtros) ? $filtros : [],
-            'usuariosLista'  => is_array($usuariosLista) ? $usuariosLista : [],
-            'serviciosLista' => is_array($serviciosValidos) ? $serviciosValidos : [],
-            'estadosLista'   => is_array($estadosValidos) ? $estadosValidos : [],
-            'tituloPagina'   => 'PipelineDesk | Listado',
-            'usuario'        => $usuario,
-            'mensajeFlash'   => $flash['mensaje'] ?? null,
-            'iconoFlash'     => $flash['icono'] ?? null,
-            'claseFlash'     => $flash['clase'] ?? 'info'
-        ]);
-    }
-
-    private static function fechaFiltroValida(string $fecha): bool
-    {
-        $fechaObj = \DateTime::createFromFormat('Y-m-d', $fecha);
-
-        return $fechaObj instanceof \DateTime && $fechaObj->format('Y-m-d') === $fecha;
-    }
-
-
-    /**FILTROS por BBDD :
-     * 
-     * 
-     * curso  
-        mes  
-        responsable_id  
-        estado  
-
-        CAMPOS
-        id  
-        lead_nombre  
-        estado  
-        servicios  
-        responsable_nombre  
-        ultimo_contacto  
-        valor  
-
-     */
 }
