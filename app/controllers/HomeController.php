@@ -40,18 +40,17 @@ class HomeController extends Controller
         $estadosLista = $lm->getEstados();
         $tareasRetrasadasCount = $tm->getRetrasadasCount($usuarioId, $esAdmin);
 
+        $imagenesUsuarios = [
+            1 => 'user1.png',
+            2 => 'user2.png',
+            3 => 'user3.png'
+        ];
+
         $nuevasTareas = $tm->getNuevasAsignadasByUsuario($usuarioId);
         $notificacionTarea = null;
 
         if (!empty($nuevasTareas)) {
             $tareaNueva = $nuevasTareas[0];
-
-            $imagenesUsuarios = [
-                1 => 'user1.png',
-                2 => 'user2.png',
-                3 => 'user3.png'
-            ];
-
             $usuarioCreadorId = (int) ($tareaNueva['usuario_creador_id'] ?? 0);
 
             $notificacionTarea = [
@@ -148,6 +147,8 @@ class HomeController extends Controller
         }
 
         $resumenGeneral = $lm->getDashboardResumenGeneral($usuarioId, $esAdmin, $filtros);
+        $usuarioObjetivoId = (!$esAdmin) ? $usuarioId : (int) ($filtros['usuario_id'] ?? 0);
+        $objetivoMes = $lm->getObjetivoMesActual($usuarioObjetivoId, $esAdmin && $usuarioObjetivoId === 0);
         $resumenPipeline = $lm->getResumenPipeline($usuarioId, $esAdmin, $filtros);
         $leadsSinContacto = $lm->getLeadsSinContacto($usuarioId, $esAdmin, $filtros, 6);
         $resumenUsuarios = $esAdmin ? $lm->getResumenPorUsuario($filtros) : [];
@@ -168,6 +169,7 @@ class HomeController extends Controller
             'serviciosLista'       => is_array($serviciosValidos) ? $serviciosValidos : [],
             'estadosLista'         => is_array($estadosValidos) ? $estadosValidos : [],
             'resumenGeneral'       => is_array($resumenGeneral) ? $resumenGeneral : [],
+            'objetivoMes'          => is_array($objetivoMes) ? $objetivoMes : [],
             'resumenPipeline'      => is_array($resumenPipeline) ? $resumenPipeline : [],
             'resumenTareas'        => is_array($resumenTareas) ? $resumenTareas : [],
             'objecionesPorTipo'    => is_array($objecionesPorTipo) ? $objecionesPorTipo : [],
@@ -178,19 +180,31 @@ class HomeController extends Controller
         ]);
     }
 
-    public static function politicaPrivacidad(): void
+    public static function guardarObjetivoMes(): void
     {
         SessionManager::iniciarSesion();
-        $flash = SessionManager::getMensajeFlash();
+        SessionManager::usuarioNoAutenticado('usuario', 'login');
+
         $usuario = SessionManager::get('usuario');
         $usuario = is_array($usuario) ? $usuario : [];
 
-        self::view('home/privacy_view', [
-            'tituloPagina' => 'PipelineDesk | Política de privacidad',
-            'usuario'      => $usuario,
-            'mensajeFlash' => $flash['mensaje'] ?? null,
-            'iconoFlash'   => $flash['icono'] ?? null,
-            'claseFlash'   => $flash['clase'] ?? 'info'
-        ]);
+        if (($usuario['rol'] ?? '') !== 'admin') {
+            SessionManager::setMensajeFlash('No tienes permisos para actualizar el objetivo mensual.', '⚠', 'error');
+            header('Location: ' . BASE_URL . 'dashboard');
+            exit();
+        }
+
+        $objetivo = max(0, (int) ($_POST['objetivo_leads'] ?? 0));
+        $lm = new LeadModel();
+        $guardado = $lm->saveObjetivoMesActual($objetivo, (int) ($usuario['id'] ?? 0));
+
+        SessionManager::setMensajeFlash(
+            $guardado ? 'Objetivo mensual actualizado correctamente.' : 'No se ha podido actualizar el objetivo mensual.',
+            $guardado ? '✅' : '⚠',
+            $guardado ? 'exito' : 'error'
+        );
+
+        header('Location: ' . BASE_URL . 'dashboard');
+        exit();
     }
 }

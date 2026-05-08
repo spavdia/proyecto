@@ -172,3 +172,145 @@
         width: 100%;
     }
 }
+
+.app-toast-rich {
+    width: min(440px, calc(100vw - 32px));
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 16px;
+}
+
+.app-toast-premio {
+    background: linear-gradient(135deg, #fff8e1 0%, #ffedd5 40%, #fef3c7 100%);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    box-shadow: 0 20px 44px rgba(217, 119, 6, 0.22);
+    animation: premioPulse 1.15s ease 2;
+}
+
+.dark .app-toast-premio {
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.95) 0%, rgba(146, 64, 14, 0.92) 45%, rgba(20, 83, 45, 0.88) 100%);
+    border-color: rgba(251, 191, 36, 0.28);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.38);
+}
+
+.app-toast-premio-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.app-toast-premio-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.58);
+    color: #9a3412;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.dark .app-toast-premio-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fde68a;
+}
+
+.app-toast-premio-cuerpo {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 14px;
+    align-items: start;
+}
+
+.app-toast-premio-avatar {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 999px;
+    border: 3px solid rgba(255, 255, 255, 0.72);
+    box-shadow: 0 10px 24px rgba(146, 64, 14, 0.18);
+}
+
+.app-toast-premio-info {
+    min-width: 0;
+}
+
+.app-toast-premio-titulo {
+    margin: 0 0 4px;
+    color: #7c2d12;
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.app-toast-premio-usuario {
+    margin: 0 0 6px;
+    color: #92400e;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.app-toast-premio-texto {
+    margin: 0;
+    color: #7c2d12;
+    font-size: 0.93rem;
+    line-height: 1.55;
+    font-weight: 500;
+}
+
+.dark .app-toast-premio-titulo,
+.dark .app-toast-premio-usuario,
+.dark .app-toast-premio-texto {
+    color: #fff7ed;
+}
+
+.app-toast-premio-acciones {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.app-toast-premio-enlace {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #9a3412;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 800;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.app-toast-premio-enlace:hover {
+    transform: translateY(-1px);
+    opacity: 0.96;
+}
+
+.dark .app-toast-premio-enlace {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fef3c7;
+}
+
+@keyframes premioPulse {
+    0% { transform: translateX(24px) scale(0.96); }
+    55% { transform: translateX(0) scale(1.02); }
+    100% { transform: translateX(0) scale(1); }
+}
+
+@media (max-width: 640px) {
+    .app-toast-rich {
+        width: 100%;
+    }
+
+    .app-toast-premio-cuerpo {
+        grid-template-columns: 1fr;
+    }
+}

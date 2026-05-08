@@ -15,6 +15,7 @@ $usuariosLista = (isset($__ctx['usuariosLista']) && is_array($__ctx['usuariosLis
 $serviciosLista = (isset($__ctx['serviciosLista']) && is_array($__ctx['serviciosLista'])) ? $__ctx['serviciosLista'] : [];
 $estadosLista = (isset($__ctx['estadosLista']) && is_array($__ctx['estadosLista'])) ? $__ctx['estadosLista'] : [];
 $resumenGeneral = (isset($__ctx['resumenGeneral']) && is_array($__ctx['resumenGeneral'])) ? $__ctx['resumenGeneral'] : [];
+$objetivoMes = (isset($__ctx['objetivoMes']) && is_array($__ctx['objetivoMes'])) ? $__ctx['objetivoMes'] : [];
 $resumenPipeline = (isset($__ctx['resumenPipeline']) && is_array($__ctx['resumenPipeline'])) ? $__ctx['resumenPipeline'] : [];
 $resumenTareas = (isset($__ctx['resumenTareas']) && is_array($__ctx['resumenTareas'])) ? $__ctx['resumenTareas'] : [];
 $objecionesPorTipo = (isset($__ctx['objecionesPorTipo']) && is_array($__ctx['objecionesPorTipo'])) ? $__ctx['objecionesPorTipo'] : [];
@@ -27,6 +28,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
 
 $nombreUsuario = (string) ($usuario['nombre'] ?? 'Usuario');
 $rolUsuario = (string) ($usuario['rol'] ?? 'ventas');
+$usuarioId = (int) ($usuario['id'] ?? 0);
 $esAdmin = (($usuario['rol'] ?? '') === 'admin');
 
 if (!function_exists('dashboard_money_eur')) {
@@ -66,6 +68,7 @@ $resumenGeneral = array_merge([
     'leads_objeciones' => 0,
     'valor_pipeline' => 0,
     'valor_ganado' => 0,
+    'valor_perdido' => 0,
     'conversion' => 0
 ], $resumenGeneral);
 
@@ -77,6 +80,15 @@ $resumenTareas = array_merge([
     'objeciones_abiertas' => 0,
     'objeciones_resueltas' => 0
 ], $resumenTareas);
+
+$objetivoMes = array_merge([
+    'anio' => (int) date('Y'),
+    'mes' => (int) date('n'),
+    'objetivo' => 0,
+    'ganados' => 0,
+    'restantes' => 0,
+    'porcentaje' => 0
+], $objetivoMes);
 
 $clasesEstado = [
     'Nuevo Lead'   => 'estado-nuevo',
@@ -96,6 +108,21 @@ $maxSoluciones = 0;
 foreach ($solucionesMasUsadas as $fila) {
     $maxSoluciones = max($maxSoluciones, (int) ($fila['total'] ?? 0));
 }
+
+$objetivoObjetivo = (int) ($objetivoMes['objetivo'] ?? 0);
+$objetivoGanados = (int) ($objetivoMes['ganados'] ?? 0);
+$objetivoRestantes = (int) ($objetivoMes['restantes'] ?? 0);
+$objetivoPorcentaje = (float) ($objetivoMes['porcentaje'] ?? 0);
+$objetivoPosicion = max(2, min(98, $objetivoPorcentaje));
+$nombreMesObjetivo = [1=>'enero',2=>'febrero',3=>'marzo',4=>'abril',5=>'mayo',6=>'junio',7=>'julio',8=>'agosto',9=>'septiembre',10=>'octubre',11=>'noviembre',12=>'diciembre'];
+$labelMesObjetivo = $nombreMesObjetivo[(int) ($objetivoMes['mes'] ?? (int) date('n'))] ?? 'mes actual';
+$objetivoMediaAnterior = (float) ($objetivoMes['media_anterior'] ?? 0);
+$objetivoMediaActual = (float) ($objetivoMes['media_actual'] ?? 0);
+$objetivoReferenciaAnterior = (int) ($objetivoMes['ganados_mes_anterior'] ?? $objetivoObjetivo);
+$objetivoEtiquetaEstado = $objetivoPorcentaje >= 100 ? 'Meta igualada o superada' : ($objetivoPorcentaje >= 70 ? 'Buen ritmo comercial' : 'Impulso necesario');
+$objetivoPorcentajeTexto = rtrim(rtrim(number_format($objetivoPorcentaje, 1, ',', '.'), '0'), ',');
+$objetivoMediaAnteriorTexto = number_format($objetivoMediaAnterior, 2, ',', '.');
+$objetivoMediaActualTexto = number_format($objetivoMediaActual, 2, ',', '.');
 ?>
 
 <div class="panel" id="dashboardApp">
@@ -109,7 +136,7 @@ foreach ($solucionesMasUsadas as $fila) {
                 <p class="cabecera-etiqueta">Analítica comercial</p>
                 <h1>Dashboard</h1>
                 <p class="cabecera-texto">
-                    Analiza resultados y productividad comercial. Detecta objeciones y seguimiento operativo.
+                    Controla objetivos, rendimiento del equipo, embudo comercial y seguimiento operativo desde una sola vista.
                 </p>
             </div>
 
@@ -127,12 +154,117 @@ foreach ($solucionesMasUsadas as $fila) {
                 </button>
 
                 <a href="<?= BASE_URL . 'panel' ?>" class="boton boton-volver">Volver al panel</a>
+                <?php require APP_ROOT . '/app/views/layouts/theme_toggle.php'; ?>
 
-                <?php require APP_ROOT . '/app/views/layouts/user_toolbar.php'; ?>
+                <div class="usuario">
+                    <span class="usuario-nombre"><?= htmlspecialchars($nombreUsuario) ?></span>
+                    <span class="usuario-rol"><?= htmlspecialchars($rolUsuario) ?></span>
+                </div>
             </div>
         </header>
 
-    
+        <section class="bloque bloque-objetivo-mes">
+            <div class="bloque-top bloque-top-objetivo">
+                <div>
+                    <h2>Objetivos del Mes</h2>
+                    <p class="bloque-subtexto">Referencia automática según los leads ganados en <?= htmlspecialchars($labelMesObjetivo) ?> y comparación con el ritmo del mes anterior.</p>
+                </div>
+                <span class="objetivo-badge-central"><?= htmlspecialchars($objetivoEtiquetaEstado) ?></span>
+            </div>
+
+            <div class="objetivo-resumen-central">
+                <div class="objetivo-resumen-dato objetivo-resumen-dato-principal">
+                    <span>Ganados este mes</span>
+                    <strong><?= $objetivoGanados ?></strong>
+                    <small>Lead score acumulado del mes actual</small>
+                </div>
+
+                <div class="objetivo-resumen-dato">
+                    <span>Mes anterior</span>
+                    <strong><?= $objetivoReferenciaAnterior ?></strong>
+                    <small>Cierres logrados en el mes anterior</small>
+                </div>
+
+                <div class="objetivo-resumen-dato">
+                    <span>Media diaria anterior</span>
+                    <strong><?= htmlspecialchars($objetivoMediaAnteriorTexto) ?></strong>
+                    <small>Promedio diario de cierres del mes anterior</small>
+                </div>
+
+                <div class="objetivo-resumen-dato objetivo-resumen-dato-progreso">
+                    <span>Progreso</span>
+                    <strong><?= htmlspecialchars($objetivoPorcentajeTexto) ?>%</strong>
+                    <small><?= $objetivoRestantes > 0 ? $objetivoRestantes . ' por alcanzar para igualar la referencia' : 'Referencia anterior alcanzada' ?></small>
+                </div>
+            </div>
+
+            <div class="objetivo-semaforo">
+                <div class="objetivo-semaforo-top">
+                    <small>Ritmo del mes actual</small>
+                    <strong><?= htmlspecialchars($objetivoMediaActualTexto) ?> / día</strong>
+                </div>
+
+                <div class="objetivo-semaforo-panel">
+                    <div class="objetivo-indicador" style="left: <?= $objetivoPosicion ?>%;">
+                        <span class="objetivo-indicador-triangulo"></span>
+                    </div>
+
+                    <div class="objetivo-semaforo-barra">
+                        <div class="objetivo-tramo objetivo-tramo-rojo"></div>
+                        <div class="objetivo-tramo objetivo-tramo-amarillo"></div>
+                        <div class="objetivo-tramo objetivo-tramo-verde"></div>
+                    </div>
+
+                    <div class="objetivo-semaforo-escala" aria-hidden="true">
+                        <span>0%</span>
+                        <span>50%</span>
+                        <span>80%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <?php if ($esAdmin): ?>
+            <section class="bloque">
+                <div class="bloque-top">
+                    <h2>Productividad por usuario</h2>
+                    <p class="bloque-subtexto">Comparativa de leads, cierres y valor ganado.</p>
+                </div>
+
+                <?php if (empty($resumenUsuarios)): ?>
+                    <p class="texto-vacio">No hay datos de usuarios para estos filtros.</p>
+                <?php else: ?>
+                    <div class="usuarios-grid">
+                        <?php foreach ($resumenUsuarios as $fila): ?>
+                            <article class="usuario-card">
+                                <div class="usuario-card-top">
+                                    <h3><?= htmlspecialchars((string) ($fila['nombre'] ?? 'Usuario')) ?></h3>
+                                    <span><?= htmlspecialchars((string) ($fila['rol'] ?? 'ventas')) ?></span>
+                                </div>
+
+                                <div class="usuario-metricas">
+                                    <div>
+                                        <small>Leads</small>
+                                        <strong><?= (int) ($fila['total_leads'] ?? 0) ?></strong>
+                                    </div>
+                                    <div>
+                                        <small>Ganados</small>
+                                        <strong><?= (int) ($fila['ganados'] ?? 0) ?></strong>
+                                    </div>
+                                    <div>
+                                        <small>Conversión</small>
+                                        <strong><?= htmlspecialchars((string) ($fila['conversion'] ?? 0)) ?>%</strong>
+                                    </div>
+                                </div>
+
+                                <p class="usuario-valor"><?= htmlspecialchars(dashboard_money_eur((float) ($fila['valor_ganado'] ?? 0))) ?></p>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
+        <?php endif; ?>
 
         <section class="bloque bloque-filtros">
             <div class="bloque-top">
@@ -143,12 +275,10 @@ foreach ($solucionesMasUsadas as $fila) {
                 <?php if ($esAdmin): ?>
                     <div class="campo">
                         <label for="usuario_id">Usuario</label>
-                        <select id="usuario_id" name="usuario_id" class="">
+                        <select id="usuario_id" name="usuario_id">
                             <option value="0">Todos</option>
                             <?php foreach ($usuariosLista as $usuarioItem): ?>
-                                <option
-                                    value="<?= (int) ($usuarioItem['id'] ?? 0) ?>"
-                                    <?= ((int) ($filtros['usuario_id'] ?? 0) === (int) ($usuarioItem['id'] ?? 0)) ? 'selected' : '' ?>>
+                                <option value="<?= (int) ($usuarioItem['id'] ?? 0) ?>" <?= ((int) ($filtros['usuario_id'] ?? 0) === (int) ($usuarioItem['id'] ?? 0)) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars((string) ($usuarioItem['nombre'] ?? 'Usuario')) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -158,22 +288,20 @@ foreach ($solucionesMasUsadas as $fila) {
 
                 <div class="campo">
                     <label for="fecha_desde">Desde</label>
-                    <input class="" type="date" id="fecha_desde" name="fecha_desde" value="<?= htmlspecialchars((string) ($filtros['fecha_desde'] ?? '')) ?>">
+                    <input type="date" id="fecha_desde" name="fecha_desde" value="<?= htmlspecialchars((string) ($filtros['fecha_desde'] ?? '')) ?>">
                 </div>
 
                 <div class="campo">
                     <label for="fecha_hasta">Hasta</label>
-                    <input class="" type="date" id="fecha_hasta" name="fecha_hasta" value="<?= htmlspecialchars((string) ($filtros['fecha_hasta'] ?? '')) ?>">
+                    <input type="date" id="fecha_hasta" name="fecha_hasta" value="<?= htmlspecialchars((string) ($filtros['fecha_hasta'] ?? '')) ?>">
                 </div>
 
                 <div class="campo">
                     <label for="servicios">Servicio</label>
-                    <select id="servicios" name="servicios" class="">
+                    <select id="servicios" name="servicios">
                         <option value="">Todos</option>
                         <?php foreach ($serviciosLista as $servicio): ?>
-                            <option
-                                value="<?= htmlspecialchars((string) $servicio) ?>"
-                                <?= (($filtros['servicios'] ?? '') === (string) $servicio) ? 'selected' : '' ?>>
+                            <option value="<?= htmlspecialchars((string) $servicio) ?>" <?= (($filtros['servicios'] ?? '') === (string) $servicio) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars((string) $servicio) ?>
                             </option>
                         <?php endforeach; ?>
@@ -182,12 +310,10 @@ foreach ($solucionesMasUsadas as $fila) {
 
                 <div class="campo">
                     <label for="estado">Estado del lead</label>
-                    <select id="estado" name="estado" class="">
+                    <select id="estado" name="estado">
                         <option value="">Todos</option>
                         <?php foreach ($estadosLista as $estado): ?>
-                            <option
-                                value="<?= htmlspecialchars((string) $estado) ?>"
-                                <?= (($filtros['estado'] ?? '') === (string) $estado) ? 'selected' : '' ?>>
+                            <option value="<?= htmlspecialchars((string) $estado) ?>" <?= (($filtros['estado'] ?? '') === (string) $estado) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars((string) $estado) ?>
                             </option>
                         <?php endforeach; ?>
@@ -196,7 +322,7 @@ foreach ($solucionesMasUsadas as $fila) {
 
                 <div class="campo">
                     <label for="origen">Origen</label>
-                    <select id="origen" name="origen" class="">
+                    <select id="origen" name="origen">
                         <option value="">Todos</option>
                         <option value="formulario_web" <?= (($filtros['origen'] ?? '') === 'formulario_web') ? 'selected' : '' ?>>Web</option>
                         <option value="app_interna" <?= (($filtros['origen'] ?? '') === 'app_interna') ? 'selected' : '' ?>>Interna</option>
@@ -231,15 +357,22 @@ foreach ($solucionesMasUsadas as $fila) {
                 <strong class="metrica-valor"><?= htmlspecialchars((string) ($resumenGeneral['conversion'] ?? 0)) ?>%</strong>
             </article>
 
-            <article class="metrica-card">
-                <p class="metrica-label">Valor pipeline</p>
-                <strong class="metrica-valor"><?= htmlspecialchars(dashboard_money_eur((float) ($resumenGeneral['valor_pipeline'] ?? 0))) ?></strong>
-            </article>
+            <?php if ($esAdmin): ?>
+                <article class="metrica-card">
+                    <p class="metrica-label">Valor pipeline</p>
+                    <strong class="metrica-valor"><?= htmlspecialchars(dashboard_money_eur((float) ($resumenGeneral['valor_pipeline'] ?? 0))) ?></strong>
+                </article>
 
-            <article class="metrica-card">
-                <p class="metrica-label">Valor ganado</p>
-                <strong class="metrica-valor"><?= htmlspecialchars(dashboard_money_eur((float) ($resumenGeneral['valor_ganado'] ?? 0))) ?></strong>
-            </article>
+                <article class="metrica-card">
+                    <p class="metrica-label">Valor ganado</p>
+                    <strong class="metrica-valor"><?= htmlspecialchars(dashboard_money_eur((float) ($resumenGeneral['valor_ganado'] ?? 0))) ?></strong>
+                </article>
+
+                <article class="metrica-card metrica-perdida">
+                    <p class="metrica-label">Valor perdido</p>
+                    <strong class="metrica-valor"><?= htmlspecialchars(dashboard_money_eur((float) ($resumenGeneral['valor_perdido'] ?? 0))) ?></strong>
+                </article>
+            <?php endif; ?>
 
             <article class="metrica-card">
                 <p class="metrica-label">Leads en objeciones</p>
@@ -309,10 +442,7 @@ foreach ($solucionesMasUsadas as $fila) {
                     <?php else: ?>
                         <div class="ranking-lista">
                             <?php foreach ($objecionesPorTipo as $fila): ?>
-                                <?php
-                                $total = (int) ($fila['total'] ?? 0);
-                                $ancho = dashboard_porcentaje_barra($total, $maxObjeciones);
-                                ?>
+                                <?php $total = (int) ($fila['total'] ?? 0); $ancho = dashboard_porcentaje_barra($total, $maxObjeciones); ?>
                                 <article class="ranking-item">
                                     <div class="ranking-head">
                                         <strong><?= htmlspecialchars((string) ($fila['tipo_bloqueo'] ?? 'Definir')) ?></strong>
@@ -335,10 +465,7 @@ foreach ($solucionesMasUsadas as $fila) {
                     <?php else: ?>
                         <div class="ranking-lista">
                             <?php foreach ($solucionesMasUsadas as $fila): ?>
-                                <?php
-                                $total = (int) ($fila['total'] ?? 0);
-                                $ancho = dashboard_porcentaje_barra($total, $maxSoluciones);
-                                ?>
+                                <?php $total = (int) ($fila['total'] ?? 0); $ancho = dashboard_porcentaje_barra($total, $maxSoluciones); ?>
                                 <article class="ranking-item">
                                     <div class="ranking-head">
                                         <strong><?= htmlspecialchars((string) ($fila['solucion_bloqueo'] ?? 'Definir')) ?></strong>
@@ -386,7 +513,7 @@ foreach ($solucionesMasUsadas as $fila) {
         <section class="bloque">
             <div class="bloque-top">
                 <h2>Leads sin contacto reciente</h2>
-                <p class="bloque-subtexto">Leads sin último contacto o con seguimiento retrasado.</p>
+                <p class="bloque-subtexto">Solo se muestran leads cuyo último contacto sigue vacío.</p>
             </div>
 
             <div class="tabla-wrap">
@@ -422,7 +549,7 @@ foreach ($solucionesMasUsadas as $fila) {
                                     </td>
                                     <td><?= htmlspecialchars((string) ($lead['servicios'] ?? '-')) ?></td>
                                     <td><?= htmlspecialchars((string) ($lead['responsable_nombre'] ?? 'Sin asignar')) ?></td>
-                                    <td><?= !empty($lead['ultimo_contacto']) ? htmlspecialchars(dashboard_fecha_es((string) $lead['ultimo_contacto'])) : 'Sin contacto' ?></td>
+                                    <td>Sin contacto</td>
                                     <td><?= htmlspecialchars(dashboard_money_eur((float) ($lead['valor'] ?? 0))) ?></td>
                                 </tr>
                             <?php endforeach; ?>
@@ -431,47 +558,6 @@ foreach ($solucionesMasUsadas as $fila) {
                 </table>
             </div>
         </section>
-
-        <?php if ($esAdmin): ?>
-            <section class="bloque">
-                <div class="bloque-top">
-                    <h2>Productividad por usuario</h2>
-                    <p class="bloque-subtexto">Comparativa de leads, cierres y valor ganado.</p>
-                </div>
-
-                <?php if (empty($resumenUsuarios)): ?>
-                    <p class="texto-vacio">No hay datos de usuarios para estos filtros.</p>
-                <?php else: ?>
-                    <div class="usuarios-grid">
-                        <?php foreach ($resumenUsuarios as $fila): ?>
-                            <article class="usuario-card">
-                                <div class="usuario-card-top">
-                                    <h3><?= htmlspecialchars((string) ($fila['nombre'] ?? 'Usuario')) ?></h3>
-                                    <span><?= htmlspecialchars((string) ($fila['rol'] ?? 'ventas')) ?></span>
-                                </div>
-
-                                <div class="usuario-metricas">
-                                    <div>
-                                        <small>Leads</small>
-                                        <strong><?= (int) ($fila['total_leads'] ?? 0) ?></strong>
-                                    </div>
-                                    <div>
-                                        <small>Ganados</small>
-                                        <strong><?= (int) ($fila['ganados'] ?? 0) ?></strong>
-                                    </div>
-                                    <div>
-                                        <small>Conversión</small>
-                                        <strong><?= htmlspecialchars((string) ($fila['conversion'] ?? 0)) ?>%</strong>
-                                    </div>
-                                </div>
-
-                                <p class="usuario-valor"><?= htmlspecialchars(dashboard_money_eur((float) ($fila['valor_ganado'] ?? 0))) ?></p>
-                            </article>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </section>
-        <?php endif; ?>
     </main>
 </div>
 
