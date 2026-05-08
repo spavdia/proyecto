@@ -109,7 +109,7 @@ foreach ($solucionesMasUsadas as $fila) {
                 <p class="cabecera-etiqueta">Analítica comercial</p>
                 <h1>Dashboard</h1>
                 <p class="cabecera-texto">
-                    Métricas del embudo, productividad comercial, objeciones y seguimiento operativo.
+                    Analiza resultados y productividad comercial. Detecta objeciones y seguimiento operativo.
                 </p>
             </div>
 

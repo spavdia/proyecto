@@ -63,10 +63,10 @@ $clasesPrioridadCampo = [
     <main class="contenido">
         <header class="cabecera-kanban">
             <div class="cabecera-info">
-                <p class="cabecera-etiqueta">Pipeline CRM</p>
+                <p class="cabecera-etiqueta">CRM PipelineDesk</p>
                 <h1>Etapas del negocio</h1>
                 <p class="cabecera-texto">
-                   Gestión del embudo de ventas
+                   Mueve tus leads por fases del proceso, evita cuellos de botella
                 </p>
             </div>
 

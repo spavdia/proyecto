@@ -46,15 +46,15 @@ $diapositivas = $diapositivas ?? [
 <section class="eslogan">
     <div class="contenedor">
         <p>
-            PipelineDesk: organiza tu embudo de ventas, mejora el seguimiento comercial y presenta tu proyecto con claridad.
+            PipelineDesk: organiza tu embudo de ventas, mejora el seguimiento comercial.
         </p>
     </div>
 </section>
 
 <main class="inicio">
     <section class="contenedor hero">
-        <p class="etiqueta">PipelineDesk CRM Pipeline</p>
-        <h1>Hecho para gestionar tu pipeline, diseñado para presentar tu proyecto</h1>
+        <p class="etiqueta">PipelineDesk </p>
+        <h1>Comienza a gestionar tu CRM</h1>
         <p class="intro">
             Una plataforma centrada en leads, seguimiento comercial, evolución del embudo y visualización clara del trabajo.
         </p>

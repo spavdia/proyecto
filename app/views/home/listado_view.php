@@ -61,10 +61,10 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
     <main class="contenido listado-contenido">
         <header class="cabecera-listado">
             <div class="cabecera-listado-info">
-                <p class="cabecera-etiqueta">CRM comercial</p>
+                <p class="cabecera-etiqueta">CRM PipelineDesk</p>
                 <h1>Listado de Leads</h1>
                 <p class="cabecera-texto">
-                    Vista general de leads del CRM con los mismos filtros del dashboard.
+                    Aplica filtros por curso, mes, vendedor o estado para localizar rápidamente el grupo de leads que necesitas revisar.
                 </p>
             </div>
 

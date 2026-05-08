@@ -28,7 +28,7 @@ require_once APP_ROOT . '/app/views/layouts/header.php';
                 <p class="cabecera-etiqueta">CRM Pipeline</p>
                 <h1>Nuevo lead</h1>
                 <p class="cabecera-texto">
-                    Crea manualmente un nuevo lead desde el panel comercial de PipelineDesk.
+                    Registra una nueva oportunidad comercial
                 </p>
             </div>
 

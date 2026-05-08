@@ -103,10 +103,10 @@ $claseLabelEditar = 'mb-1 block text-xs font-semibold uppercase tracking-wide te
     <main class="contenido">
         <header class="cabecera-tareas">
             <div class="cabecera-info">
-                <p class="cabecera-etiqueta">Productividad comercial</p>
-                <h1>Vista de tareas</h1>
+                <p class="cabecera-etiqueta">CRM PipelineDesk</p>
+                <h1>Tareas asignadas</h1>
                 <p class="cabecera-texto">
-                    Gestiona seguimientos, actividades y tareas asignadas desde una única vista operativa.
+                    Gestiona seguimientos, bloqueos, próximas acciones.
                 </p>
             </div>
 

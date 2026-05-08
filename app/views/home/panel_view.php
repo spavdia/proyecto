@@ -163,10 +163,10 @@ $clasesServicios = [
 
         <header class="cabecera-panel">
             <div class="cabecera-info">
-                <p class="cabecera-etiqueta">CRM Pipeline</p>
-                <h1>Vista general del embudo comercial</h1>
+                <p class="cabecera-etiqueta">CRM PipelineDesk</p>
+                <h1>Control del embudo comercial</h1>
                 <p class="cabecera-texto">
-                    Panel principal de PipelineDesk con los leads agrupados por estado del embudo.
+                    Panel principal para gestionar el avance de tus leads
                 </p>
             </div>
 
