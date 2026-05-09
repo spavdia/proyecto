@@ -12,13 +12,131 @@ class HomeController extends Controller
     {
         SessionManager::iniciarSesion();
         $flash = SessionManager::getMensajeFlash();
+        $diapositivas = self::getDiapositivasPresentacion();
 
         self::view('home/index_view', [
             'tituloPagina' => 'PipelineDesk | Inicio',
             'mensajeFlash' => $flash['mensaje'] ?? null,
             'iconoFlash'   => $flash['icono'] ?? null,
-            'claseFlash'   => $flash['clase'] ?? 'info'
+            'claseFlash'   => $flash['clase'] ?? 'info',
+            'diapositivas' => $diapositivas
         ]);
+    }
+
+    private static function getDiapositivasPresentacion(): array
+    {
+        return [
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_1.png',
+                'titulo' => 'PipelineDesk CRM',
+                'texto'  => 'Presentacion del proyecto CRM Pipeline para centros de formacion, desarrollado con PHP, MySQL, JavaScript, HTML, CSS y Tailwind.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_2.png',
+                'titulo' => 'Puntos a tratar',
+                'texto'  => 'Recorrido general por el objetivo, funcionalidades, arquitectura, fases, dificultades y mejoras futuras del proyecto.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_3.png',
+                'titulo' => 'Objetivo del proyecto',
+                'texto'  => 'Crear un CRM ligero para captar interesados, hacer seguimiento, mover leads por el embudo y analizar resultados.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_4.png',
+                'titulo' => 'Contexto y mercado objetivo',
+                'texto'  => 'Solucion vertical para academias pequenas y medianas que necesitan control comercial sin la complejidad de un CRM enterprise.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_5.png',
+                'titulo' => 'Funcionalidades implementadas',
+                'texto'  => 'Resumen de login, gestion de leads, panel, Kanban, detalle comercial, tareas y dashboard con KPIs.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_6.png',
+                'titulo' => 'Embudo comercial',
+                'texto'  => 'El lead avanza por estados desde nuevo hasta ganado o perdido, manteniendo historico y visibilidad del progreso.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_7.png',
+                'titulo' => 'Arquitectura final del sistema',
+                'texto'  => 'Aplicacion PHP MVC con front controller, router, controladores, modelos, vistas y persistencia en MySQL.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_8.png',
+                'titulo' => 'Estructura de carpetas',
+                'texto'  => 'Organizacion real del proyecto crm-pipeline, separando app, database, lib, public, routes y documentacion.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_9.png',
+                'titulo' => 'Modelo de datos',
+                'texto'  => 'El lead es el centro del sistema y se relaciona con usuarios, notas, historial, tareas, objetivos y notificaciones.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_10.png',
+                'titulo' => 'Consultas y acceso a datos',
+                'texto'  => 'La analitica se resuelve desde modelos con SQL preparado, joins, filtros, agregaciones y control de permisos.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_11.png',
+                'titulo' => 'Interfaz de usuario',
+                'texto'  => 'Vistas principales del CRM: login, dashboard, listado, Kanban, nuevo lead y detalle comercial.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_12.png',
+                'titulo' => 'Mapa de navegacion',
+                'texto'  => 'Separacion entre zona publica y zona privada, con rutas para panel, pipeline, dashboard, leads, tareas y cierre de sesion.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_13.png',
+                'titulo' => 'Desarrollo por fases',
+                'texto'  => 'Construccion incremental desde la base MVC hasta login, leads, Kanban, tareas, dashboard, Tailwind y mejoras de UX.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_14.png',
+                'titulo' => 'Aspectos importantes',
+                'texto'  => 'Decisiones tecnicas clave: MVC claro, POST/Redirect/GET, SQL preparado, historico comercial, Kanban asincrono y toasts.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_15.png',
+                'titulo' => 'Dificultad 1: Tailwind',
+                'texto'  => 'Integracion de Tailwind sin romper CSS previo, layout comun, modo oscuro ni componentes ya existentes.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_16.png',
+                'titulo' => 'Dificultad 2: consultas complejas',
+                'texto'  => 'Dashboard, tareas y objeciones combinan filtros, agregaciones, relaciones y automatizaciones entre entidades.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_17.png',
+                'titulo' => 'Dificultad 3: sincronizacion',
+                'texto'  => 'Los cambios de estado deben actualizar lead, notas, historial, tareas y dashboard de forma coherente.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_18.png',
+                'titulo' => 'Cambio de plan inicial',
+                'texto'  => 'Evolucion desde una arquitectura hexagonal con Java hacia una aplicacion MVC en PHP, MySQL, JavaScript, CSS y Tailwind.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_19.png',
+                'titulo' => 'Mejora 1: objeciones',
+                'texto'  => 'Propuesta para dar mas peso a las objeciones, registrando causa, impacto, respuesta y estado de resolucion.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_20.png',
+                'titulo' => 'Mejora 2: usuarios',
+                'texto'  => 'Administracion de usuarios desde la aplicacion para crear cuentas, asignar roles, activar usuarios y resetear contrasenas.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_21.png',
+                'titulo' => 'Mejora 3: configuracion adaptable',
+                'texto'  => 'Configuracion de intereses, servicios, etapas y reglas para adaptar el CRM a distintos negocios.'
+            ],
+            [
+                'imagen' => BASE_URL . 'img/presentacion/page_22.png',
+                'titulo' => 'Cierre de la presentacion',
+                'texto'  => 'PipelineDesk demuestra una aplicacion web academica coherente, mantenible y orientada a procesos comerciales reales.'
+            ]
+        ];
     }
 
     public static function panel(): void
@@ -206,5 +324,12 @@ class HomeController extends Controller
 
         header('Location: ' . BASE_URL . 'dashboard');
         exit();
+    }
+
+    public static function politicaPrivacidad(): void
+    {
+        self::view('home/privacy_view', [
+            'tituloPagina' => 'PipelineDesk | Politica de privacidad'
+        ]);
     }
 }

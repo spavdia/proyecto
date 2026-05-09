@@ -1,0 +1,840 @@
+PipelineDesk CRM
+Eventos JavaScript y flujo MVC
+Generado: 09/05/2026
+
+Este documento explica que hace cada archivo JavaScript de public/js, que
+eventos registra, si usa delegacion de eventos, si realiza peticiones fetch,
+que datos recibe y devuelve, que cambios visuales aplica y como encaja todo
+dentro del flujo MVC del proyecto PHP.
+
+
+1. RESUMEN GENERAL
+==================
+
+app.js
+- Responsabilidad: comprobacion simple de carga del JavaScript.
+- Delegacion de eventos: no.
+- Fetch: no.
+- CSS/DOM: no modifica clases ni nodos.
+- Tailwind: no interactua con Tailwind.
+
+dashboard.js
+- Responsabilidad: abrir y cerrar el menu lateral del dashboard.
+- Delegacion de eventos: no.
+- Fetch: no.
+- CSS/DOM: alterna la clase menu-abierto y aria-expanded.
+- Tailwind: no modifica utilidades Tailwind directamente.
+
+detalles.js
+- Responsabilidad: abrir y cerrar el menu lateral en la vista de detalle de lead.
+- Delegacion de eventos: no.
+- Fetch: no.
+- CSS/DOM: alterna menu-abierto y aria-expanded.
+- Tailwind: no modifica utilidades Tailwind directamente.
+
+flash-toast.js
+- Responsabilidad: mostrar, pausar, cerrar y eliminar notificaciones toast.
+- Delegacion de eventos: no global; asigna eventos a cada toast.
+- Fetch: no.
+- CSS/DOM: anade y quita app-toast-visible, app-toast-saliendo y data-cerrando.
+- Tailwind: no modifica utilidades Tailwind directamente.
+
+index.js
+- Responsabilidad: controlar el visor/carrusel de diapositivas de la portada.
+- Delegacion de eventos: no.
+- Fetch: no.
+- CSS/DOM: cambia src, alt, titulo, texto y contador de la diapositiva activa.
+- Tailwind: no modifica utilidades Tailwind directamente.
+
+kanban.js
+- Responsabilidad: drag and drop del pipeline, actualizacion de estado de leads,
+  configuracion de tarjetas y menu lateral.
+- Delegacion de eventos: parcial. El drag and drop se asigna a tarjetas y columnas
+  existentes; el cierre del panel de configuracion usa un click global.
+- Fetch: si, para persistir el cambio de estado en el servidor.
+- CSS/DOM: usa arrastrando, destino, oculto-campo, movido-ok, movido-error,
+  visible, menu-abierto y crea avisos kanban-vacio.
+- Tailwind: no cambia clases Tailwind; usa clases propias del proyecto.
+
+listado.js
+- Responsabilidad: gestionar el menu lateral del listado de leads.
+- Delegacion de eventos: si, escucha clicks en el aside y detecta enlaces con
+  evento.target.closest('a').
+- Fetch: no.
+- CSS/DOM: alterna menu-abierto.
+- Tailwind: no modifica utilidades Tailwind directamente.
+
+panel.js
+- Responsabilidad: menu lateral, cierre de notificaciones y selector visual de
+  estados en formularios/listados.
+- Delegacion de eventos: si, para cerrar notificaciones y cerrar selectores al
+  hacer click fuera.
+- Fetch: no.
+- CSS/DOM: crea selector-estado-flyout y alterna abierto, activa, estado-* y
+  clases del trigger.
+- Tailwind: no modifica utilidades Tailwind directamente.
+
+tareas.js
+- Responsabilidad: menu lateral, formulario de nueva tarea, bloque de objeciones
+  y actualizacion rapida del estado de tareas.
+- Delegacion de eventos: no global; usa listeners en controles concretos.
+- Fetch: no; envia formularios tradicionales.
+- CSS/DOM: alterna con-formulario, visible, estado-pendiente, estado-curso,
+  estado-terminada y guardando.
+- Tailwind: interactua con elementos que pueden estar maquetados con Tailwind
+  en la vista, pero no anade ni elimina clases Tailwind.
+
+theme.js
+- Responsabilidad: modo claro/oscuro y sincronizacion de botones de tema.
+- Delegacion de eventos: no.
+- Fetch: no.
+- CSS/DOM: alterna dark en html, data-theme, hidden y aria-pressed.
+- Tailwind: si. Al cambiar la clase dark en html activa las variantes dark: de
+  Tailwind y las reglas CSS propias basadas en .dark.
+
+
+2. EVENTOS POR ARCHIVO
+======================
+
+2.1 public/js/app.js
+--------------------
+
+No registra eventos. Solo ejecuta un console.log cuando el archivo se carga.
+
+Recibe:
+- Nada del usuario.
+- Nada del DOM.
+- Nada del servidor.
+
+Devuelve:
+- No devuelve datos.
+- No envia peticiones.
+- No modifica la pagina.
+
+
+2.2 public/js/dashboard.js
+--------------------------
+
+Eventos:
+- DOMContentLoaded en document:
+  Espera a que el DOM este disponible antes de buscar #dashboardApp,
+  #botonMenu y #fondoMenu.
+
+- click en #botonMenu:
+  Abre o cierra el menu lateral alternando la clase menu-abierto en el
+  contenedor principal.
+  Tambien actualiza aria-expanded para accesibilidad.
+
+- click en #fondoMenu:
+  Cierra el menu lateral quitando menu-abierto y poniendo aria-expanded=false.
+
+- keydown en document:
+  Si la tecla pulsada es Escape, cierra el menu lateral.
+
+Delegacion:
+- No hay delegacion. Los listeners se asignan directamente a botonMenu,
+  fondoMenu y document.
+
+Fetch:
+- No usa fetch.
+
+CSS/DOM:
+- Modifica classList de #dashboardApp.
+- Modifica aria-expanded en #botonMenu.
+- La apariencia final depende del CSS asociado a .menu-abierto.
+
+Tailwind:
+- No interactua directamente con Tailwind.
+
+
+2.3 public/js/detalles.js
+-------------------------
+
+Eventos:
+- DOMContentLoaded en document:
+  Busca #panelApp. Si no existe, usa .panel como contenedor de fallback.
+  Tambien busca #botonMenu y #fondoMenu.
+
+- click en #botonMenu:
+  Alterna menu-abierto en el contenedor y actualiza aria-expanded.
+
+- click en #fondoMenu:
+  Cierra el menu.
+
+- keydown en document:
+  Si la tecla es Escape, cierra el menu.
+
+Delegacion:
+- No hay delegacion de eventos.
+
+Fetch:
+- No usa fetch.
+
+CSS/DOM:
+- Alterna menu-abierto.
+- Actualiza aria-expanded.
+
+Tailwind:
+- No modifica clases Tailwind.
+
+
+2.4 public/js/flash-toast.js
+----------------------------
+
+Eventos:
+- DOMContentLoaded en document:
+  Selecciona todos los elementos con [data-toast] y prepara su comportamiento.
+
+- requestAnimationFrame:
+  Anade app-toast-visible en el siguiente frame. Esto permite que el navegador
+  pinte primero el estado inicial y luego dispare la transicion CSS.
+
+- setTimeout:
+  Cierra automaticamente cada toast. El tiempo viene de data-toast-delay o, si
+  no existe, usa 4500 ms.
+
+- click en [data-toast-close]:
+  Cierra manualmente el toast y cancela el temporizador activo.
+
+- mouseenter en cada toast:
+  Pausa el cierre automatico mientras el usuario pasa el raton por encima.
+
+- mouseleave en cada toast:
+  Reprograma el cierre automatico con un tiempo mas corto.
+
+Delegacion:
+- No usa delegacion global. Cada toast recibe sus listeners.
+
+Fetch:
+- No usa fetch.
+
+Recibe:
+- Elementos [data-toast].
+- Boton opcional [data-toast-close].
+- Atributo opcional data-toast-delay.
+
+Devuelve:
+- No devuelve datos al servidor.
+- En cliente, elimina el elemento toast del DOM despues de la animacion.
+
+CSS/DOM:
+- Anade app-toast-visible.
+- Quita app-toast-visible.
+- Anade app-toast-saliendo.
+- Usa dataset.cerrando para evitar cierres duplicados.
+
+Tailwind:
+- No modifica clases Tailwind.
+
+
+2.5 public/js/index.js
+----------------------
+
+Eventos:
+- DOMContentLoaded en document:
+  Busca #visorPresentacion y lee data-diapositivas.
+  Convierte ese JSON en un array de diapositivas.
+
+- click en #botonSiguiente:
+  Avanza a la siguiente diapositiva.
+
+- click en #botonAnterior:
+  Retrocede a la diapositiva anterior.
+
+- click en #diapositivaActiva:
+  Avanza a la siguiente diapositiva.
+
+- keydown en #diapositivaActiva:
+  Enter o Space avanzan.
+  ArrowRight avanza.
+  ArrowLeft retrocede.
+
+Delegacion:
+- No usa delegacion. Los listeners se asignan a botones y diapositiva activa.
+
+Fetch:
+- No usa fetch.
+
+Recibe:
+- data-diapositivas desde la vista PHP.
+- Cada diapositiva debe contener imagen, titulo y texto.
+
+Devuelve:
+- No devuelve datos al servidor.
+- Actualiza la vista en cliente.
+
+CSS/DOM:
+- Cambia imagen.src.
+- Cambia imagen.alt.
+- Cambia el texto de #tituloDiapositiva.
+- Cambia el texto de #textoDiapositiva.
+- Cambia el contador de diapositivas.
+
+Tailwind:
+- No modifica clases Tailwind.
+
+
+2.6 public/js/kanban.js
+-----------------------
+
+Este es el archivo JavaScript con mas interaccion. Controla el tablero Kanban,
+el arrastre de tarjetas, el cambio de estado de leads, la configuracion de
+campos visibles y el menu lateral.
+
+Eventos:
+- DOMContentLoaded en document:
+  Busca #kanbanApp, #kanbanTablero, #botonMenu, #fondoMenu, #mensajeKanban,
+  #botonConfigKanban y #panelConfigKanban.
+  Carga configuracion visual desde localStorage.
+  Aplica visibilidad de campos en las tarjetas.
+  Prepara listeners de drag and drop, menu y configuracion.
+
+- dragstart en cada .kanban-tarjeta:
+  Guarda la tarjeta arrastrada.
+  Guarda la columna de origen.
+  Guarda el estado anterior.
+  Anade la clase arrastrando.
+  Escribe el id del lead en dataTransfer.
+
+- dragend en cada .kanban-tarjeta:
+  Quita arrastrando.
+  Limpia clases de destino.
+  Resetea la tarjeta activa y la columna de origen.
+
+- dragover en cada .kanban-columna:
+  Ejecuta preventDefault para permitir el drop.
+  Anade la clase destino a la columna.
+
+- dragleave en cada .kanban-columna:
+  Quita destino.
+
+- drop en cada .kanban-columna:
+  Valida que haya tarjeta activa.
+  Lee el nuevo estado desde data-estado de la columna.
+  Si el estado es igual al anterior, no hace peticion.
+  Mueve la tarjeta al nuevo contenedor de forma optimista.
+  Actualiza data-estado de la tarjeta.
+  Recalcula contadores y totales.
+  Ejecuta fetch para guardar el cambio en servidor.
+  Si el servidor falla, revierte la tarjeta a su columna original.
+
+- click en #botonMenu:
+  Abre/cierra el menu lateral del Kanban.
+
+- click en #fondoMenu:
+  Cierra el menu lateral.
+
+- keydown en document:
+  Si la tecla es Escape, cierra el menu lateral.
+
+- click en #botonConfigKanban:
+  Muestra u oculta el panel de configuracion de campos.
+  Usa stopPropagation para evitar que el click global lo cierre en el mismo
+  instante.
+
+- click en #panelConfigKanban:
+  Usa stopPropagation para permitir interactuar dentro del panel sin cerrarlo.
+
+- click en document:
+  Cierra el panel de configuracion si se pulsa fuera.
+
+- change en [data-campo-config]:
+  Actualiza la configuracion de campos visibles.
+  Guarda la configuracion en localStorage.
+  Aplica o quita oculto-campo en los elementos [data-campo].
+
+Delegacion:
+- Drag and drop: no esta delegado en #kanbanTablero; cada tarjeta y columna
+  recibe sus listeners.
+- Cierre de configuracion: si hay una forma de delegacion global mediante click
+  en document para detectar clicks fuera del panel.
+
+Fetch:
+- Si usa fetch.
+
+Endpoint:
+- POST {BASE_URL}pipeline/cambiar-estado
+
+Ruta MVC:
+- Route::post('/pipeline/cambiar-estado', [LeadController::class, 'cambiarEstadoKanban'])
+
+Datos que envia:
+- FormData con lead_id.
+- FormData con estado.
+- credentials: 'same-origin', para mantener la sesion/cookies del mismo origen.
+
+Datos que espera recibir:
+- Respuesta JSON.
+- En exito:
+  {
+    ok: true,
+    mensaje: "...",
+    estadoAnterior: "...",
+    estadoNuevo: "...",
+    leadId: 123
+  }
+
+- En error:
+  {
+    ok: false,
+    mensaje: "..."
+  }
+
+Errores controlados por el controlador:
+- 401 si no hay sesion.
+- 422 si lead_id o estado no son validos.
+- 404 si el lead no existe.
+- 500 si falla la actualizacion.
+
+Que devuelve al usuario:
+- Si todo va bien, mantiene la tarjeta en la nueva columna y muestra mensaje de
+  exito.
+- Si falla, devuelve la tarjeta a la columna original, restaura data-estado,
+  recalcula contadores y muestra mensaje de error.
+
+CSS/DOM:
+- arrastrando: tarjeta que se esta moviendo.
+- destino: columna sobre la que se puede soltar.
+- oculto-campo: oculta campos configurables de las tarjetas.
+- movido-ok: feedback visual tras un cambio correcto.
+- movido-error: feedback visual tras un fallo.
+- visible: muestra el panel de configuracion.
+- menu-abierto: abre el menu lateral.
+- kanban-vacio: aviso dinamico cuando una columna no tiene tarjetas.
+
+Tailwind:
+- No modifica clases Tailwind. Trabaja con clases propias.
+
+
+2.7 public/js/listado.js
+------------------------
+
+Eventos:
+- DOMContentLoaded en document:
+  Prepara #listadoApp, #botonMenu, #asidePanel y #fondoMenu.
+
+- click en #botonMenu:
+  Si el menu esta abierto, lo cierra. Si esta cerrado, lo abre.
+
+- click en #fondoMenu:
+  Cierra el menu.
+
+- click en #asidePanel:
+  Detecta si el click se hizo sobre un enlace o dentro de un enlace usando
+  evento.target.closest('a'). Si es asi, cierra el menu.
+
+- keydown en document:
+  Si la tecla es Escape, cierra el menu.
+
+Delegacion:
+- Si. El listener esta en #asidePanel y detecta enlaces internos mediante
+  closest('a'). Esto evita tener que poner un listener en cada enlace.
+
+Fetch:
+- No usa fetch.
+
+CSS/DOM:
+- Alterna menu-abierto.
+- Actualiza aria-expanded.
+
+Tailwind:
+- No modifica clases Tailwind.
+
+
+2.8 public/js/panel.js
+----------------------
+
+Este archivo cubre tres comportamientos: menu lateral, notificaciones y selector
+visual de estados.
+
+Eventos:
+- DOMContentLoaded en document:
+  Busca #panelApp, #botonMenu y #fondoMenu.
+  Prepara botones de menu.
+  Prepara cierre de notificaciones.
+  Prepara selectores visuales de estado.
+
+- click en #botonMenu:
+  Abre o cierra el menu lateral y actualiza aria-expanded.
+
+- click en #fondoMenu:
+  Cierra el menu lateral.
+
+- click en document para [data-cerrar-notificacion]:
+  Usa evento.target.closest('[data-cerrar-notificacion]') para detectar botones
+  de cierre aunque esten dentro de elementos anidados.
+  Oculta la notificacion asociada.
+
+- click en cada [data-selector-trigger]:
+  Abre el selector visual de estado.
+  Cierra cualquier selector anterior abierto.
+  Calcula la posicion del trigger.
+  Crea o reposiciona el flyout.
+
+- click en cada opcion [data-estado] del flyout:
+  Lee el nuevo estado.
+  Lo escribe en el input oculto [data-selector-input].
+  Actualiza el texto visible del trigger.
+  Copia clases estado-* de la opcion al trigger.
+  Cierra el selector.
+  Envia el formulario con formulario.submit().
+
+- click en document para cerrar selector:
+  Si el click ocurre fuera del selector y fuera del flyout, cierra el selector
+  abierto.
+
+- keydown en document:
+  Si la tecla es Escape, cierra el selector abierto.
+
+- resize en window:
+  Cierra el selector para evitar que quede descolocado.
+
+- scroll en window:
+  Cierra el selector para evitar que quede descolocado durante el desplazamiento.
+
+Delegacion:
+- Si. Usa click en document para detectar botones [data-cerrar-notificacion].
+- Si. Usa click en document para cerrar selectores al hacer click fuera.
+- Las opciones del flyout reciben listeners al crearse.
+
+Fetch:
+- No usa fetch.
+- El cambio se envia mediante submit tradicional del formulario.
+
+Recibe:
+- Bloques [data-selector-estado].
+- Trigger [data-selector-trigger].
+- Input oculto [data-selector-input].
+- Template [data-selector-template].
+- Opciones con [data-estado].
+
+Devuelve:
+- No devuelve JSON.
+- Envia el formulario asociado con submit().
+
+CSS/DOM:
+- Crea .selector-estado-flyout en document.body.
+- Alterna abierto en el selector.
+- Alterna activa en la opcion seleccionada.
+- Actualiza texto del trigger.
+- Copia clases estado-* al trigger.
+- Oculta notificaciones cerradas.
+
+Tailwind:
+- No modifica utilidades Tailwind directamente.
+
+
+2.9 public/js/tareas.js
+-----------------------
+
+Eventos:
+- DOMContentLoaded en document:
+  Busca #tareasApp, #botonMenu, #fondoMenu, #botonNuevaTarea,
+  #botonCerrarFormulario, #panelFormularioTarea, #tareasLayout,
+  #tipo_actividad, #lead_id y #bloqueObjecionesFormulario.
+
+- click en #botonMenu:
+  Abre o cierra el menu lateral.
+
+- click en #fondoMenu:
+  Cierra el menu lateral.
+
+- keydown en document:
+  Si la tecla es Escape, cierra el menu lateral.
+
+- click en #botonNuevaTarea:
+  Muestra u oculta el formulario de nueva tarea.
+  Si lo abre, pone foco en el primer input, select o textarea disponible.
+
+- click en #botonCerrarFormulario:
+  Cierra el formulario.
+
+- change en #tipo_actividad:
+  Recalcula si debe mostrarse el bloque de objeciones.
+
+- change en #lead_id:
+  Lee data-estado del option seleccionado.
+  Recalcula si debe mostrarse el bloque de objeciones.
+
+- change en cada .selector-estado-tabla:
+  Cambia la clase visual del select segun el nuevo estado.
+  Anade guardando.
+  Envia el formulario padre con submit().
+
+Delegacion:
+- No hay una delegacion global fuerte. Los listeners se asignan a controles
+  concretos y a cada select .selector-estado-tabla.
+
+Fetch:
+- No usa fetch.
+- Envia formularios POST tradicionales.
+
+Recibe:
+- Select de tipo de actividad.
+- Select de lead.
+- Options de lead con data-estado.
+- Selectores de estado en tabla.
+- Formularios generados por la vista.
+
+Devuelve:
+- No devuelve JSON.
+- Envia formulario al servidor.
+
+CSS/DOM:
+- menu-abierto: menu lateral abierto.
+- con-formulario: adapta el layout cuando se muestra el formulario.
+- hidden: oculta/muestra el formulario.
+- visible: muestra el bloque de objeciones.
+- estado-pendiente, estado-curso, estado-terminada: estilo del select de estado.
+- guardando: feedback visual mientras se envia el formulario.
+
+Tailwind:
+- El archivo no anade ni elimina clases Tailwind.
+- La vista puede tener clases Tailwind en elementos con los que este JS
+  interactua, pero el JS solo cambia clases propias o atributos.
+
+
+2.10 public/js/theme.js
+-----------------------
+
+Este archivo se ejecuta como una IIFE, es decir, una funcion inmediata que deja
+expuesto window.crmTheme y prepara el modo claro/oscuro.
+
+Eventos y funciones:
+- applyTheme(theme):
+  Si theme es dark, anade dark al elemento html y establece data-theme=dark.
+  Si theme es light, quita dark y establece data-theme=light.
+  Despues sincroniza los botones.
+
+- getPreferredTheme():
+  Lee localStorage.theme.
+  Si existe light o dark, usa ese valor.
+  Si no existe preferencia guardada, usa matchMedia('(prefers-color-scheme: dark)').
+
+- toggleTheme():
+  Cambia de dark a light o de light a dark.
+  Guarda la decision en localStorage.theme.
+  Aplica el tema.
+
+- syncButtons():
+  Busca [data-theme-toggle].
+  Actualiza aria-pressed.
+  Muestra u oculta etiquetas [data-theme-label-light] y [data-theme-label-dark]
+  con la clase hidden.
+
+- DOMContentLoaded en document:
+  Aplica el tema preferido.
+  Sincroniza botones.
+  Registra click en cada [data-theme-toggle].
+
+- click en cada [data-theme-toggle]:
+  Alterna el tema.
+
+- change en matchMedia('(prefers-color-scheme: dark)'):
+  Si el usuario no guardo una preferencia manual, adapta el tema al sistema.
+
+Delegacion:
+- No usa delegacion. Cada boton [data-theme-toggle] recibe su listener.
+
+Fetch:
+- No usa fetch.
+
+Recibe:
+- Preferencia guardada en localStorage.theme.
+- Preferencia del sistema desde matchMedia.
+- Clicks en botones [data-theme-toggle].
+
+Devuelve:
+- No devuelve datos al servidor.
+- Expone window.crmTheme con apply, current y toggle.
+
+CSS/DOM:
+- Alterna dark en document.documentElement.
+- Actualiza data-theme.
+- Alterna hidden en etiquetas de botones.
+- Actualiza aria-pressed.
+
+Tailwind:
+- Es el punto clave de interaccion con Tailwind.
+- Tailwind aplica sus variantes dark: cuando el elemento html tiene la clase
+  dark.
+- Tambien se activan las reglas CSS propias basadas en .dark.
+
+
+3. FETCH DETALLADO
+==================
+
+Solo se ha detectado una peticion fetch en public/js:
+
+Archivo:
+- public/js/kanban.js
+
+Endpoint:
+- POST {BASE_URL}pipeline/cambiar-estado
+
+Ruta:
+- /pipeline/cambiar-estado
+
+Controlador:
+- LeadController::cambiarEstadoKanban()
+
+Datos enviados:
+- lead_id: identificador del lead que se esta moviendo.
+- estado: nuevo estado de la columna destino.
+
+Formato:
+- FormData.
+
+Credenciales:
+- credentials: 'same-origin'.
+
+Respuesta correcta esperada:
+- JSON con ok=true, mensaje, estadoAnterior, estadoNuevo y leadId.
+
+Respuesta de error esperada:
+- JSON con ok=false y mensaje.
+
+Uso en la interfaz:
+- El cliente mueve la tarjeta antes de confirmar con el servidor.
+- Si el servidor confirma, se mantiene el cambio.
+- Si el servidor falla, el cliente revierte la tarjeta a su columna original.
+
+
+4. INTERACCION CON CSS Y TAILWIND
+=================================
+
+La aplicacion carga CSS global y CSS especifico por vista. El layout principal
+incluye normalmente:
+- public/css/tailwind.css
+- public/css/style.css
+- public/css/flash-toast.css
+- CSS especifico de la vista mediante la variable $archivoCssVista
+
+Los JavaScript trabajan principalmente con clases propias del proyecto:
+- menu-abierto
+- app-toast-visible
+- app-toast-saliendo
+- arrastrando
+- destino
+- oculto-campo
+- movido-ok
+- movido-error
+- visible
+- con-formulario
+- estado-pendiente
+- estado-curso
+- estado-terminada
+- guardando
+- abierto
+- activa
+- selector-estado-flyout
+- estado-*
+
+Interaccion real con Tailwind:
+- theme.js es el archivo que mas interactua con Tailwind.
+- Al alternar la clase dark en html, activa las utilidades dark: compiladas en
+  public/css/tailwind.css.
+- Tambien activa estilos propios escritos con selectores .dark.
+
+Interaccion indirecta:
+- tareas.js y panel.js pueden actuar sobre elementos que en la vista tienen
+  clases Tailwind, pero esos scripts no modifican esas clases.
+- Su trabajo es funcional: mostrar/ocultar, enviar formularios o cambiar clases
+  propias de estado.
+
+
+5. FLUJO DENTRO DEL MVC
+=======================
+
+Flujo general:
+1. El navegador solicita una URL.
+2. La peticion entra por public/index.php.
+3. public/index.php carga configuracion y routes/web.php.
+4. routes/web.php registra rutas GET y POST.
+5. Route::handleRoute() normaliza la URI y detecta el metodo HTTP.
+6. Route llama al controlador configurado para esa ruta.
+7. El controlador valida sesion, permisos y datos de entrada.
+8. El controlador llama a modelos como LeadModel o TareaModel.
+9. El modelo consulta o modifica la base de datos.
+10. El controlador decide que vista cargar o que respuesta devolver.
+11. Controller::view($vista, $datos) hace extract($datos).
+12. Controller::view carga app/views/$vista.php.
+13. La vista genera HTML, atributos data-*, formularios, ids y clases.
+14. El navegador carga CSS y JavaScript.
+15. Los JS se activan normalmente en DOMContentLoaded.
+16. El usuario interactua con menus, formularios, Kanban, toasts o tema.
+17. Los cambios vuelven al servidor mediante formularios POST o fetch.
+
+Flujo de render de una vista:
+- Controlador prepara datos.
+- Controlador llama a Controller::view().
+- La vista recibe variables por extract().
+- La vista imprime HTML.
+- El layout incluye estilos y scripts.
+- El JS usa ids, clases y atributos data-* que la vista ha renderizado.
+
+Flujo con formulario tradicional:
+1. El usuario cambia un select o pulsa un boton.
+2. El JS puede ajustar clases o valores.
+3. El formulario se envia con submit().
+4. Route recibe la ruta POST.
+5. El controlador valida los datos.
+6. El modelo modifica la base de datos.
+7. El controlador redirige o vuelve a renderizar la vista.
+
+Flujo con fetch en Kanban:
+1. La vista Kanban renderiza columnas y tarjetas con data-id y data-estado.
+2. kanban.js registra eventos de drag and drop.
+3. El usuario arrastra una tarjeta a otra columna.
+4. kanban.js mueve la tarjeta en pantalla de forma optimista.
+5. kanban.js envia POST /pipeline/cambiar-estado con lead_id y estado.
+6. Route ejecuta LeadController::cambiarEstadoKanban().
+7. El controlador valida sesion, lead_id, estado y existencia del lead.
+8. LeadModel::updateEstado() actualiza el estado en la base de datos.
+9. El controlador registra historial con LeadModel::createHistorial().
+10. Si el nuevo estado es Objeciones, puede crear tarea automatica.
+11. Si el nuevo estado es Ganado, puede crear notificacion.
+12. El controlador devuelve JSON.
+13. kanban.js mantiene el movimiento si ok=true.
+14. kanban.js revierte el movimiento si ok=false o si hay error de red.
+
+
+6. RUTAS MVC RELACIONADAS
+=========================
+
+Rutas principales detectadas:
+- GET / -> HomeController::index
+- GET /panel -> HomeController::panel
+- GET /pipeline -> HomeController::kanban
+- GET /dashboard -> HomeController::dashboard
+- GET /politica-privacidad -> HomeController::politicaPrivacidad
+- GET /contacto -> LeadController::mostrarFormContacto
+- POST /contacto -> LeadController::nuevoContacto
+- GET /leads/nuevo -> LeadController::mostrarFormLead
+- POST /leads/guardar -> LeadController::nuevoLead
+- POST /leads/cambiar-estado/{id} -> LeadController::cambiarEstado
+- POST /pipeline/cambiar-estado -> LeadController::cambiarEstadoKanban
+- POST /leads/{id}/actualizar -> LeadController::actualizarLead
+- POST /leads/{id}/eliminar -> LeadController::eliminarLead
+- POST /leads/{id}/notas/guardar -> LeadController::nuevaNota
+- GET /leads/{id} -> LeadController::mostrarDetalle
+- GET /leads/listado -> LeadController::mostrarListado
+- GET /tareas -> TareaController::index
+- POST /tareas/guardar -> TareaController::guardar
+- POST /tareas/{id}/actualizar -> TareaController::actualizar
+- POST /tareas/{id}/eliminar -> TareaController::eliminar
+
+
+7. CONCLUSIONES
+===============
+
+- La capa JavaScript complementa a las vistas, pero no sustituye al MVC.
+- La mayoria de interacciones usan formularios POST tradicionales.
+- Solo kanban.js usa fetch para persistencia asincrona.
+- panel.js y listado.js son los ejemplos mas claros de delegacion de eventos.
+- theme.js es el archivo que conecta de forma real con Tailwind, porque controla
+  la clase dark del elemento html.
+- Los demas scripts trabajan con clases propias del proyecto, atributos ARIA,
+  hidden, valores de formulario y texto del DOM.
+- El flujo MVC mantiene la logica de negocio en controladores/modelos, mientras
+  JavaScript se ocupa de mejorar la interaccion en cliente.

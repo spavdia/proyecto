@@ -49,186 +49,6 @@ class LeadModel
         $this->ensureSupportTables();
     }
 
-    private function ensureSupportTables(): void
-    {
-        $this->db->executeUpdate("CREATE TABLE IF NOT EXISTS objetivos_mensuales (
-            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            anio SMALLINT UNSIGNED NOT NULL,
-            mes TINYINT UNSIGNED NOT NULL,
-            objetivo_leads INT UNSIGNED NOT NULL DEFAULT 0,
-            usuario_id INT UNSIGNED NULL,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            UNIQUE KEY uniq_objetivo_mes (anio, mes),
-            CONSTRAINT fk_objetivos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-        $this->db->executeUpdate("CREATE TABLE IF NOT EXISTS notificaciones_app (
-            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            usuario_id INT UNSIGNED NOT NULL,
-            usuario_origen_id INT UNSIGNED NULL,
-            lead_id INT UNSIGNED NULL,
-            tipo VARCHAR(50) NOT NULL,
-            titulo VARCHAR(150) NOT NULL,
-            mensaje TEXT NOT NULL,
-            enlace VARCHAR(255) NULL,
-            leida TINYINT(1) NOT NULL DEFAULT 0,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            CONSTRAINT fk_notificaciones_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE ON UPDATE CASCADE,
-            CONSTRAINT fk_notificaciones_origen FOREIGN KEY (usuario_origen_id) REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE,
-            CONSTRAINT fk_notificaciones_lead FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE SET NULL ON UPDATE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-    }
-
-    public function getObjetivoMesActual(int $usuarioId = 0, bool $esAdmin = true): array
-    {
-        $fechaActual = new DateTime('first day of this month');
-        $fechaAnterior = new DateTime('first day of last month');
-
-        $anioActual = (int) $fechaActual->format('Y');
-        $mesActual = (int) $fechaActual->format('n');
-        $anioAnterior = (int) $fechaAnterior->format('Y');
-        $mesAnterior = (int) $fechaAnterior->format('n');
-
-        $ganadosActual = $this->getGanadosScorePorMes($anioActual, $mesActual, $usuarioId, $esAdmin);
-        $ganadosAnteriorReal = $this->getGanadosScorePorMes($anioAnterior, $mesAnterior, $usuarioId, $esAdmin);
-        $ganadosAnteriorVisual = $ganadosAnteriorReal === 0 ? 20 : $ganadosAnteriorReal;
-
-        $restantes = max(0, $ganadosAnteriorVisual - $ganadosActual);
-        $porcentaje = $ganadosAnteriorVisual > 0
-            ? (float) round(($ganadosActual / $ganadosAnteriorVisual) * 100, 1)
-            : ($ganadosActual > 0 ? 100.0 : 0.0);
-
-        return [
-            'anio' => $anioActual,
-            'mes' => $mesActual,
-            'objetivo' => $ganadosAnteriorVisual,
-            'ganados' => $ganadosActual,
-            'restantes' => $restantes,
-            'porcentaje' => $porcentaje,
-            'ganados_mes_anterior' => $ganadosAnteriorVisual
-        ];
-    }
-
-    private function getGanadosScorePorMes(int $anio, int $mes, int $usuarioId = 0, bool $esAdmin = true): int
-    {
-        $sql = "SELECT COUNT(DISTINCT l.id) AS total
-                FROM leads l
-                WHERE l.estado = 'Ganado'
-                  AND l.lead_score = 1
-                  AND EXISTS (
-                      SELECT 1
-                      FROM historial_lead h
-                      WHERE h.lead_id = l.id
-                        AND h.estado_nuevo = 'Ganado'
-                        AND YEAR(h.created_at) = ?
-                        AND MONTH(h.created_at) = ?
-                  )";
-
-        $params = [$anio, $mes];
-
-        if (!$esAdmin && $usuarioId > 0) {
-            $sql .= " AND l.responsable_id = ?";
-            $params[] = $usuarioId;
-        }
-
-        $resultado = $this->db->executeQuery($sql, $params);
-        return (int) ($resultado[0]['total'] ?? 0);
-    }
-
-    public function saveObjetivoMesActual(int $objetivoLeads, int $usuarioId): bool
-    {
-        $anio = (int) date('Y');
-        $mes = (int) date('n');
-        $objetivoLeads = max(0, $objetivoLeads);
-
-        $sql = "INSERT INTO objetivos_mensuales (anio, mes, objetivo_leads, usuario_id)
-                VALUES (?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    objetivo_leads = VALUES(objetivo_leads),
-                    usuario_id = VALUES(usuario_id),
-                    updated_at = NOW()";
-
-        $resultado = $this->db->executeUpdate($sql, [$anio, $mes, $objetivoLeads, $usuarioId]);
-        return $resultado !== false;
-    }
-
-    public function createGanadoNotificationForAll(int $leadId, int $usuarioOrigenId): bool
-    {
-        $leadInfo = $this->db->executeQuery(
-            "SELECT l.id, l.servicios, l.responsable_id, u.nombre AS responsable_nombre
-             FROM leads l
-             LEFT JOIN usuarios u ON u.id = l.responsable_id
-             WHERE l.id = ?
-             LIMIT 1",
-            [$leadId]
-        );
-
-        $lead = $leadInfo[0] ?? null;
-        if (!$lead) {
-            return false;
-        }
-
-        $resumenObjetivo = $this->getObjetivoMesActual();
-        $responsableId = (int) ($lead['responsable_id'] ?? 0);
-        $vendedor = (string) ($lead['responsable_nombre'] ?? 'El equipo comercial');
-        $servicio = (string) ($lead['servicios'] ?? 'un nuevo curso');
-        $ganadosMes = (int) ($resumenObjetivo['ganados'] ?? 0);
-        $referenciaAnterior = (int) ($resumenObjetivo['ganados_mes_anterior'] ?? 0);
-        $porcentaje = (float) ($resumenObjetivo['porcentaje'] ?? 0);
-        $porcentajeTexto = rtrim(rtrim(number_format($porcentaje, 1, '.', ''), '0'), '.');
-
-        $titulo = 'FELICIDADES';
-        $mensaje = $vendedor . ' ha ganado un nuevo negocio en ' . $servicio . '. '
-            . 'Objetivos del mes: ' . $ganadosMes . ' / ' . $referenciaAnterior . ' (' . $porcentajeTexto . '%).';
-
-        $usuarios = $this->db->executeQuery(
-            "SELECT id FROM usuarios WHERE activo = 1 ORDER BY id ASC"
-        );
-
-        foreach ($usuarios as $usuario) {
-            $destinoId = (int) ($usuario['id'] ?? 0);
-            if ($destinoId <= 0) {
-                continue;
-            }
-
-            $this->db->executeUpdate(
-                "INSERT INTO notificaciones_app (usuario_id, usuario_origen_id, lead_id, tipo, titulo, mensaje, enlace, leida)
-                 VALUES (?, ?, ?, 'logro_ganado', ?, ?, ?, 0)",
-                [$destinoId, $responsableId > 0 ? $responsableId : ($usuarioOrigenId > 0 ? $usuarioOrigenId : null), $leadId, $titulo, $mensaje, 'leads/' . $leadId]
-            );
-        }
-
-        return true;
-    }
-
-    public function getPendingGanadoNotificationsByUsuario(int $usuarioId): array
-    {
-        $sql = "SELECT n.*, u.nombre AS origen_nombre
-                FROM notificaciones_app n
-                LEFT JOIN usuarios u ON u.id = n.usuario_origen_id
-                WHERE n.usuario_id = ?
-                  AND n.tipo = 'logro_ganado'
-                  AND n.leida = 0
-                ORDER BY n.created_at ASC, n.id ASC";
-
-        return $this->db->executeQuery($sql, [$usuarioId]);
-    }
-
-    public function markNotificationsAsReadByIds(array $notificacionesIds): void
-    {
-        $idsValidos = array_values(array_filter(array_map('intval', $notificacionesIds), static fn (int $id): bool => $id > 0));
-        if (empty($idsValidos)) {
-            return;
-        }
-
-        $placeholders = implode(',', array_fill(0, count($idsValidos), '?'));
-        $this->db->executeUpdate(
-            "UPDATE notificaciones_app SET leida = 1 WHERE id IN ($placeholders)",
-            $idsValidos
-        );
-    }
-
     public function getEstados(): array
     {
         return $this->estados;
@@ -539,7 +359,8 @@ class LeadModel
 
         return $resultado !== false;
     }
-
+    
+    /** consultas más elaboradas */
     private function buildLeadDashboardWhere(array $filtros, int $usuarioId, bool $esAdmin, string $alias = 'l'): array
     {
         $condiciones = [];
@@ -828,5 +649,186 @@ class LeadModel
                     u.nombre AS responsable_nombre
                 FROM leads l
                 LEFT JOIN usuarios u ON l.responsable_id = u.id";
+    }
+
+    /** consultas avanzadas */
+     private function ensureSupportTables(): void
+    {
+        $this->db->executeUpdate("CREATE TABLE IF NOT EXISTS objetivos_mensuales (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            anio SMALLINT UNSIGNED NOT NULL,
+            mes TINYINT UNSIGNED NOT NULL,
+            objetivo_leads INT UNSIGNED NOT NULL DEFAULT 0,
+            usuario_id INT UNSIGNED NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_objetivo_mes (anio, mes),
+            CONSTRAINT fk_objetivos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        $this->db->executeUpdate("CREATE TABLE IF NOT EXISTS notificaciones_app (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            usuario_id INT UNSIGNED NOT NULL,
+            usuario_origen_id INT UNSIGNED NULL,
+            lead_id INT UNSIGNED NULL,
+            tipo VARCHAR(50) NOT NULL,
+            titulo VARCHAR(150) NOT NULL,
+            mensaje TEXT NOT NULL,
+            enlace VARCHAR(255) NULL,
+            leida TINYINT(1) NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_notificaciones_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE ON UPDATE CASCADE,
+            CONSTRAINT fk_notificaciones_origen FOREIGN KEY (usuario_origen_id) REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE,
+            CONSTRAINT fk_notificaciones_lead FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE SET NULL ON UPDATE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    }
+
+    public function getObjetivoMesActual(int $usuarioId = 0, bool $esAdmin = true): array
+    {
+        $fechaActual = new DateTime('first day of this month');
+        $fechaAnterior = new DateTime('first day of last month');
+
+        $anioActual = (int) $fechaActual->format('Y');
+        $mesActual = (int) $fechaActual->format('n');
+        $anioAnterior = (int) $fechaAnterior->format('Y');
+        $mesAnterior = (int) $fechaAnterior->format('n');
+
+        $ganadosActual = $this->getGanadosScorePorMes($anioActual, $mesActual, $usuarioId, $esAdmin);
+        $ganadosAnteriorReal = $this->getGanadosScorePorMes($anioAnterior, $mesAnterior, $usuarioId, $esAdmin);
+        $ganadosAnteriorVisual = $ganadosAnteriorReal === 0 ? 20 : $ganadosAnteriorReal;
+
+        $restantes = max(0, $ganadosAnteriorVisual - $ganadosActual);
+        $porcentaje = $ganadosAnteriorVisual > 0
+            ? (float) round(($ganadosActual / $ganadosAnteriorVisual) * 100, 1)
+            : ($ganadosActual > 0 ? 100.0 : 0.0);
+
+        return [
+            'anio' => $anioActual,
+            'mes' => $mesActual,
+            'objetivo' => $ganadosAnteriorVisual,
+            'ganados' => $ganadosActual,
+            'restantes' => $restantes,
+            'porcentaje' => $porcentaje,
+            'ganados_mes_anterior' => $ganadosAnteriorVisual
+        ];
+    }
+
+    private function getGanadosScorePorMes(int $anio, int $mes, int $usuarioId = 0, bool $esAdmin = true): int
+    {
+        $sql = "SELECT COUNT(DISTINCT l.id) AS total
+                FROM leads l
+                WHERE l.estado = 'Ganado'
+                  AND l.lead_score = 1
+                  AND EXISTS (
+                      SELECT 1
+                      FROM historial_lead h
+                      WHERE h.lead_id = l.id
+                        AND h.estado_nuevo = 'Ganado'
+                        AND YEAR(h.created_at) = ?
+                        AND MONTH(h.created_at) = ?
+                  )";
+
+        $params = [$anio, $mes];
+
+        if (!$esAdmin && $usuarioId > 0) {
+            $sql .= " AND l.responsable_id = ?";
+            $params[] = $usuarioId;
+        }
+
+        $resultado = $this->db->executeQuery($sql, $params);
+        return (int) ($resultado[0]['total'] ?? 0);
+    }
+
+    public function saveObjetivoMesActual(int $objetivoLeads, int $usuarioId): bool
+    {
+        $anio = (int) date('Y');
+        $mes = (int) date('n');
+        $objetivoLeads = max(0, $objetivoLeads);
+
+        $sql = "INSERT INTO objetivos_mensuales (anio, mes, objetivo_leads, usuario_id)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    objetivo_leads = VALUES(objetivo_leads),
+                    usuario_id = VALUES(usuario_id),
+                    updated_at = NOW()";
+
+        $resultado = $this->db->executeUpdate($sql, [$anio, $mes, $objetivoLeads, $usuarioId]);
+        return $resultado !== false;
+    }
+
+    public function createGanadoNotificationForAll(int $leadId, int $usuarioOrigenId): bool
+    {
+        $leadInfo = $this->db->executeQuery(
+            "SELECT l.id, l.servicios, l.responsable_id, u.nombre AS responsable_nombre
+             FROM leads l
+             LEFT JOIN usuarios u ON u.id = l.responsable_id
+             WHERE l.id = ?
+             LIMIT 1",
+            [$leadId]
+        );
+
+        $lead = $leadInfo[0] ?? null;
+        if (!$lead) {
+            return false;
+        }
+
+        $resumenObjetivo = $this->getObjetivoMesActual();
+        $responsableId = (int) ($lead['responsable_id'] ?? 0);
+        $vendedor = (string) ($lead['responsable_nombre'] ?? 'El equipo comercial');
+        $servicio = (string) ($lead['servicios'] ?? 'un nuevo curso');
+        $ganadosMes = (int) ($resumenObjetivo['ganados'] ?? 0);
+        $referenciaAnterior = (int) ($resumenObjetivo['ganados_mes_anterior'] ?? 0);
+        $porcentaje = (float) ($resumenObjetivo['porcentaje'] ?? 0);
+        $porcentajeTexto = rtrim(rtrim(number_format($porcentaje, 1, '.', ''), '0'), '.');
+
+        $titulo = 'FELICIDADES';
+        $mensaje = $vendedor . ' ha ganado un nuevo negocio en ' . $servicio . '. '
+            . 'Objetivos del mes: ' . $ganadosMes . ' / ' . $referenciaAnterior . ' (' . $porcentajeTexto . '%).';
+
+        $usuarios = $this->db->executeQuery(
+            "SELECT id FROM usuarios WHERE activo = 1 ORDER BY id ASC"
+        );
+
+        foreach ($usuarios as $usuario) {
+            $destinoId = (int) ($usuario['id'] ?? 0);
+            if ($destinoId <= 0) {
+                continue;
+            }
+
+            $this->db->executeUpdate(
+                "INSERT INTO notificaciones_app (usuario_id, usuario_origen_id, lead_id, tipo, titulo, mensaje, enlace, leida)
+                 VALUES (?, ?, ?, 'logro_ganado', ?, ?, ?, 0)",
+                [$destinoId, $responsableId > 0 ? $responsableId : ($usuarioOrigenId > 0 ? $usuarioOrigenId : null), $leadId, $titulo, $mensaje, 'leads/' . $leadId]
+            );
+        }
+
+        return true;
+    }
+
+    public function getPendingGanadoNotificationsByUsuario(int $usuarioId): array
+    {
+        $sql = "SELECT n.*, u.nombre AS origen_nombre
+                FROM notificaciones_app n
+                LEFT JOIN usuarios u ON u.id = n.usuario_origen_id
+                WHERE n.usuario_id = ?
+                  AND n.tipo = 'logro_ganado'
+                  AND n.leida = 0
+                ORDER BY n.created_at ASC, n.id ASC";
+
+        return $this->db->executeQuery($sql, [$usuarioId]);
+    }
+
+    public function markNotificationsAsReadByIds(array $notificacionesIds): void
+    {
+        $idsValidos = array_values(array_filter(array_map('intval', $notificacionesIds), static fn (int $id): bool => $id > 0));
+        if (empty($idsValidos)) {
+            return;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($idsValidos), '?'));
+        $this->db->executeUpdate(
+            "UPDATE notificaciones_app SET leida = 1 WHERE id IN ($placeholders)",
+            $idsValidos
+        );
     }
 }

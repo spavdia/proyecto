@@ -24,8 +24,8 @@ $menuActivo = $menuActivo ?? '';
         <a href="<?= BASE_URL . 'tareas' ?>" class="menu-enlace <?= $menuActivo === 'tareas' ? 'activo' : '' ?>">Tareas</a>
 
         <p class="menu-titulo">Configuración</p>
-        <a href="#" class="menu-enlace">Usuarios</a>
-        <a href="#" class="menu-enlace">Definir negocio</a>
+        <span class="menu-enlace menu-enlace-desactivado" aria-disabled="true">Usuarios</span>
+        <span class="menu-enlace menu-enlace-desactivado" aria-disabled="true">Definir negocio</span>
         <a href="<?= BASE_URL . 'logout' ?>" class="menu-enlace">Cerrar sesión</a>
     </nav>
 </aside>

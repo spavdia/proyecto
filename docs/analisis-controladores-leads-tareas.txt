@@ -1,0 +1,1078 @@
+PipelineDesk CRM
+Analisis de LeadController y TareaController
+Generado: 09/05/2026
+
+Este documento analiza los casos de uso, responsabilidades, entradas, salidas,
+rutas MVC, validaciones, uso de sesion, patron PRG, self::view(), arrays,
+bucles y respuestas JSON de:
+
+- app/controllers/LeadController.php
+- app/controllers/TareaController.php
+
+Nota de nombre: el archivo real del proyecto es TareaController.php, aunque en
+la peticion se mencione TareasController.
+
+
+1. FLUJO MVC GENERAL
+====================
+
+1. El navegador solicita una ruta.
+2. public/index.php carga routes/web.php.
+3. routes/web.php registra rutas GET y POST con Route::get() y Route::post().
+4. Route::handleRoute() lee $_SERVER['REQUEST_URI'] y $_SERVER['REQUEST_METHOD'].
+5. Si la ruta es estatica, llama directamente al controlador con call_user_func().
+6. Si la ruta tiene parametros, por ejemplo /leads/{id}, extrae el parametro y
+   llama al controlador con call_user_func_array($handler, $params).
+7. El controlador inicia sesion, valida permisos, lee GET/POST o parametros de
+   la firma, llama al modelo y decide una salida.
+8. La salida puede ser:
+   - self::view(...): renderiza una vista PHP.
+   - header('Location: ...') + exit(): redireccion PRG.
+   - echo json_encode(...): respuesta JSON para JavaScript/fetch.
+
+
+2. USO DE SESION EN ESTOS CONTROLADORES
+=======================================
+
+Cuando se inicia sesion:
+- Casi todos los metodos llaman a SessionManager::iniciarSesion().
+- Los metodos privados no inician sesion directamente, porque se ejecutan desde
+  metodos publicos que ya la han iniciado.
+
+Por que se usa sesion:
+- Para comprobar autenticacion con SessionManager::usuarioNoAutenticado().
+- Para leer el usuario actual con SessionManager::get('usuario').
+- Para saber id y rol del usuario: id, rol.
+- Para guardar mensajes flash antes de redirigir.
+
+Cuando guarda en sesion:
+- Usa SessionManager::setMensajeFlash($mensaje, $icono, $clase).
+- Esto se usa antes de un header('Location: ...') para que la siguiente vista
+  pueda mostrar el resultado de la operacion.
+- Es necesario porque una redireccion corta la request actual y empieza otra.
+
+Variables que no se recomiendan en sesion:
+- Formularios completos con datos sensibles.
+- Passwords, tokens largos, datos bancarios o datos privados de leads.
+- Listados grandes de leads/tareas.
+- Resultados completos de consultas SQL.
+- Objetos de modelo o conexion.
+- Datos que deben estar siempre actualizados en base de datos, como estado,
+  prioridad o valor de un lead.
+
+Uso correcto en este proyecto:
+- Guardar solo usuario autenticado y mensajes flash cortos.
+- Reconsultar datos reales desde modelo cuando se renderiza una vista.
+
+
+3. PATRON PRG Y SELF::VIEW
+==========================
+
+PRG significa Post/Redirect/Get.
+
+Cuando se usa PRG:
+- Despues de una operacion POST correcta.
+- Despues de un error de persistencia que conviene mostrar en otra carga.
+- Para evitar que el navegador repita el POST al refrescar.
+
+Ejemplos:
+- nuevoContacto() guarda lead publico y redirige a /contacto.
+- nuevoLead() guarda lead interno y redirige a /panel.
+- cambiarEstado() actualiza estado y redirige a /panel o /leads/{id}.
+- nuevaNota() guarda actividad y redirige a /leads/{id}.
+- eliminarLead() elimina y redirige a /panel.
+- guardar(), actualizar() y eliminar() de TareaController redirigen a /tareas.
+
+Cuando se usa self::view():
+- En rutas GET que solo muestran pantalla.
+- En POST con errores de validacion, para devolver la misma vista con errores y
+  valores escritos por el usuario sin hacer redireccion.
+
+Ejemplos:
+- mostrarFormContacto(), mostrarFormLead(), mostrarDetalle(), mostrarListado().
+- nuevoContacto() si hay errores de formulario.
+- nuevoLead() si hay errores de formulario.
+- actualizarLead() si hay errores de edicion.
+- TareaController::renderIndex() para la vista principal de tareas.
+- guardar() y actualizar() de tareas usan renderIndex() si hay errores.
+
+
+4. METODOS DE ARRAY, BUCLES Y ORGANIZACION DE DATOS
+===================================================
+
+Arrays asociativos:
+- Se usan para errores: $errores['campo'] = 'mensaje'.
+- Se usan para datos de formularios: $leadForm, $datosForm, $datosEdicion.
+- Se usan para pasar datos a vistas con self::view().
+- Se usan para pasar datos a modelos create(), update(), createHistorial().
+
+empty():
+- Comprueba si hay errores: if (!empty($errores)).
+- Comprueba nuevas tareas asignadas: if (!empty($nuevasAsignadas)).
+- Decide si se crea historial de campos modificados.
+
+in_array(..., ..., true):
+- Valida que estados, prioridades, servicios, origenes, tipos de actividad,
+  tipos de bloqueo y soluciones pertenezcan a listas permitidas.
+- El tercer parametro true fuerza comparacion estricta.
+
+array_map():
+- En nuevoLead() y actualizarLead() convierte la lista de responsables en lista
+  de ids:
+  $idsResponsables = array_map(static fn($r) => (int) $r['id'], $responsables);
+- Resultado: permite validar responsable_id con in_array().
+
+is_array():
+- En mostrarListado() asegura que usuario, filtros y listas lleguen a la vista
+  como arrays aunque el modelo devuelva algo inesperado.
+
+implode():
+- En actualizarLead() convierte campos modificados en una frase:
+  implode(', ', $camposModificados).
+
+foreach:
+- En actualizarLead() recorre $mapaComparacion.
+- Compara valores anteriores y nuevos.
+- Resultado: genera $camposModificados para registrar historial legible.
+
+Desestructuracion de arrays:
+- En mostrarListado(), si fecha_desde es mayor que fecha_hasta, intercambia:
+  [$filtros['fecha_desde'], $filtros['fecha_hasta']] =
+  [$filtros['fecha_hasta'], $filtros['fecha_desde']];
+
+Switch:
+- En TareaController::getTextoInfoSolucion() decide el texto segun la solucion
+  elegida para una objecion.
+
+
+5. ECHO JSON_ENCODE: CUANDO SE USA Y POR QUE
+============================================
+
+Solo aparece en LeadController::cambiarEstadoKanban().
+
+Ruta:
+- POST /pipeline/cambiar-estado
+
+Origen:
+- public/js/kanban.js usa fetch() cuando el usuario arrastra una tarjeta del
+  Kanban a otra columna.
+
+Por que usa echo json_encode:
+- Porque no es una navegacion normal ni un formulario tradicional.
+- Es una peticion asincrona desde JavaScript.
+- El navegador no necesita una pagina HTML nueva.
+- JavaScript necesita una respuesta estructurada para saber si mantiene el
+  movimiento de la tarjeta o si debe revertirlo.
+
+Flujo MVC JSON:
+1. La vista Kanban renderiza tarjetas con data-id y data-estado.
+2. kanban.js detecta el drop de la tarjeta.
+3. kanban.js envia fetch POST a /pipeline/cambiar-estado.
+4. Route::handleRoute() detecta POST /pipeline/cambiar-estado.
+5. Route llama a LeadController::cambiarEstadoKanban().
+6. El controlador inicia sesion.
+7. Establece header('Content-Type: application/json; charset=utf-8').
+8. Valida usuario, lead_id y estado.
+9. Llama a LeadModel para buscar y actualizar el lead.
+10. Crea historial y acciones automaticas si procede.
+11. Devuelve JSON con echo json_encode(...).
+12. kanban.js interpreta la respuesta.
+
+Respuestas JSON posibles:
+- Sin sesion:
+  http_response_code(401)
+  {"ok": false, "mensaje": "Debes iniciar sesion."}
+
+- Datos invalidos:
+  http_response_code(422)
+  {"ok": false, "mensaje": "Los datos enviados no son validos."}
+
+- Lead inexistente:
+  http_response_code(404)
+  {"ok": false, "mensaje": "No se ha encontrado el lead."}
+
+- Error al actualizar:
+  http_response_code(500)
+  {"ok": false, "mensaje": "No se ha podido actualizar el estado."}
+
+- Estado repetido:
+  {"ok": true, "mensaje": "El lead ya estaba en ese estado.",
+   "estadoAnterior": "...", "estadoNuevo": "..."}
+
+- Exito:
+  {"ok": true, "mensaje": "...", "estadoAnterior": "...",
+   "estadoNuevo": "...", "leadId": 123}
+
+Diferencia con self::view():
+- self::view() entrega HTML para una pantalla completa.
+- echo json_encode() entrega datos para que JavaScript actualice la pantalla
+  actual sin recargar.
+
+Diferencia con PRG:
+- PRG redirige despues de un POST de formulario.
+- JSON no redirige; responde dentro de la misma peticion fetch.
+
+
+6. METODOS MAS SENCILLOS
+========================
+
+6.1 LeadController::fechaFiltroValida(string $fecha): bool
+----------------------------------------------------------
+
+Caso de uso:
+- Validar filtros GET de fecha en el listado de leads.
+
+Ruta MVC:
+- No tiene ruta propia. Lo usa mostrarListado().
+
+Recibe:
+- $fecha en formato esperado Y-m-d.
+
+Devuelve:
+- true si DateTime puede crear la fecha y al formatearla sigue igual.
+- false si la fecha no es valida.
+
+Logica:
+- DateTime::createFromFormat('Y-m-d', $fecha).
+- Comprueba instancia DateTime.
+- Comprueba que format('Y-m-d') coincide con la entrada.
+
+GET/POST/firma:
+- Usa variable en la firma.
+- No lee $_GET ni $_POST directamente.
+
+
+6.2 LeadController::crearTareaAutomaticaObjecion(int $leadId, int $usuarioId): bool
+----------------------------------------------------------------------------------
+
+Caso de uso:
+- Crear una tarea automatica cuando un lead entra en estado Objeciones.
+
+Ruta MVC:
+- Helper interno usado por nuevoLead(), cambiarEstado(), actualizarLead() y
+  cambiarEstadoKanban().
+
+Recibe:
+- id del lead.
+- id del usuario que provoca el cambio.
+
+Devuelve:
+- bool devuelto por TareaModel::createObjecionAutomatica().
+
+Logica:
+- Instancia TareaModel.
+- Delega la creacion de la tarea en el modelo.
+
+
+6.3 LeadController::crearNotificacionGanado(int $leadId, int $usuarioId): bool
+------------------------------------------------------------------------------
+
+Caso de uso:
+- Crear notificaciones cuando un lead pasa a Ganado.
+
+Ruta MVC:
+- Helper interno usado por nuevoLead(), cambiarEstado(), actualizarLead() y
+  cambiarEstadoKanban().
+
+Recibe:
+- id del lead.
+- id del usuario origen.
+
+Devuelve:
+- bool devuelto por LeadModel::createGanadoNotificationForAll().
+
+Logica:
+- Instancia LeadModel.
+- Delega la creacion de notificaciones.
+
+
+6.4 TareaController::puedeGestionarTarea(array $tarea, int $usuarioId, bool $esAdmin): bool
+------------------------------------------------------------------------------------------
+
+Caso de uso:
+- Decidir si el usuario puede actualizar o eliminar una tarea.
+
+Ruta MVC:
+- Helper usado por actualizar() y eliminar().
+
+Recibe:
+- Array de tarea.
+- id del usuario actual.
+- booleano de admin.
+
+Devuelve:
+- true si es admin.
+- true si el usuario es asignado o creador de la tarea.
+- false en caso contrario.
+
+Metodos de array:
+- Usa acceso asociativo con null coalescing:
+  $tarea['usuario_asignado_id'] ?? 0.
+
+
+6.5 TareaController::getTextoInfoSolucion(string $solucionBloqueo, string $tipoBloqueo): string
+------------------------------------------------------------------------------------------------
+
+Caso de uso:
+- Generar texto orientativo para resolver objeciones.
+
+Ruta MVC:
+- Helper usado por resolverDescripcionTarea().
+
+Recibe:
+- Solucion elegida.
+- Tipo de bloqueo.
+
+Devuelve:
+- Texto explicativo.
+
+Logica:
+- Usa switch por solucion:
+  Reencuadre de valor, Facilidad y acompanamiento, Prueba o demostracion.
+- Si no coincide, devuelve un texto generico.
+
+
+6.6 TareaController::resolverDescripcionTarea(...): string
+----------------------------------------------------------
+
+Caso de uso:
+- Decidir descripcion final de una tarea antes de guardar o actualizar.
+
+Ruta MVC:
+- Helper usado por guardar() y actualizar().
+
+Recibe:
+- tipoActividad.
+- tipoBloqueo.
+- solucionBloqueo.
+- descripcionManual.
+
+Devuelve:
+- descripcionManual si no es Objeciones.
+- texto por defecto si falta solucion.
+- texto INFO generado si hay solucion.
+
+Logica:
+- Para tareas normales respeta lo escrito por el usuario.
+- Para Objeciones transforma bloqueo y solucion en descripcion operativa.
+
+
+7. METODOS GET Y RENDER DE VISTAS
+=================================
+
+7.1 LeadController::mostrarFormContacto(): void
+-----------------------------------------------
+
+Ruta:
+- GET /contacto
+
+Caso de uso:
+- Mostrar formulario publico de contacto.
+
+Recibe:
+- No recibe parametros de firma.
+- Lee flash de sesion si existe.
+
+Devuelve:
+- No retorna valor. Renderiza home/contacto_view.
+
+Logica:
+- Inicia sesion.
+- Lee mensaje flash.
+- Carga servicios desde LeadModel.
+- Pasa valores vacios para el formulario.
+
+Sesion:
+- Usa sesion para mensajes flash.
+- No exige usuario autenticado porque es formulario publico.
+
+self::view o PRG:
+- Usa self::view().
+
+
+7.2 LeadController::mostrarFormLead(): void
+-------------------------------------------
+
+Ruta:
+- GET /leads/nuevo
+
+Caso de uso:
+- Mostrar formulario interno para crear un lead.
+
+Recibe:
+- No recibe parametros.
+- Lee usuario autenticado via sesion.
+
+Devuelve:
+- Renderiza lead/lead_create_view.
+
+Logica:
+- Inicia sesion.
+- Exige autenticacion.
+- Carga listas desde LeadModel: servicios, prioridades, estados, responsables.
+- Pasa valores por defecto al formulario.
+
+Sesion:
+- Lee usuario para comprobar acceso.
+- Lee flash para mostrar mensajes.
+
+self::view o PRG:
+- Usa self::view().
+
+
+7.3 LeadController::mostrarDetalle(int $id): void
+-------------------------------------------------
+
+Ruta:
+- GET /leads/{id}
+
+Caso de uso:
+- Mostrar ficha de un lead, notas, historial y modo edicion opcional.
+
+Recibe:
+- $id desde la ruta.
+- $_GET['editar'] para activar modo edicion.
+
+Devuelve:
+- Renderiza lead/detalles_view.
+- Redirige a /panel si id o lead no son validos.
+
+Logica:
+- Valida id > 0.
+- Busca lead con findById().
+- Carga notas, historial, dias en panel y listas auxiliares.
+- Detecta modo edicion si editar=1.
+
+Validacion GET/firma:
+- $id llega por firma desde Route.
+- editar se valida comparando exactamente con '1'.
+
+Sesion:
+- Exige usuario autenticado.
+- Lee usuario para pasarlo a la vista.
+- Lee flash.
+
+self::view o PRG:
+- self::view() si todo va bien.
+- PRG/redireccion si hay error.
+
+
+7.4 LeadController::mostrarListado(): void
+------------------------------------------
+
+Ruta:
+- GET /leads/listado
+
+Caso de uso:
+- Mostrar listado filtrable de leads/contactos.
+
+Recibe:
+- Filtros desde $_GET:
+  usuario_id, fecha_desde, fecha_hasta, servicios, estado, origen.
+
+Devuelve:
+- Renderiza home/listado_view.
+
+Logica:
+- Inicia sesion y exige autenticacion.
+- Lee usuario y rol.
+- Si no es admin, fuerza usuario_id al usuario actual.
+- Carga listas validas desde LeadModel.
+- Construye $filtros.
+- Limpia filtros invalidos.
+- Valida fechas con fechaFiltroValida().
+- Si fecha_desde > fecha_hasta, intercambia ambas fechas.
+- Llama a getListadoFiltrado().
+
+Metodos de array:
+- is_array() para proteger datos enviados a vista.
+- in_array() para validar servicios, estados y origenes.
+- Desestructuracion para intercambiar fechas.
+
+self::view o PRG:
+- Usa self::view().
+
+
+7.5 TareaController::index(): void
+----------------------------------
+
+Ruta:
+- GET /tareas
+
+Caso de uso:
+- Mostrar vista principal de tareas.
+
+Recibe:
+- No recibe parametros.
+
+Devuelve:
+- Delega en renderIndex().
+
+Logica:
+- Inicia sesion.
+- Exige usuario autenticado.
+- Llama a renderIndex().
+
+self::view o PRG:
+- renderIndex() termina con self::view('home/tareas_view', ...).
+
+
+7.6 TareaController::renderIndex(array $extra = []): void
+---------------------------------------------------------
+
+Ruta:
+- No tiene ruta propia.
+- Se usa desde index(), guardar() y actualizar().
+
+Caso de uso:
+- Centralizar todos los datos que necesita tareas_view.
+
+Recibe:
+- $extra con datos opcionales:
+  mostrarFormulario, errores, datosForm, editarId, erroresEdicion, datosEdicion.
+- Tambien lee $_GET['editar'] como fallback.
+
+Devuelve:
+- Renderiza home/tareas_view.
+
+Logica:
+- Lee usuario de sesion.
+- Determina id y rol admin.
+- Carga tareas, usuarios, leads y catalogos desde TareaModel.
+- Consulta nuevas tareas asignadas.
+- Si hay nuevas asignadas, las marca como leidas.
+- Carga resumenes: bloqueos, estados, retrasadas, usuarios admin y proximos seguimientos.
+- Mezcla datos base con $extra para conservar errores/formularios.
+
+Metodos de array:
+- empty() para comprobar nuevas asignadas.
+- Null coalescing sobre $extra para valores por defecto.
+
+Sesion:
+- Lee usuario.
+- Lee mensajes flash.
+
+self::view o PRG:
+- Usa self::view().
+
+
+8. POST SIMPLES Y ACCIONES DIRECTAS
+===================================
+
+8.1 LeadController::nuevoContacto(): void
+-----------------------------------------
+
+Ruta:
+- POST /contacto
+
+Caso de uso:
+- Crear lead publico desde formulario web.
+
+Recibe:
+- $_POST['lead_nombre']
+- $_POST['email']
+- $_POST['telefono']
+- $_POST['servicios']
+- $_POST['indicaciones']
+
+Devuelve:
+- self::view() con errores si la validacion falla.
+- self::view() con error si falla create().
+- PRG a /contacto si se guarda bien.
+
+Validacion:
+- trim() para limpiar entradas.
+- lead_nombre, email, telefono y servicios obligatorios.
+- filter_var($email, FILTER_VALIDATE_EMAIL).
+
+Logica:
+- Crea lead con origen formulario_web.
+- Indicaciones, email y telefono vacios se guardan como null si procede.
+- Obtiene ultimo id.
+- Crea historial de alta si hay id.
+- Guarda mensaje flash de exito.
+- Redirige a /contacto.
+
+Sesion:
+- No exige login.
+- Usa flash para exito tras redireccion.
+
+
+8.2 LeadController::nuevaNota(int $id): void
+--------------------------------------------
+
+Ruta:
+- POST /leads/{id}/notas/guardar
+
+Caso de uso:
+- Registrar actividad o nota en un lead.
+
+Recibe:
+- $id desde ruta.
+- $_POST['tipo_actividad']
+- $_POST['contenido']
+- usuario desde sesion.
+
+Devuelve:
+- Redireccion a /panel o /leads/{id}.
+
+Validacion:
+- id > 0.
+- usuarioId > 0.
+- tipo_actividad debe estar en ['Llamada', 'Email', 'Cita presencial'].
+- contenido obligatorio.
+- lead debe existir.
+
+Logica:
+- Crea nota.
+- Actualiza ultimo_contacto.
+- Crea historial.
+- Guarda flash.
+- Redirige al detalle.
+
+Metodos de array:
+- in_array() para validar tipo de actividad.
+
+PRG:
+- Siempre redirige despues del POST.
+
+
+8.3 LeadController::eliminarLead(int $id): void
+-----------------------------------------------
+
+Ruta:
+- POST /leads/{id}/eliminar
+
+Caso de uso:
+- Eliminar un lead.
+
+Recibe:
+- $id desde ruta.
+- usuario desde sesion.
+
+Devuelve:
+- Redireccion a /panel o /leads/{id}.
+
+Validacion:
+- Requiere usuario autenticado.
+- Requiere rol admin.
+- id > 0.
+- lead existente.
+- delete() debe devolver true.
+
+Logica:
+- Si el usuario no es admin, bloquea la operacion.
+- Si el lead existe, llama a LeadModel::delete().
+- Guarda flash.
+- Redirige.
+
+Sesion:
+- Lee rol desde $_SESSION['usuario'].
+- Usa flash para resultado.
+
+PRG:
+- Si, siempre redirige.
+
+
+8.4 TareaController::eliminar(int $id): void
+--------------------------------------------
+
+Ruta:
+- POST /tareas/{id}/eliminar
+
+Caso de uso:
+- Eliminar una tarea.
+
+Recibe:
+- $id desde ruta.
+- usuario desde sesion.
+
+Devuelve:
+- Redireccion a /tareas.
+
+Validacion:
+- Tarea debe existir.
+- puedeGestionarTarea() debe permitir accion.
+- delete() debe devolver true.
+
+Logica:
+- Busca tarea.
+- Valida permisos.
+- Elimina tarea.
+- Registra historial en el lead asociado.
+- Guarda flash.
+- Redirige.
+
+PRG:
+- Si.
+
+
+9. POST DE COMPLEJIDAD MEDIA
+============================
+
+9.1 LeadController::cambiarEstado(int $id): void
+------------------------------------------------
+
+Ruta:
+- POST /leads/cambiar-estado/{id}
+
+Caso de uso:
+- Cambiar estado desde una pantalla HTML/formulario normal.
+
+Recibe:
+- $id desde ruta.
+- $_POST['estado'].
+- $_POST['volver_detalle'] opcional.
+- usuario desde sesion.
+
+Devuelve:
+- Redireccion a /panel o /leads/{id}.
+
+Validacion:
+- id > 0.
+- estado en LeadModel::getEstados().
+- lead existente.
+- updateEstado() correcto.
+
+Logica:
+- Lee estado anterior.
+- Actualiza estado.
+- Si cambia realmente, crea historial.
+- Si entra en Objeciones, crea tarea automatica.
+- Si entra en Ganado, crea notificacion.
+- Guarda flash adaptado al caso.
+- Si volver_detalle=1, redirige al detalle; si no, al panel.
+
+Metodos de array:
+- in_array() para validar estado.
+
+Sesion:
+- Lee usuario para historial.
+- Guarda flash para mostrar resultado tras redireccion.
+
+PRG:
+- Si.
+
+
+9.2 TareaController::guardar(): void
+------------------------------------
+
+Ruta:
+- POST /tareas/guardar
+
+Caso de uso:
+- Crear una tarea manual.
+
+Recibe:
+- $_POST['lead_id']
+- $_POST['usuario_asignado_id']
+- $_POST['tipo_actividad']
+- $_POST['tipo_bloqueo']
+- $_POST['solucion_bloqueo']
+- $_POST['descripcion']
+- $_POST['fecha_final']
+- $_POST['estado']
+
+Devuelve:
+- renderIndex() con errores si falla validacion.
+- Redireccion a /tareas si guarda o si falla persistencia.
+
+Validacion:
+- lead_id debe existir en getLeadInfo().
+- usuario_asignado_id debe existir y estar activo.
+- tipo_actividad debe pertenecer a getTiposActividad().
+- descripcion obligatoria salvo Objeciones.
+- fecha_final obligatoria y DateTime Y-m-d valida.
+- estado debe pertenecer a getEstadosTarea().
+- Si es Objeciones, el lead debe estar en estado Objeciones.
+- tipo_bloqueo y solucion_bloqueo deben pertenecer a sus listas.
+
+Logica:
+- Construye $datosForm para repintar la vista si hay errores.
+- Si hay errores, llama renderIndex() con mostrarFormulario=true.
+- Resuelve descripcion final.
+- Convierte fecha a formato BD con " 00:00:00".
+- Crea tarea.
+- Registra historial en el lead.
+- Guarda flash y redirige.
+
+Metodos de array:
+- in_array() para catalogos.
+- empty() para errores.
+- Arrays asociativos para $errores, $datosForm y datos de create().
+
+self::view o PRG:
+- renderIndex()/self::view si hay errores de validacion.
+- PRG si se guarda o si falla la persistencia.
+
+
+9.3 TareaController::actualizar(int $id): void
+----------------------------------------------
+
+Ruta:
+- POST /tareas/{id}/actualizar
+
+Caso de uso:
+- Editar descripcion, fecha, estado y datos de objecion de una tarea.
+
+Recibe:
+- $id desde ruta.
+- $_POST['descripcion']
+- $_POST['fecha_final']
+- $_POST['estado']
+- $_POST['tipo_bloqueo']
+- $_POST['solucion_bloqueo']
+
+Devuelve:
+- renderIndex() con errores.
+- Redireccion a /tareas.
+
+Validacion:
+- Tarea debe existir.
+- Usuario debe poder gestionarla.
+- descripcion obligatoria si no es Objeciones.
+- fecha_final obligatoria y valida.
+- estado en getEstadosTarea().
+- Si la tarea es Objeciones, bloqueo y solucion validos.
+
+Logica:
+- Busca tarea.
+- Valida permisos.
+- Construye $datosEdicion para repintar formulario.
+- Si hay errores, renderIndex() con editarId.
+- Resuelve descripcion final.
+- Actualiza tarea.
+- Crea historial en lead.
+- Guarda flash y redirige.
+
+Metodos de array:
+- in_array() para estados, bloqueos y soluciones.
+- empty() para errores.
+- Arrays asociativos para datos de edicion y update().
+
+self::view o PRG:
+- renderIndex()/self::view si hay errores de validacion.
+- PRG si actualiza o falla persistencia.
+
+
+10. POST AVANZADOS DE LEADS
+===========================
+
+10.1 LeadController::nuevoLead(): void
+--------------------------------------
+
+Ruta:
+- POST /leads/guardar
+
+Caso de uso:
+- Crear lead desde la aplicacion interna.
+
+Recibe:
+- $_POST['lead_nombre']
+- $_POST['email']
+- $_POST['telefono']
+- $_POST['servicios']
+- $_POST['indicaciones']
+- $_POST['prioridad']
+- $_POST['valor']
+- $_POST['estado']
+- $_POST['responsable_id']
+
+Devuelve:
+- self::view() con errores si falla validacion.
+- Redireccion a /leads/nuevo si falla persistencia.
+- Redireccion a /panel si se guarda bien.
+
+Validacion:
+- lead_nombre obligatorio.
+- email opcional pero con formato valido.
+- servicios obligatorio.
+- prioridad en getPrioridades().
+- estado en getEstados().
+- responsable_id en ids de getResponsables().
+- valor numerico positivo si se informa.
+
+Logica:
+- Lee usuario actual para historial.
+- Valida datos.
+- Usa array_map() para extraer ids de responsables.
+- Crea lead con origen app_interna.
+- Crea historial de alta.
+- Si nace en Objeciones, crea tarea automatica.
+- Si nace en Ganado, crea notificacion.
+- Guarda flash contextual.
+- Redirige al panel.
+
+Metodos de array:
+- in_array() para listas validas.
+- array_map() para ids de responsables.
+- empty() para errores.
+- Arrays asociativos para vista, create() e historial.
+
+self::view o PRG:
+- self::view() si hay errores de validacion.
+- PRG tras guardar o fallo de persistencia.
+
+
+10.2 LeadController::actualizarLead(int $id): void
+--------------------------------------------------
+
+Ruta:
+- POST /leads/{id}/actualizar
+
+Caso de uso:
+- Actualizar ficha completa de un lead.
+
+Recibe:
+- $id desde ruta.
+- POST comun:
+  lead_nombre, email, telefono, servicios, prioridad, valor, estado,
+  responsable_id.
+- POST solo admin:
+  lead_score, ultimo_contacto, indicaciones, origen, created_at.
+
+Devuelve:
+- self::view('lead/detalles_view') con errores.
+- Redireccion a /leads/{id}?editar=1 si falla persistencia.
+- Redireccion a /leads/{id} si actualiza bien.
+
+Validacion:
+- id > 0.
+- lead existente.
+- nombre obligatorio.
+- email opcional con formato valido.
+- servicios obligatorio y dentro de getServicios().
+- prioridad dentro de getPrioridades().
+- estado dentro de getEstados().
+- responsable_id dentro de ids de getResponsables().
+- valor numerico positivo si se informa.
+- Si admin:
+  - lead_score entero no negativo con ctype_digit().
+  - ultimo_contacto DateTime Y-m-d\TH:i si se informa.
+  - origen en ['formulario_web', 'app_interna'].
+  - created_at obligatorio y DateTime Y-m-d\TH:i.
+
+Logica:
+- Lee lead actual.
+- Lee usuario y rol.
+- Valida campos comunes.
+- Valida campos admin solo si corresponde.
+- Prepara $leadForm para repintar errores.
+- Si hay errores, recarga notas, historial, dias y listas y muestra vista.
+- Normaliza fechas para base de datos cambiando T por espacio y anadiendo :00.
+- Construye $datosUpdate.
+- Actualiza modelo.
+- Compara campos anteriores y nuevos.
+- Crea historial de cambio de estado si cambia estado.
+- Crea historial de campos modificados si hay cambios.
+- Si entra en Objeciones, crea tarea automatica.
+- Si entra en Ganado, crea notificacion.
+- Guarda flash contextual.
+- Redirige al detalle.
+
+Metodos de array y bucles:
+- array_map() para ids de responsables.
+- in_array() para servicios, prioridades, estados y origen.
+- foreach sobre $mapaComparacion:
+  - Recorre cada campo controlado.
+  - Compara $leadActual[$campo] con $datosUpdate[$campo].
+  - Si difiere, anade texto humano a $camposModificados.
+- implode(', ', $camposModificados):
+  - Genera descripcion de historial.
+
+self::view o PRG:
+- self::view() si hay errores de validacion.
+- PRG si falla persistencia o si actualiza bien.
+
+
+10.3 LeadController::cambiarEstadoKanban(): void
+------------------------------------------------
+
+Ruta:
+- POST /pipeline/cambiar-estado
+
+Caso de uso:
+- Actualizar estado de un lead desde drag and drop del Kanban sin recargar.
+
+Recibe:
+- $_POST['lead_id']
+- $_POST['estado']
+- usuario desde sesion.
+
+Devuelve:
+- JSON con echo json_encode().
+
+Validacion:
+- Si no hay usuario en sesion, devuelve 401.
+- lead_id debe ser > 0.
+- estado debe estar en LeadModel::getEstados().
+- lead debe existir.
+- updateEstado() debe devolver true.
+
+Logica:
+- Declara Content-Type JSON.
+- Valida sesion manualmente en vez de usar usuarioNoAutenticado(), porque una
+  redireccion a login no serviria para fetch.
+- Si falla, responde JSON y codigo HTTP.
+- Si el estado es el mismo, responde ok sin actualizar.
+- Actualiza estado.
+- Crea historial.
+- Si entra en Objeciones, crea tarea automatica.
+- Si entra en Ganado, crea notificacion.
+- Devuelve JSON para que kanban.js decida si mantiene o revierte la tarjeta.
+
+Por que no usa PRG:
+- Porque el cliente es fetch(), no un formulario HTML.
+- No se debe redirigir; se deben entregar datos JSON.
+
+Por que no usa self::view:
+- No necesita HTML.
+- La vista ya esta cargada en el navegador.
+- JavaScript solo necesita estado de exito/error y mensaje.
+
+Metodos de array:
+- in_array() para validar estado.
+- Arrays asociativos para json_encode().
+
+
+11. RESUMEN DE RUTAS Y METODOS HTTP
+===================================
+
+LeadController:
+- GET /contacto -> mostrarFormContacto()
+- POST /contacto -> nuevoContacto()
+- GET /leads/nuevo -> mostrarFormLead()
+- POST /leads/guardar -> nuevoLead()
+- POST /leads/cambiar-estado/{id} -> cambiarEstado(int $id)
+- GET /leads/{id} -> mostrarDetalle(int $id)
+- POST /leads/{id}/notas/guardar -> nuevaNota(int $id)
+- POST /leads/{id}/actualizar -> actualizarLead(int $id)
+- POST /leads/{id}/eliminar -> eliminarLead(int $id)
+- POST /pipeline/cambiar-estado -> cambiarEstadoKanban()
+- GET /leads/listado -> mostrarListado()
+
+TareaController:
+- GET /tareas -> index()
+- POST /tareas/guardar -> guardar()
+- POST /tareas/{id}/actualizar -> actualizar(int $id)
+- POST /tareas/{id}/eliminar -> eliminar(int $id)
+
+
+12. CONCLUSION
+==============
+
+LeadController concentra los casos de uso del ciclo de vida del lead: entrada
+publica, alta interna, cambio de estado, detalle, notas, edicion, borrado,
+listado y actualizacion asincrona desde Kanban.
+
+TareaController concentra los casos de uso de seguimiento: listado operativo,
+creacion, edicion, borrado, permisos por usuario y apoyo especifico para
+objeciones.
+
+La regla general del proyecto es clara:
+- GET renderiza vistas.
+- POST de formulario valida, guarda flash y redirige con PRG.
+- POST con fetch devuelve JSON con echo json_encode().
+- self::view() se usa cuando hay que mostrar HTML en la misma request.
+- La sesion se usa para autenticacion y flashes, no para almacenar datos de
+  negocio completos.

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const panelApp = document.getElementById('panelApp');
-    const botonMenu = document.getElementById('botonMenu');
-    const fondoMenu = document.getElementById('fondoMenu');
+    const panelApp = document.querySelector('#panelApp');
+    const botonMenu = document.querySelector('#botonMenu');
+    const fondoMenu = document.querySelector('#fondoMenu');
 
     if (botonMenu && panelApp) {
         botonMenu.addEventListener('click', function () {

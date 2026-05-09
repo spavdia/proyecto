@@ -42,6 +42,7 @@
 }
 
 .hero {
+    width: min(1520px, calc(100% - 32px));
     background-color: #1111;
     border-radius: 28px;
     padding: 48px 24px;
@@ -76,7 +77,8 @@
 
 /* VISOR */
 .visor {
-    max-width: 960px;
+    width: 100%;
+    max-width: none;
     margin: 0 auto;
 }
 
@@ -95,10 +97,13 @@
 }
 
 .diapositiva img {
+    display: block;
     width: 100%;
-    height: min(420px, 48vw);
-    object-fit: cover;
-    background: #dbe1f3;
+    height: auto;
+    max-height: none;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    background: #0f172a;
 }
 
 /* TEXTO DIAPOSITIVA */

@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const app = document.getElementById('kanbanApp');
-    const tablero = document.getElementById('kanbanTablero');
-    const botonMenu = document.getElementById('botonMenu');
-    const fondoMenu = document.getElementById('fondoMenu');
-    const mensaje = document.getElementById('mensajeKanban');
-    const botonConfig = document.getElementById('botonConfigKanban');
-    const panelConfig = document.getElementById('panelConfigKanban');
+    const app = document.querySelector('#kanbanApp');
+    const tablero = document.querySelector('#kanbanTablero');
+    const botonMenu = document.querySelector('#botonMenu');
+    const fondoMenu = document.querySelector('#fondoMenu');
+    const mensaje = document.querySelector('#mensajeKanban');
+    const botonConfig = document.querySelector('#botonConfigKanban');
+    const panelConfig = document.querySelector('#panelConfigKanban');
 
     if (!app || !tablero) {
         return;

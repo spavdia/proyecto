@@ -2,7 +2,6 @@
 
 namespace Sergio\App\Controllers;
 
-use Sergio\App\model\LoginModel;
 use Sergio\Lib\SessionManager;
 use Sergio\App\models\LeadModel;
 use Sergio\App\models\TareaModel;
@@ -1005,7 +1004,7 @@ class LeadController extends Controller
         return $tm->createObjecionAutomatica($leadId, $usuarioId);
     }
 
-    //Contactos
+    //Listados
     public static function mostrarListado(): void
     {
         SessionManager::iniciarSesion();
@@ -1082,6 +1081,7 @@ class LeadController extends Controller
         ]);
     }
 
+    /** --------HEALPERS ------------------*/
     private static function fechaFiltroValida(string $fecha): bool
     {
         $fechaObj = \DateTime::createFromFormat('Y-m-d', $fecha);
@@ -1097,22 +1097,4 @@ class LeadController extends Controller
     }
 
 
-    /**FILTROS por BBDD :
-     * 
-     * 
-     * curso  
-        mes  
-        responsable_id  
-        estado  
-
-        CAMPOS
-        id  
-        lead_nombre  
-        estado  
-        servicios  
-        responsable_nombre  
-        ultimo_contacto  
-        valor  
-
-     */
 }

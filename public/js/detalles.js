@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const app = document.getElementById('panelApp') || document.querySelector('.panel');
-    const botonMenu = document.getElementById('botonMenu');
-    const fondoMenu = document.getElementById('fondoMenu');
+    const app = document.querySelector('#panelApp') || document.querySelector('.panel');
+    const botonMenu = document.querySelector('#botonMenu');
+    const fondoMenu = document.querySelector('#fondoMenu');
 
     if (!app || !botonMenu || !fondoMenu) {
         return;

@@ -1033,19 +1033,6 @@ body {
     font-weight: 700;
 }
 
-.celda-lead-tarea.lead-objecion {
-    background: #fef3c7;
-    color: #92400e;
-    border-left: 4px solid #f59e0b;
-    border-radius: 10px 0 0 10px;
-}
-
-.dark .celda-lead-tarea.lead-objecion {
-    background: #78350f;
-    color: #fde68a;
-    border-left: 4px solid #f59e0b;
-}
-
 .texto-nota {
     max-width: 360px;
     white-space: normal;

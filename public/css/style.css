@@ -314,6 +314,16 @@ button[aria-disabled="true"] {
     color: var(--color-texto-invertido);
 }
 
+.menu .menu-enlace.menu-enlace-desactivado,
+.menu .menu-enlace.menu-enlace-desactivado:hover,
+.menu .menu-enlace.menu-enlace-desactivado:focus {
+    background: transparent;
+    color: var(--color-texto-suave);
+    cursor: default;
+    opacity: 0.65;
+    pointer-events: none;
+}
+
 .fondo-menu {
     display: none;
 }

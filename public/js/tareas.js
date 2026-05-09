@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const app = document.getElementById('tareasApp');
-    const botonMenu = document.getElementById('botonMenu');
-    const fondoMenu = document.getElementById('fondoMenu');
-    const botonNuevaTarea = document.getElementById('botonNuevaTarea');
-    const botonCerrarFormulario = document.getElementById('botonCerrarFormulario');
-    const panelFormulario = document.getElementById('panelFormularioTarea');
-    const tareasLayout = document.getElementById('tareasLayout');
-    const selectTipoActividad = document.getElementById('tipo_actividad');
-    const selectLead = document.getElementById('lead_id');
-    const bloqueObjeciones = document.getElementById('bloqueObjecionesFormulario');
+    const app = document.querySelector('#tareasApp');
+    const botonMenu = document.querySelector('#botonMenu');
+    const fondoMenu = document.querySelector('#fondoMenu');
+    const botonNuevaTarea = document.querySelector('#botonNuevaTarea');
+    const botonCerrarFormulario = document.querySelector('#botonCerrarFormulario');
+    const panelFormulario = document.querySelector('#panelFormularioTarea');
+    const tareasLayout = document.querySelector('#tareasLayout');
+    const selectTipoActividad = document.querySelector('#tipo_actividad');
+    const selectLead = document.querySelector('#lead_id');
+    const bloqueObjeciones = document.querySelector('#bloqueObjecionesFormulario');
 
     function abrirMenu() {
         if (!app || !botonMenu) {
